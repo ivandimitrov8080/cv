@@ -20,6 +20,17 @@ type Experience = {
   feedback?: string
 }
 
+type Education = {
+  institution: string
+  location: string
+  degree: string
+  field: string
+  from: Date
+  to: Date
+  summary: string
+  links?: A[]
+}
+
 const tw = createTw({
 });
 
@@ -40,7 +51,7 @@ const globePath = "M6.487 1.746c0 4.192 3.592 1.66 4.592 5.754 0 .828 1 1.5 2 1.
 
 const divider =
   <View style={tw("w-full mt-4")}>
-    <View style={tw("w-full border-slate-50 border-b-[.02px]")}></View>
+    <View style={tw("w-full border-slate-50 border-b-[.2px]")}></View>
   </View>
 
 
@@ -266,6 +277,42 @@ const experience = ({
     </View>
   </View>
 
+const education = ({
+  institution,
+  location,
+  degree,
+  field,
+  from,
+  to,
+  summary,
+  links
+}: Education) =>
+  <View style={tw(sectionStyles)}>
+    <View style={tw("w-full flex flex-col mt-2 border-2 border-slate-50 p-4 rounded-2xl")}>
+      <View style={tw("flex flex-row flex-wrap gap-1")}>
+        <Text>Studied {degree} of {field}</Text>
+        <Text>at</Text>
+        <Text>{institution}, {location}</Text>
+        <Text>from</Text>
+        <Text>{from.toDateString()}</Text>
+        <Text>to</Text>
+        <Text>{to.toDateString()}</Text>
+      </View>
+      {links && (
+        <View style={tw("flex flex-row flex-wrap w-full gap-2 justify-center")}>
+          {links.map(l => (
+            <View key={l.href} style={tw("flex flex-row gap-2")}>
+              {svg([linkPath])}
+              <Text style={tw("text-sm")}>{l.text}</Text>
+            </View>
+          ))}
+        </View>
+      )}
+      <View style={tw("m-4")}>
+        <Text>{summary}</Text>
+      </View>
+    </View>
+  </View>
 const Links = () => (
   <View style={tw("flex flex-row gap-4 w-full text-sm justify-center p-4")}>
     {github}
@@ -371,6 +418,24 @@ const CV = () => (
           to: new Date("May 2020"),
           description: "Developed a full-stack web + android app helping students book exams, browse resources, see events, news and more.",
           technologies: cnetTech
+        })}
+      </View>
+    </Page>
+    <Page
+      size="A4"
+      style={tw(pageStyles)}
+    >
+      <View style={tw("my-2")}>
+        {divider}
+        <Text style={tw("text-2xl mt-2")}>Education</Text>
+        {education({
+          institution: "South-West University 'Neofit Rilski'",
+          location: "Blagoevgrad, Bulgaria",
+          degree: "Bachelor's",
+          field: "Electronics",
+          from: new Date("Sep 2016"),
+          to: new Date("Jun 2018"),
+          summary: "This is an engineering degree focused on the science of electronics and electrical engineering. It studies the physical properties of individual electrons and the forces that take place when current is flowing through a circuit. Those same forces make computers possible through carefully engineered logic gates built with transistors."
         })}
       </View>
     </Page>
