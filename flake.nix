@@ -22,11 +22,23 @@
         nativeBuildInputs = with pkgs; [
           nodejs_20
           bun
+          inotify-tools
         ];
+        shellHook = ''
+          echo "$$" > ./pid
+          monitor() {
+            while true; do
+              inotifywait -e modify ${pname}.tsx > /dev/null 2>&1
+              make
+              pkill -HUP mupdf
+            done
+          }
+          monitor > /dev/null 2>&1 &
+        '';
       in
       {
         devShells.default = pkgs.mkShell {
-          inherit pname buildInputs nativeBuildInputs;
+          inherit pname buildInputs nativeBuildInputs shellHook;
         };
         packages.default = pkgs.stdenv.mkDerivation {
           inherit buildInputs nativeBuildInputs pname version src;
