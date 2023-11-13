@@ -17,6 +17,7 @@ type Experience = {
   description: string
   technologies: string[]
   links?: A[]
+  feedback?: string
 }
 
 const tw = createTw({
@@ -79,8 +80,6 @@ const tech = {
   ],
   web: [
     "JavaScript",
-    "TypeScript",
-    "React",
     "HTML",
     "CSS"
   ],
@@ -145,10 +144,20 @@ const tech = {
     "html2text",
     "Poetry",
   ],
+  javascript: [
+    "TypeScript",
+    "React",
+  ],
   nextjs: [
     "NextJS 12",
     "NextJS 13",
     "NextJS 14",
+    "NextAuth",
+    "Prisma",
+    "Vercel",
+    "Vercel Postgres",
+    "Formik",
+    "Framer Motion",
   ],
   styles: [
     "CSS",
@@ -156,6 +165,8 @@ const tech = {
     "TailwindCSS",
     "DaisyUI",
     "tailwind-scrollbar",
+    "FontAwesome",
+    "nProgress",
   ],
   general: [
     "Markdown",
@@ -194,8 +205,12 @@ const hoi2Tech: string[] = filterKeysIncl(techKeys,
   ["python", "nextjs", "styles", "linux", "git", "general"]
 )
   // @ts-ignore
-  .map(e => tech[e]).flat().concat(["Wix"])
-
+  .map(e => tech[e]).flat().concat(["Wix", "Fuse.js"])
+const stepsyTech: string[] = filterKeysIncl(techKeys,
+  ["nextjs", "styles", "linux", "git", "general"]
+)
+  // @ts-ignore
+  .map(e => tech[e]).flat().concat(["googleapis", "Fuse.js", "Interact.js"])
 
 const experience = ({
   company,
@@ -205,7 +220,8 @@ const experience = ({
   to,
   description,
   technologies,
-  links
+  links,
+  feedback
 }: Experience) =>
   <View style={tw(sectionStyles)}>
     <View style={tw("w-full flex flex-col mt-2 border-2 border-slate-50 p-4 rounded-2xl")}>
@@ -231,7 +247,12 @@ const experience = ({
       <View style={tw("m-4")}>
         <Text>{description}</Text>
       </View>
-      <View style={tw("flex flex-row flex-wrap")}>
+      {feedback && (
+        <View style={tw("w-full m-auto mb-1")}>
+          <Text>Result: "{feedback}"</Text>
+        </View>
+      )}
+      <View style={tw("flex flex-row flex-wrap m-2")}>
         {technologies.map(t => (
           <View key={t} style={tw("flex flex-row")}>
             <View style={tw("border-2 border-teal-200 h-1 mx-1 mt-1 rounded-full")}></View>
@@ -273,17 +294,48 @@ const CV = () => (
       style={tw(pageStyles)}>
       <Intro />
       {divider}
-      <Text style={tw("text-3xl mt-2")}>Experience</Text>
+      <Text style={tw("text-2xl mt-2")}>Experience</Text>
       <View style={tw("my-auto")}>
+        {experience({
+          company: "N/A",
+          position: "Freelance Systems Administrator",
+          location: "UK",
+          from: new Date("21 Sep 2023"),
+          to: new Date("5 Nov 2023"),
+          description: "Diagnosed and analyzed a faulty LUKS encrypted drive on a remote server.",
+          technologies: tech.linux,
+          feedback: "Ivan was great to work with. Bought his own ideas and expertise, and workshopped a solution with me. Has a wealth of knowledge and I'd very happily work with him again."
+        })}
+        {experience({
+          company: "Stepsy",
+          position: "Freelance Full Stack Software Developer",
+          location: "Estonia",
+          from: new Date("29 Jul 2023"),
+          to: new Date("5 Nov 2023"),
+          description: "Created a multi-tenant knowledge base website based on Google APIs",
+          technologies: stepsyTech,
+          links: [
+            { text: "Case Study", href: "https://www.idimitrov.dev/c/cases/stepsy.wiki.md" }
+          ],
+          feedback: "Great experience working with Ivan! Ready to implement your vision, also advises on how it should be done."
+        })}
         {experience({
           company: "HOI 2 Bunker",
           position: "Freelance Full Stack Software Developer",
           location: "UK",
           from: new Date("22 Jun 2023"),
           to: new Date("27 Jun 2023"),
-          description: "Scraped an old wiki website with over 500 pages and created a new static site generated using Markdown.",
-          technologies: hoi2Tech
+          description: "Scraped an old wiki website with over 500 pages and created a new static site generated using Markdown and NextJS.",
+          technologies: hoi2Tech,
+          feedback: "Ivan went above and beyond to make sure I was happy with the final result"
         })}
+      </View>
+    </Page>
+    <Page
+      size="A4"
+      style={tw(pageStyles)}
+    >
+      <View style={tw("my-auto")}>
         {experience({
           company: "North Concepts",
           position: "Technical Writer for Java Data Pipeline Library",
@@ -291,7 +343,8 @@ const CV = () => (
           from: new Date("25 May 2023"),
           to: new Date("20 Jun 2023"),
           description: "Wrote technical documentation and content for the DataPipeline library by NorthConcepts.",
-          technologies: ncTech
+          technologies: ncTech,
+          feedback: "Ivan is a talented developer and was able to understand and write about our developer framework without difficulty."
         })}
         {experience({
           company: "RA Creative",
@@ -307,13 +360,6 @@ const CV = () => (
             { text: "Wells Fargo", href: "https://www.wellsfargo.com/" },
           ]
         })}
-      </View>
-    </Page>
-    <Page
-      size="A4"
-      style={tw(pageStyles)}
-    >
-      <View style={tw("my-auto")}>
         {experience({
           company: "Central Net",
           position: "Full Stack + Mobile Software Developer",
