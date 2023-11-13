@@ -105,6 +105,9 @@ const tech = {
     "Monit",
     "CLI",
     "pandoc",
+    "LUKS",
+    "hexdump",
+    "dd",
   ],
   git: [
     "git",
