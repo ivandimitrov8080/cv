@@ -41,6 +41,14 @@ type Education = {
   links?: A[];
 };
 
+type Certificate = {
+  name: string;
+  issuer: string;
+  description: string;
+  date: Date;
+  links?: A[];
+};
+
 const tech = {
   android: ["Android", "Android Studio"],
   java: [
@@ -276,6 +284,46 @@ const education = ({
   </View>
 );
 
+const certificate = ({
+  name,
+  issuer,
+  description,
+  date,
+  links
+}: Certificate) => (
+  <View style={tw("w-full flex flex-col")}>
+    <View
+      style={tw(
+        "w-full flex flex-col mt-2 border-2 border-slate-50 p-4 rounded-2xl"
+      )}
+    >
+      <View style={tw("flex flex-row flex-wrap gap-1")}>
+        <Text>
+          {name}
+        </Text>
+        <Text>from</Text>
+        <Text>
+          {issuer}
+        </Text>
+        <Text>on</Text>
+        <Text>{date.toDateString()}</Text>
+      </View>
+      {links && (
+        <View style={tw("flex flex-row flex-wrap w-full gap-2 justify-center")}>
+          {links.map((l) => (
+            <View key={l.href} style={tw("flex flex-row gap-2")}>
+              {link(l)}
+            </View>
+          ))}
+        </View>
+      )}
+      <View style={tw("m-4")}>
+        <Text>{description}</Text>
+      </View>
+    </View>
+  </View>
+);
+
 const link = ({ text, href, icon }: A) => (
   <Link src={href} style={tw("no-underline text-slate-50 flex flex-row gap-1")}>
     {icon || svg.link}
@@ -446,7 +494,7 @@ const CV = () => (
       </View>
     </Page>
     <Page size="A4" style={pageStyles}>
-      <View style={tw("my-2")}>
+      <View style={tw("my-auto")}>
         {divider}
         <Text style={tw("text-2xl mt-2")}>Education</Text>
         {education({
@@ -458,6 +506,28 @@ const CV = () => (
           to: new Date("Jun 2018"),
           summary:
             "This is an engineering degree focused on the science of electronics and electrical engineering. It studies the physical properties of individual electrons and the forces that take place when current is flowing through a circuit. Those same forces make computers possible through carefully engineered logic gates built with transistors.",
+        })}
+        {divider}
+        <Text style={tw("text-2xl mt-2")}>Certificates</Text>
+        {certificate({
+          name: "Oracle Certified Professional, Java SE 8 Programmer",
+          issuer: "Oracle",
+          description: "An Oracle Certified Professional, Java SE 8 Programmer has validated their Java development skills by answering challenging, real-world, scenario-based questions that measure problem solving skills using Java code.",
+          date: new Date("19 May 2020"),
+          links: [{
+            text: "Credly",
+            href: "https://www.credly.com/badges/281fbd5f-ca29-4235-b023-a9b93af2f6c5/public_url",
+          }]
+        })}
+        {certificate({
+          name: "Oracle Certified Associate, Java SE 8 Programmer",
+          issuer: "Oracle",
+          description: "An Oracle Certified Associate, Java SE 8 Programmer has demonstrated knowledge of object-oriented concepts, the Java programming language and general knowledge of Java platforms and technologies.",
+          date: new Date("17 Mar 2020"),
+          links: [{
+            text: "Credly",
+            href: "https://www.credly.com/badges/910f311b-0f7f-4911-b945-5ded663408ec/public_url",
+          }]
         })}
       </View>
     </Page>
