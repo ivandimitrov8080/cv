@@ -470,8 +470,8 @@ const CV = () => (
           technologies: skillsInverted(["dataIntegration", "python", "nextjs"]),
           links: [
             { text: "RA Creative", href: "https://racreative.co.uk/" },
-            { text: "Parcel Lab", href: "https://parcellab.com/" },
-            { text: "Wells Fargo", href: "https://www.wellsfargo.com/" },
+            { text: "Parcel Lab case study", href: "https://www.idimitrov.dev/c/cases/parcellab.md" },
+            { text: "Wells Fargo case study", href: "https://www.idimitrov.dev/c/cases/wellsfargo.md" },
           ],
         })}
         {experience({
