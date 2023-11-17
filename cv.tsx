@@ -206,7 +206,7 @@ const experience = ({
         <Text>from</Text>
         <Text>{from.toDateString()}</Text>
         <Text>to</Text>
-        <Text>{to.toDateString()}</Text>
+        <Text>{to > new Date() ? "present" : to.toDateString()}</Text>
       </View>
       {links && (
         <View style={tw("flex flex-row flex-wrap w-full gap-2 justify-center")}>
@@ -278,7 +278,7 @@ const education = ({
         </View>
       )}
       <View style={tw("m-4")}>
-        <Text>{summary}</Text>
+        <Text style={tw("text-md")}>{summary}</Text>
       </View>
     </View>
   </View>
@@ -289,7 +289,7 @@ const certificate = ({
   issuer,
   description,
   date,
-  links
+  links,
 }: Certificate) => (
   <View style={tw("w-full flex flex-col")}>
     <View
@@ -298,13 +298,9 @@ const certificate = ({
       )}
     >
       <View style={tw("flex flex-row flex-wrap gap-1")}>
-        <Text>
-          {name}
-        </Text>
+        <Text>{name}</Text>
         <Text>from</Text>
-        <Text>
-          {issuer}
-        </Text>
+        <Text>{issuer}</Text>
         <Text>on</Text>
         <Text>{date.toDateString()}</Text>
       </View>
@@ -318,7 +314,7 @@ const certificate = ({
         </View>
       )}
       <View style={tw("m-4")}>
-        <Text>{description}</Text>
+        <Text style={tw("text-md")}>{description}</Text>
       </View>
     </View>
   </View>
@@ -387,16 +383,28 @@ const CV = () => (
       <Text style={tw("text-2xl mt-2")}>Experience</Text>
       <View style={tw("my-auto")}>
         {experience({
-          company: "N/A",
-          position: "Freelance Systems Administrator",
-          location: "UK",
-          from: new Date("21 Sep 2023"),
-          to: new Date("5 Nov 2023"),
+          company: "idimitrov.dev",
+          position: "Software Developer / Owner",
+          location: "Worldwide",
+          from: new Date("2023"),
+          to: new Date("9999"),
           description:
-            "Diagnosed and analyzed a faulty LUKS encrypted drive on a remote server.",
-          technologies: [...tech.linux],
-          feedback:
-            "Ivan was great to work with. Bought his own ideas and expertise, and workshopped a solution with me. Has a wealth of knowledge and I'd very happily work with him again.",
+            "This is my software consulting and development business. Please head over to my resume website or Upwork to learn more.",
+          technologies: [
+            "Business development",
+            "Software Development",
+            "Communication",
+          ],
+          links: [
+            {
+              text: "Upwork",
+              href: "https://www.upwork.com/freelancers/idimitrov",
+            },
+            {
+              text: "Resume",
+              href: "https://www.idimitrov.dev/cases",
+            },
+          ],
         })}
         {experience({
           company: "Stepsy",
@@ -423,43 +431,6 @@ const CV = () => (
             "Great experience working with Ivan! Ready to implement your vision, also advises on how it should be done.",
         })}
         {experience({
-          company: "HOI 2 Bunker",
-          position: "Freelance Full Stack Software Developer",
-          location: "UK",
-          from: new Date("22 Jun 2023"),
-          to: new Date("27 Jun 2023"),
-          description:
-            "Scraped an old wiki website with over 500 pages and created a new static site generated using Markdown and NextJS.",
-          technologies: skills([
-            "python",
-            "nextjs",
-            "styles",
-            "linux",
-            "git",
-            "general",
-          ]),
-          feedback:
-            "Ivan went above and beyond to make sure I was happy with the final result",
-        })}
-      </View>
-    </Page>
-    <Page size="A4" style={pageStyles}>
-      <View style={tw("my-auto")}>
-        {experience({
-          company: "North Concepts",
-          position: "Technical Writer for Java Data Pipeline Library",
-          location: "Canada",
-          from: new Date("25 May 2023"),
-          to: new Date("20 Jun 2023"),
-          description:
-            "Wrote technical documentation and content for the DataPipeline library by NorthConcepts.",
-          technologies: skills(["java", "dataIntegration", "git"]).concat(
-            "WordPress"
-          ),
-          feedback:
-            "Ivan is a talented developer and was able to understand and write about our developer framework without difficulty.",
-        })}
-        {experience({
           company: "RA Creative",
           position: "Full Stack Software Developer",
           location: "Nottingham, UK",
@@ -470,10 +441,20 @@ const CV = () => (
           technologies: skillsInverted(["dataIntegration", "python", "nextjs"]),
           links: [
             { text: "RA Creative", href: "https://racreative.co.uk/" },
-            { text: "Parcel Lab case study", href: "https://www.idimitrov.dev/c/cases/parcellab.md" },
-            { text: "Wells Fargo case study", href: "https://www.idimitrov.dev/c/cases/wellsfargo.md" },
+            {
+              text: "Parcel Lab case study",
+              href: "https://www.idimitrov.dev/c/cases/parcellab.md",
+            },
+            {
+              text: "Wells Fargo case study",
+              href: "https://www.idimitrov.dev/c/cases/wellsfargo.md",
+            },
           ],
         })}
+      </View>
+    </Page>
+    <Page size="A4" style={pageStyles}>
+      <View style={tw("my-auto")}>
         {experience({
           company: "Central Net",
           position: "Full Stack + Mobile Software Developer",
@@ -491,14 +472,10 @@ const CV = () => (
             "styles",
           ]),
         })}
-      </View>
-    </Page>
-    <Page size="A4" style={pageStyles}>
-      <View style={tw("my-auto")}>
         {divider}
         <Text style={tw("text-2xl mt-2")}>Education</Text>
         {education({
-          institution: "South-West University 'Neofit Rilski'",
+          institution: "SWU 'Neofit Rilski'",
           location: "Blagoevgrad, Bulgaria",
           degree: "Bachelor's",
           field: "Electronics",
@@ -512,22 +489,28 @@ const CV = () => (
         {certificate({
           name: "Oracle Certified Professional, Java SE 8 Programmer",
           issuer: "Oracle",
-          description: "An Oracle Certified Professional, Java SE 8 Programmer has validated their Java development skills by answering challenging, real-world, scenario-based questions that measure problem solving skills using Java code.",
+          description:
+            "An Oracle Certified Professional, Java SE 8 Programmer has validated their Java development skills by answering challenging, real-world, scenario-based questions that measure problem solving skills using Java code.",
           date: new Date("19 May 2020"),
-          links: [{
-            text: "Credly",
-            href: "https://www.credly.com/badges/281fbd5f-ca29-4235-b023-a9b93af2f6c5/public_url",
-          }]
+          links: [
+            {
+              text: "Credly",
+              href: "https://www.credly.com/badges/281fbd5f-ca29-4235-b023-a9b93af2f6c5/public_url",
+            },
+          ],
         })}
         {certificate({
           name: "Oracle Certified Associate, Java SE 8 Programmer",
           issuer: "Oracle",
-          description: "An Oracle Certified Associate, Java SE 8 Programmer has demonstrated knowledge of object-oriented concepts, the Java programming language and general knowledge of Java platforms and technologies.",
+          description:
+            "An Oracle Certified Associate, Java SE 8 Programmer has demonstrated knowledge of object-oriented concepts, the Java programming language and general knowledge of Java platforms and technologies.",
           date: new Date("17 Mar 2020"),
-          links: [{
-            text: "Credly",
-            href: "https://www.credly.com/badges/910f311b-0f7f-4911-b945-5ded663408ec/public_url",
-          }]
+          links: [
+            {
+              text: "Credly",
+              href: "https://www.credly.com/badges/910f311b-0f7f-4911-b945-5ded663408ec/public_url",
+            },
+          ],
         })}
       </View>
     </Page>
