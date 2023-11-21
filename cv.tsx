@@ -51,6 +51,17 @@ type Certificate = {
 
 const tech = {
   android: ["Android", "Android Studio"],
+  architectures: [
+    "Microservices",
+    "MVC",
+    "Layered architecture",
+    "DDD",
+    "EDA",
+    "Publish-subscribe",
+    "Client-server",
+    "REST",
+    "Pipes and filters",
+  ],
   java: [
     "Java",
     "JPA",
@@ -394,6 +405,7 @@ const CV = () => (
             "Business development",
             "Software Development",
             "Communication",
+            ...skills(["architectures"])
           ],
           links: [
             {
@@ -420,6 +432,7 @@ const CV = () => (
             "linux",
             "git",
             "general",
+            "architectures"
           ]).concat(["googleapis", "Fuse.js", "Interact.js"]),
           links: [
             {
@@ -482,7 +495,7 @@ const CV = () => (
           from: new Date("Sep 2016"),
           to: new Date("Jun 2018"),
           summary:
-            "This is an engineering degree focused on the science of electronics and electrical engineering. It studies the physical properties of individual electrons and the forces that take place when current is flowing through a circuit. Those same forces make computers possible through carefully engineered logic gates built with transistors.",
+            "This is an engineering degree focused on the science of electronics and electrical engineering. It studies the physical properties of individual electrons and the forces that take place when current is flowing through a circuit.",
         })}
         {divider}
         <Text style={tw("text-2xl mt-2")}>Certificates</Text>
