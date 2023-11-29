@@ -25,7 +25,6 @@ type Experience = {
   from: Date;
   to: Date;
   description: string;
-  technologies: string[];
   links?: A[];
   feedback?: string;
 };
@@ -47,124 +46,6 @@ type Certificate = {
   description: string;
   date: Date;
   links?: A[];
-};
-
-const tech = {
-  android: ["Android", "Android Studio"],
-  architectures: [
-    "Microservices",
-    "MVC",
-    "Layered architecture",
-    "DDD",
-    "EDA",
-    "Publish-subscribe",
-    "Client-server",
-    "REST",
-    "Pipes and filters",
-  ],
-  java: [
-    "Java",
-    "JPA",
-    "Hibernate",
-    "Spring Framework",
-    "Spring Boot",
-    "Lombok",
-    "Spring MVC",
-    "Thymeleaf",
-    "JSP",
-    "JSTL",
-    "XML",
-    "Spring Security",
-    "OAuth2",
-    "H2",
-    "Spring Boot Actuator",
-    "Maven",
-    "Gradle",
-    "Ant",
-  ],
-  web: ["JavaScript", "HTML", "CSS"],
-  api: ["REST", "SOAP"],
-  db: ["MySQL", "PostgreSQL"],
-  linux: [
-    "Linux",
-    "Bash",
-    "coreutils",
-    "Ubuntu",
-    "CentOS",
-    "RHEL",
-    "SSH",
-    "iptables",
-    "systemd",
-    "vim",
-    "Monit",
-    "CLI",
-    "pandoc",
-    "LUKS",
-    "hexdump",
-    "dd",
-  ],
-  git: ["git", "GitHub", "GitLab", "BitBucket"],
-  hybris: ["SAP hybris", "ZK Framework"],
-  payment: ["PayPal", "Adyen", "V12", "Wells Fargo Open Banking APIs"],
-  dataIntegration: [
-    "Spring Batch",
-    "Data Pipeline",
-    "Scriptella",
-    "Easy Batch",
-    "GETL",
-    "Apache Camel",
-    "Apache Samza",
-    "Apache Flink",
-    "Apache Storm",
-    "Apache Spark",
-    "Apache NiFi",
-  ],
-  python: [
-    "python",
-    "BeautifulSoup4",
-    "requests",
-    "pypandoc",
-    "markdownify",
-    "html2text",
-    "Poetry",
-  ],
-  javascript: ["TypeScript", "React"],
-  nextjs: [
-    "NextJS 12",
-    "NextJS 13",
-    "NextJS 14",
-    "NextAuth",
-    "Prisma",
-    "Vercel",
-    "Vercel Postgres",
-    "Formik",
-    "Framer Motion",
-  ],
-  styles: [
-    "CSS",
-    "SASS",
-    "TailwindCSS",
-    "DaisyUI",
-    "tailwind-scrollbar",
-    "FontAwesome",
-    "nProgress",
-  ],
-  general: ["Markdown", "Google", "DuckDuckGo", "PDF", "Email"],
-} as const;
-
-const techKeys = Object.keys(tech) as Array<keyof typeof tech>;
-
-type TechKeys = keyof typeof tech;
-
-const skills = (skills: TechKeys[]): string[] => {
-  return skills.map((s) => tech[s]).flat();
-};
-
-const skillsInverted = (skills: TechKeys[]): string[] => {
-  return techKeys
-    .filter((k) => !skills.includes(k))
-    .map((s) => tech[s])
-    .flat();
 };
 
 const createSvg = (paths: string[]) => (
@@ -198,7 +79,6 @@ const experience = ({
   from,
   to,
   description,
-  technologies,
   links,
   feedback,
 }: Experience) => (
@@ -209,15 +89,15 @@ const experience = ({
       )}
     >
       <View style={tw("flex flex-row flex-wrap gap-1")}>
-        <Text>{position}</Text>
+        <Text style={tw("text-amber-500")}>{position}</Text>
         <Text>at</Text>
-        <Text>
+        <Text style={tw("text-blue-500")}>
           {company}, {location}
         </Text>
         <Text>from</Text>
-        <Text>{from.toDateString()}</Text>
+        <Text style={tw("text-lime-500")}>{from.toDateString()}</Text>
         <Text>to</Text>
-        <Text>{to > new Date() ? "present" : to.toDateString()}</Text>
+        <Text style={tw("text-lime-500")}>{to > new Date() ? "present" : to.toDateString()}</Text>
       </View>
       {links && (
         <View style={tw("flex flex-row flex-wrap w-full gap-2 justify-center")}>
@@ -229,23 +109,17 @@ const experience = ({
         </View>
       )}
       <View style={tw("m-4")}>
-        <Text>{description}</Text>
+        <Text style={tw("text-neutral-400")}>{description}</Text>
       </View>
       {feedback && (
-        <View style={tw("w-full m-auto mb-1")}>
-          <Text>Feedback: "{feedback}"</Text>
-        </View>
+        <Text style={tw("w-full m-auto mb-1")}>
+          <Text style={tw("text-amber-500")}>let </Text>
+          <Text>clientFeedback</Text>
+          <Text style={tw("text-amber-500")}> = </Text>
+          <Text style={tw("text-green-500")}>"{feedback}"</Text>
+          <Text>;</Text>
+        </Text>
       )}
-      <View style={tw("flex flex-row flex-wrap m-2")}>
-        {technologies.map((t) => (
-          <View key={t} style={tw("flex flex-row")}>
-            <View
-              style={tw("border-2 border-green-300 h-1 mx-1 mt-1 rounded-full")}
-            ></View>
-            <Text style={tw("text-xs")}>{t}</Text>
-          </View>
-        ))}
-      </View>
     </View>
   </View>
 );
@@ -267,17 +141,17 @@ const education = ({
       )}
     >
       <View style={tw("flex flex-row flex-wrap gap-1")}>
-        <Text>
+        <Text style={tw("text-amber-500")}>
           Studied {degree} of {field}
         </Text>
         <Text>at</Text>
-        <Text>
+        <Text style={tw("text-blue-500")}>
           {institution}, {location}
         </Text>
         <Text>from</Text>
-        <Text>{from.toDateString()}</Text>
+        <Text style={tw("text-lime-500")}>{from.toDateString()}</Text>
         <Text>to</Text>
-        <Text>{to.toDateString()}</Text>
+        <Text style={tw("text-lime-500")}>{to.toDateString()}</Text>
       </View>
       {links && (
         <View style={tw("flex flex-row flex-wrap w-full gap-2 justify-center")}>
@@ -289,7 +163,7 @@ const education = ({
         </View>
       )}
       <View style={tw("m-4")}>
-        <Text style={tw("text-md")}>{summary}</Text>
+        <Text style={tw("text-neutral-400")}>{summary}</Text>
       </View>
     </View>
   </View>
@@ -309,11 +183,11 @@ const certificate = ({
       )}
     >
       <View style={tw("flex flex-row flex-wrap gap-1")}>
-        <Text>{name}</Text>
+        <Text style={tw("text-amber-500")}>{name}</Text>
         <Text>from</Text>
-        <Text>{issuer}</Text>
+        <Text style={tw("text-blue-500")}>{issuer}</Text>
         <Text>on</Text>
-        <Text>{date.toDateString()}</Text>
+        <Text style={tw("text-lime-500")}>{date.toDateString()}</Text>
       </View>
       {links && (
         <View style={tw("flex flex-row flex-wrap w-full gap-2 justify-center")}>
@@ -325,7 +199,7 @@ const certificate = ({
         </View>
       )}
       <View style={tw("m-4")}>
-        <Text style={tw("text-md")}>{description}</Text>
+        <Text style={tw("text-neutral-400")}>{description}</Text>
       </View>
     </View>
   </View>
@@ -365,13 +239,13 @@ const Links = () => (
 const Intro = () => (
   <View style={tw("text-center border-2 border-slate-50 rounded-full")}>
     <Text style={tw("text-5xl")}>Ivan K. Dimitrov</Text>
-    <Text style={tw("text-sm")}>Software Developer</Text>
+    <Text>Software Developer</Text>
     <Links />
   </View>
 );
 
 const pageStyles = tw(
-  "w-full h-full text-slate-50 bg-slate-950 flex flex-col p-12 text-base"
+  "w-full h-full text-slate-50 bg-gray-900 flex flex-col p-12 text-base"
 );
 const divider = (
   <View style={tw("w-full mt-4")}>
@@ -391,7 +265,7 @@ const CV = () => (
     <Page size="A4" style={pageStyles}>
       <Intro />
       {divider}
-      <Text style={tw("text-2xl mt-2")}>Experience</Text>
+      <Text style={tw("text-2xl mt-2 text-violet-500")}>Experience</Text>
       <View style={tw("my-auto")}>
         {experience({
           company: "idimitrov.dev",
@@ -400,13 +274,7 @@ const CV = () => (
           from: new Date("2023"),
           to: new Date("9999"),
           description:
-            "This is my software consulting and development business. Please head over to my resume website or Upwork to learn more.",
-          technologies: [
-            "Business development",
-            "Software Development",
-            "Communication",
-            ...skills(["architectures"])
-          ],
+            "This is my software consulting and development business. It offers web development services to businesses around the world. Please head over to my resume website or my Upwork profile to learn more.",
           links: [
             {
               text: "Upwork",
@@ -417,6 +285,7 @@ const CV = () => (
               href: "https://www.idimitrov.dev/cases",
             },
           ],
+          feedback: "100% Job Success"
         })}
         {experience({
           company: "Stepsy",
@@ -425,15 +294,7 @@ const CV = () => (
           from: new Date("29 Jul 2023"),
           to: new Date("5 Nov 2023"),
           description:
-            "Created a multi-tenant knowledge base website based on Google APIs",
-          technologies: skills([
-            "nextjs",
-            "styles",
-            "linux",
-            "git",
-            "general",
-            "architectures"
-          ]).concat(["googleapis", "Fuse.js", "Interact.js"]),
+            "As a software developer working with stepsy.co, I was responsible for implementing their brand new wiki web app stepsy.wiki. Working on this greenfield project allowed me to make fundamental technical decisions that had a positive impact on further development.",
           links: [
             {
               text: "Case Study",
@@ -450,8 +311,7 @@ const CV = () => (
           from: new Date("Dec 2020"),
           to: new Date("20 Jan 2023"),
           description:
-            "Worked on seven international eCommerce web apps serving customers in the US and Europe.",
-          technologies: skillsInverted(["dataIntegration", "python", "nextjs"]),
+            "As a software developer at RA Creative, I was responsible for delivering software solutions to an eCommerce business operating in 2 continents - Europe and North America. Watches of Switzerland Group is an international retailer of world leading luxury watch and jewellery brands. It has a market cap of £1.5B.",
           links: [
             { text: "RA Creative", href: "https://racreative.co.uk/" },
             {
@@ -476,17 +336,9 @@ const CV = () => (
           to: new Date("May 2020"),
           description:
             "Developed a full-stack web + android app helping students book exams, browse resources, see events, news and more.",
-          technologies: skillsInverted([
-            "hybris",
-            "payment",
-            "dataIntegration",
-            "python",
-            "nextjs",
-            "styles",
-          ]),
         })}
         {divider}
-        <Text style={tw("text-2xl mt-2")}>Education</Text>
+        <Text style={tw("text-2xl mt-2 text-violet-500")}>Education</Text>
         {education({
           institution: "SWU 'Neofit Rilski'",
           location: "Blagoevgrad, Bulgaria",
@@ -498,7 +350,7 @@ const CV = () => (
             "This is an engineering degree focused on the science of electronics and electrical engineering. It studies the physical properties of individual electrons and the forces that take place when current is flowing through a circuit.",
         })}
         {divider}
-        <Text style={tw("text-2xl mt-2")}>Certificates</Text>
+        <Text style={tw("text-2xl mt-2 text-violet-500")}>Certificates</Text>
         {certificate({
           name: "Oracle Certified Professional, Java SE 8 Programmer",
           issuer: "Oracle",
