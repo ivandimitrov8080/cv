@@ -82,7 +82,7 @@ const experience = ({
   links,
   feedback,
 }: Experience) => (
-  <View style={tw("w-full flex flex-col")}>
+  <View wrap={false} style={tw("w-full flex flex-col")}>
     <View
       style={tw(
         "w-full flex flex-col mt-2 border-2 border-slate-50 p-4 rounded-2xl"
@@ -324,10 +324,6 @@ const CV = () => (
             },
           ],
         })}
-      </View>
-    </Page>
-    <Page size="A4" style={pageStyles}>
-      <View style={tw("my-auto")}>
         {experience({
           company: "Central Net",
           position: "Full Stack + Mobile Software Developer",

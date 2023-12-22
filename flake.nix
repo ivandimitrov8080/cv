@@ -37,21 +37,21 @@
       nativeBuildInputs = with pkgs; [
         bun
       ];
-      shellHook = ''
-        echo "$$" > ./pid
-        monitor() {
-          while true; do
-            inotifywait -e modify ${pname}.tsx > /dev/null 2>&1
-            make
-            pkill -HUP mupdf
-          done
-        }
-        monitor > /dev/null 2>&1 &
-      '';
     in
     {
-      devShells.default = pkgs.mkShell {
-        inherit pname buildInputs nativeBuildInputs shellHook;
+      devShells.${system}.default = pkgs.mkShell {
+        inherit pname buildInputs nativeBuildInputs;
+        shellHook = ''
+          echo "$$" > ./pid
+          monitor() {
+            while true; do
+              inotifywait -e modify ${pname}.tsx > /dev/null 2>&1
+              make
+              pkill -HUP mupdf
+            done
+          }
+          monitor > /dev/null 2>&1 &
+        '';
       };
       packages.${system}.default = pkgs.buildNpmPackage rec {
         inherit nativeBuildInputs pname version src;
