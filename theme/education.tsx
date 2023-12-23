@@ -1,7 +1,4 @@
-import {
-  Text,
-  View,
-} from "@react-pdf/renderer";
+import { Text, View } from "@react-pdf/renderer";
 import { tw } from "./lib";
 import SvgLink from "./link";
 
@@ -14,7 +11,7 @@ export type Edu = {
   to: Date;
   summary: string;
   links?: A[];
-}
+};
 
 export default function Education({
   institution,
@@ -47,7 +44,9 @@ export default function Education({
           <Text style={tw("text-lime-500")}>{to.toDateString()}</Text>
         </View>
         {links && (
-          <View style={tw("flex flex-row flex-wrap w-full gap-2 justify-center")}>
+          <View
+            style={tw("flex flex-row flex-wrap w-full gap-2 justify-center")}
+          >
             {links.map((l) => (
               <View key={l.href} style={tw("flex flex-row gap-2")}>
                 <SvgLink text={l.text} href={l.href} icon={l.icon} />
@@ -60,5 +59,5 @@ export default function Education({
         </View>
       </View>
     </View>
-  )
+  );
 }

@@ -1,7 +1,4 @@
-import {
-  Text,
-  View,
-} from "@react-pdf/renderer";
+import { Text, View } from "@react-pdf/renderer";
 import { tw } from "./lib";
 import SvgLink from "./link";
 
@@ -12,7 +9,6 @@ export type Cert = {
   date: Date;
   links?: A[];
 };
-
 
 export default function Certificate({
   name,
@@ -36,7 +32,9 @@ export default function Certificate({
           <Text style={tw("text-lime-500")}>{date.toDateString()}</Text>
         </View>
         {links && (
-          <View style={tw("flex flex-row flex-wrap w-full gap-2 justify-center")}>
+          <View
+            style={tw("flex flex-row flex-wrap w-full gap-2 justify-center")}
+          >
             {links.map((l) => (
               <View key={l.href} style={tw("flex flex-row gap-2")}>
                 <SvgLink text={l.text} href={l.href} icon={l.icon} />
@@ -49,5 +47,5 @@ export default function Certificate({
         </View>
       </View>
     </View>
-  )
+  );
 }
