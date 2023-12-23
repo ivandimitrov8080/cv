@@ -1,0 +1,105 @@
+{
+  "experience": [
+    {
+      "company": "idimitrov.dev",
+      "position": "Software Developer / Owner",
+      "location": "Worldwide",
+      "from": "2023",
+      "to": "9999",
+      "description": "This is my software consulting and development business. It offers web development services to businesses around the world. Please head over to my resume website or my Upwork profile to learn more.",
+      "links": [
+        {
+          "text": "Upwork",
+          "href": "https://www.upwork.com/freelancers/idimitrov"
+        },
+        {
+          "text": "Resume",
+          "href": "https://www.idimitrov.dev/cases"
+        }
+      ],
+      "feedback": "100% Job Success"
+    },
+    {
+      "company": "Stepsy",
+      "position": "Freelance Full Stack Software Developer",
+      "location": "Estonia",
+      "from": "29 Jul 2023",
+      "to": "5 Nov 2023",
+      "description": "As a software developer working with stepsy.co, I was responsible for implementing their brand new wiki web app stepsy.wiki. Working on this greenfield project allowed me to make fundamental technical decisions that had a positive impact on further development.",
+      "links": [
+        {
+          "text": "Case Study",
+          "href": "https://www.idimitrov.dev/c/cases/stepsy.wiki.md"
+        }
+      ],
+      "feedback": "Great experience working with Ivan! Ready to implement your vision, also advises on how it should be done."
+    },
+    {
+      "company": "RA Creative",
+      "position": "Full Stack Software Developer",
+      "location": "Nottingham, UK",
+      "from": "Dec 2020",
+      "to": "20 Jan 2023",
+      "description": "As a software developer at RA Creative, I was responsible for delivering software solutions to an eCommerce business operating in 2 continents - Europe and North America. Watches of Switzerland Group is an international retailer of world leading luxury watch and jewellery brands. It has a market cap of £1.5B.",
+      "links": [
+        {
+          "text": "RA Creative",
+          "href": "https://racreative.co.uk/"
+        },
+        {
+          "text": "Parcel Lab case study",
+          "href": "https://www.idimitrov.dev/c/cases/parcellab.md"
+        },
+        {
+          "text": "Wells Fargo case study",
+          "href": "https://www.idimitrov.dev/c/cases/wellsfargo.md"
+        }
+      ]
+    },
+    {
+      "company": "Central Net",
+      "position": "Full Stack + Mobile Software Developer",
+      "location": "Blagoevgrad, Bulgaria",
+      "from": "May 2016",
+      "to": "May 2020",
+      "description": "Developed a full-stack web + android app helping students book exams, browse resources, see events, news and more."
+    }
+  ],
+  "education": [
+    {
+      "institution": "SWU 'Neofit Rilski'",
+      "location": "Blagoevgrad, Bulgaria",
+      "degree": "Bachelor's",
+      "field": "Electronics",
+      "from": "Sep 2016",
+      "to": "Jun 2018",
+      "summary": "This is an engineering degree focused on the science of electronics and electrical engineering. It studies the physical properties of individual electrons and the forces that take place when current is flowing through a circuit."
+    }
+  ],
+  "certificates": [
+    {
+      "name": "Oracle Certified Professional, Java SE 8 Programmer",
+      "issuer": "Oracle",
+      "description": "An Oracle Certified Professional, Java SE 8 Programmer has validated their Java development skills by answering challenging, real-world, scenario-based questions that measure problem solving skills using Java code.",
+      "date": "19 May 2020",
+      "links": [
+        {
+          "text": "Credly",
+          "href": "https://www.credly.com/badges/281fbd5f-ca29-4235-b023-a9b93af2f6c5/public_url"
+        }
+      ]
+    },
+    {
+      "name": "Oracle Certified Associate, Java SE 8 Programmer",
+      "issuer": "Oracle",
+      "description": "An Oracle Certified Associate, Java SE 8 Programmer has demonstrated knowledge of object-oriented concepts, the Java programming language and general knowledge of Java platforms and technologies.",
+      "date": "17 Mar 2020",
+      "links": [
+        {
+          "text": "Credly",
+          "href": "https://www.credly.com/badges/910f311b-0f7f-4911-b945-5ded663408ec/public_url"
+        }
+      ]
+    }
+  ]
+}
