@@ -5,7 +5,7 @@ import {
 import { tw } from "./lib";
 import SvgLink from "./link";
 
-type Props = {
+export type Cert = {
   name: string;
   issuer: string;
   description: string;
@@ -20,7 +20,7 @@ export default function Certificate({
   description,
   date,
   links,
-}: Props) {
+}: Cert) {
   return (
     <View style={tw("w-full flex flex-col")}>
       <View

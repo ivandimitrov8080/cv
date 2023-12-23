@@ -5,7 +5,7 @@ import {
 import { tw } from "./lib";
 import SvgLink from "./link";
 
-type Props = {
+export type Edu = {
   institution: string;
   location: string;
   degree: string;
@@ -25,7 +25,7 @@ export default function Education({
   to,
   summary,
   links,
-}: Props) {
+}: Edu) {
   return (
     <View style={tw("w-full flex flex-col")}>
       <View

@@ -5,7 +5,7 @@ import {
 import { tw } from "./lib";
 import SvgLink from "./link";
 
-type Props = {
+export type Exp = {
   company: string;
   position: string;
   location: string;
@@ -16,7 +16,7 @@ type Props = {
   feedback?: string;
 }
 
-export default function Experience({ company, position, location, from, to, description, links, feedback }: Props) {
+export default function Experience({ company, position, location, from, to, description, links, feedback }: Exp) {
   return (<View wrap={false} style={tw("w-full flex flex-col")}>
     <View
       style={tw(
