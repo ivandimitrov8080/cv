@@ -101,33 +101,41 @@ const Cv = () => (
             description={e.description}
           />
         ))}
-        {divider}
-        <Text style={tw("text-2xl mt-2 text-violet-500")}>Education</Text>
-        {data.education?.map((e, i) => (
-          <Education
-            key={i}
-            to={e.to}
-            from={e.from}
-            links={e.links}
-            institution={e.institution}
-            location={e.location}
-            field={e.field}
-            degree={e.degree}
-            summary={e.summary}
-          />
-        ))}
-        {divider}
-        <Text style={tw("text-2xl mt-2 text-violet-500")}>Certificates</Text>
-        {data.certificates?.map((c, i) => (
-          <Certificate
-            key={i}
-            date={c.date}
-            links={c.links}
-            name={c.name}
-            description={c.description}
-            issuer={c.issuer}
-          />
-        ))}
+        {data.education && (
+          <>
+            {divider}
+            <Text style={tw("text-2xl mt-2 text-violet-500")}>Education</Text>
+            {data.education.map((e, i) => (
+              <Education
+                key={i}
+                to={e.to}
+                from={e.from}
+                links={e.links}
+                institution={e.institution}
+                location={e.location}
+                field={e.field}
+                degree={e.degree}
+                summary={e.summary}
+              />
+            ))}
+          </>
+        )}
+        {data.certificates && (
+          <>
+            {divider}
+            <Text style={tw("text-2xl mt-2 text-violet-500")}>Certificates</Text>
+            {data.certificates?.map((c, i) => (
+              <Certificate
+                key={i}
+                date={c.date}
+                links={c.links}
+                name={c.name}
+                description={c.description}
+                issuer={c.issuer}
+              />
+            ))}
+          </>
+        )}
       </View>
     </Page>
   </Document>
