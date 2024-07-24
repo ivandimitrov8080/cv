@@ -11,3 +11,7 @@ install: $(pname)
 	mkdir -p $(out)
 	install $(pname).pdf $(out)/$(pname)
 
+dev:
+	bun $(main)
+	pkill -HUP mupdf
+
