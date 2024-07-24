@@ -34,7 +34,11 @@ export default function Experience({
           <Text style={tw("text-amber-500")}>{position}</Text>
           <Text>at</Text>
           <Text style={tw("text-blue-500")}>
-            {company}, {location}
+            {company}
+          </Text>
+          <Text>in</Text>
+          <Text style={tw("text-sky-500")}>
+            {location}
           </Text>
           <Text>from</Text>
           <Text style={tw("text-lime-500")}>{from.toDateString()}</Text>
