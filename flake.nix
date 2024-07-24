@@ -1,46 +1,41 @@
 {
-  description = "CV template";
-
   inputs = {
-    nixpkgs.url = "nixpkgs";
-    systems.url = "github:nix-systems/x86_64-linux";
-    flake-utils = {
-      url = "github:numtide/flake-utils";
-      inputs.systems.follows = "systems";
-    };
+    nixpkgs.url = "github:NixOS/nixpkgs/nixos-unstable";
     ide = {
       url = "github:ivandimitrov8080/flake-ide";
       inputs.nixpkgs.follows = "nixpkgs";
     };
   };
 
-  outputs = { self, nixpkgs, flake-utils, systems, ide }:
+  outputs = { nixpkgs, ide, ... }:
     let
       system = "x86_64-linux";
-      pkgs = nixpkgs.legacyPackages.${system};
+      pkgs = import nixpkgs {
+        inherit system; overlays = [
+        (final: prev: {
+          nvim = ide.nvim.${system}.standalone.default {
+            plugins = {
+              lsp.servers = {
+                tsserver.enable = true;
+                jsonls.enable = true;
+                tailwindcss.enable = true;
+              };
+            };
+          };
+        })
+      ];
+      };
       pname = "cv";
       version = "0.1.1";
       src = ./.;
-      nvim = ide.nvim.${system}.standalone {
-        plugins = {
-          lsp.servers = {
-            tsserver.enable = true;
-            jsonls.enable = true;
-            tailwindcss.enable = true;
-          };
-        };
-      };
-      buildInputs = with pkgs; [
-        nvim
-        inotify-tools
-      ];
-      nativeBuildInputs = with pkgs; [
-        bun
-      ];
     in
     {
       devShells.${system}.default = pkgs.mkShell {
-        inherit pname buildInputs nativeBuildInputs;
+        inherit pname;
+        buildInputs = with pkgs; [
+          nvim
+          bun
+        ];
         shellHook = ''
           echo "$$" > ./pid
           monitor() {
@@ -53,13 +48,22 @@
           monitor > /dev/null 2>&1 &
         '';
       };
-      packages.${system}.default = pkgs.buildNpmPackage rec {
-        inherit nativeBuildInputs pname version src;
-        npmDepsHash = "sha256-1fqP3HFhziup3U97t+Kx8JMAd+ZpJmz5WZATR1CaQZY=";
+      packages.${system}.default = pkgs.mkYarnPackage {
+        inherit pname version src;
+        nativeBuildInputs = [ pkgs.bun ];
+        offlineCache = pkgs.fetchYarnDeps {
+          yarnLock = "${src}/yarn.lock";
+          hash = "sha256-HKoIv3YMKy5uZ/wT2grg+Z6k4CMykY9dj/okfA2uias=";
+        };
+        buildPhase = ''
+          yarn --offline build
+        '';
+        doDist = false;
         postInstall = ''
           ls -alh
-          mkdir -p $out
           rm -rf $out/lib
+          rm -rf $out/libexec
+          rm -rf $out/bin
         '';
       };
     };

@@ -4,20 +4,18 @@
   "module": "cv.tsx",
   "type": "module",
   "devDependencies": {
-    "bun-types": "latest"
+    "@react-pdf/renderer": "latest",
+    "@types/node": "latest",
+    "@types/react": "latest",
+    "bun-types": "latest",
+    "react": "latest",
+    "react-pdf-tailwind": "latest"
   },
   "scripts": {
     "build": "bun cv.tsx"
   },
   "peerDependencies": {
     "typescript": "latest"
-  },
-  "dependencies": {
-    "@react-pdf/renderer": "latest",
-    "@types/node": "latest",
-    "@types/react": "latest",
-    "react": "latest",
-    "react-pdf-tailwind": "latest"
   },
   "prettier": {
     "trailingComma": "es5",
