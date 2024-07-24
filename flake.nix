@@ -36,17 +36,6 @@
           nvim
           bun
         ];
-        shellHook = ''
-          echo "$$" > ./pid
-          monitor() {
-            while true; do
-              inotifywait -e modify ${pname}.tsx > /dev/null 2>&1
-              make
-              pkill -HUP mupdf
-            done
-          }
-          monitor > /dev/null 2>&1 &
-        '';
       };
       packages.${system}.default = pkgs.mkYarnPackage {
         inherit pname version src;
