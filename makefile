@@ -1,6 +1,6 @@
 main = $(pname).tsx
 
-default: all
+default: dev
 all:
 	bun $(main)
 
