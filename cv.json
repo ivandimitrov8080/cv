@@ -13,7 +13,7 @@
       "location": "Prague, Czechia",
       "from": "Feb 2024",
       "to": "9999",
-      "description": "Deutsche Börse AG is a German multinational corporation that offers a marketplace for organizing the trading of shares and other securities. My role as a software developer working in the Prague branch is to take part in the implementation and integration of new features like the support for OTC IRS in C7 CAS in Release 2.284 as well as the Repo market support in C7 CAS.",
+      "description": "Deutsche Börse AG is a German multinational corporation that offers a marketplace for organizing the trading of shares and other securities. My role as a software developer working in the C7 CAS team included delivering full-stack software solutions regarding integration with other internal systems and helping migrate and redesign various parts of the application. Some redesigns are the GDPR compliance changes and the Reporting ID redesign.",
       "links": [
         {
           "text": "Release notes",
