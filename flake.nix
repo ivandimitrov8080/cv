@@ -51,7 +51,10 @@
             inherit inputs pkgs;
             modules = [
               {
-                packages = with pkgs; [ nixvim.haskell ];
+                packages = with pkgs; [
+                  nixvim.haskell
+                  (ghc.withPackages (hp: with hp; [ HPDF ]))
+                ];
               }
             ];
           };
