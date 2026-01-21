@@ -172,13 +172,33 @@ instance FromJSON CV where
 -- | All config and fonts needed to render
 --   Also carries the full CV for convenient section extraction
 --   Can be extended with more environment/config fields as needed
+-- | Which personal info fields to display, and their layout/order.
+data PersonalInfoField
+  = InfoName
+  | InfoTitle
+  | InfoDescription
+  | InfoEmail
+  | InfoGithub
+  | InfoWebsite
+  | InfoUpwork
+  deriving (Show, Eq, Ord)
+
+data PersonalInfoLayout = PersonalInfoLayout
+  { infoFieldOrder :: [PersonalInfoField],
+    infoStartY :: Cursor,
+    infoLineStep :: Cursor
+  }
+  deriving (Show)
+
+-- | All config and fonts needed to render
 data RenderEnv = RenderEnv
   { reCV :: CV,
     reFontConfig :: FontConfig,
     reColorConfig :: ColorConfig,
     reLayoutConfig :: LayoutConfig,
     reFontHeader :: PDFFont,
-    reFontBody :: PDFFont
+    reFontBody :: PDFFont,
+    reInfoLayout :: PersonalInfoLayout
   }
 
 type Cursor = PDFFloat
@@ -197,21 +217,27 @@ drawSection env s y =
    in drawText (setFont fontHeader >> text fontHeader 72 y (T.pack s)) >> return (y - 18)
 
 drawPersonalInfo :: RenderEnv -> Cursor -> Draw Cursor
-drawPersonalInfo env y = do
+drawPersonalInfo env _ = do
   let fontHeader = reFontHeader env
       pi = cvPersonalInfo (reCV env)
-  drawText $ do setFont fontHeader; text fontHeader 72 y (T.pack (piName pi))
-  let linesAll =
-        [ maybe "" id (piTitle pi),
-          maybe "" id (piDescription pi),
-          maybe "" id (piEmail pi),
-          "github: " ++ maybe "" id (piGithub pi),
-          "website: " ++ maybe "" id (piWebsite pi),
-          "upwork: " ++ maybe "" id (piUpwork pi)
-        ]
-      nextLines = filter (/= "") linesAll
-      y' = y - 32
-  drawInfoLines fontHeader y' nextLines
+      layout = reInfoLayout env
+      fields = infoFieldOrder layout
+      y0 = infoStartY layout
+      step = infoLineStep layout
+      toText f = case f of
+        InfoName -> piName pi
+        InfoTitle -> maybe "" id (piTitle pi)
+        InfoDescription -> maybe "" id (piDescription pi)
+        InfoEmail -> maybe "" id (piEmail pi)
+        InfoGithub -> if maybe "" id (piGithub pi) /= "" then "github: " ++ maybe "" id (piGithub pi) else ""
+        InfoWebsite -> if maybe "" id (piWebsite pi) /= "" then "website: " ++ maybe "" id (piWebsite pi) else ""
+        InfoUpwork -> if maybe "" id (piUpwork pi) /= "" then "upwork: " ++ maybe "" id (piUpwork pi) else ""
+      linesAll = filter (/= "") $ map toText fields
+  -- Print all info lines vertically with configured spacing
+  foldM
+    (\yc l -> drawText (setFont fontHeader >> text fontHeader 72 yc (T.pack l)) >> return (yc - step))
+    y0
+    linesAll
 
 drawExperience :: RenderEnv -> Cursor -> Experience -> Draw Cursor
 drawExperience env y e = do
@@ -289,6 +315,12 @@ main = do
           fontConfig = maybe defaultFontConfig id (font cvConfig')
           colorConfig = maybe defaultColorConfig id (color cvConfig')
           layoutConfig = maybe defaultLayoutConfig id (layout cvConfig')
+          infoLayout =
+            PersonalInfoLayout
+              { infoFieldOrder = [InfoName, InfoTitle, InfoDescription, InfoEmail, InfoGithub, InfoWebsite, InfoUpwork],
+                infoStartY = startY, -- can be customized
+                infoLineStep = 16 -- can be customized
+              }
           env =
             RenderEnv
               { reCV = cv,
@@ -296,7 +328,8 @@ main = do
                 reColorConfig = colorConfig,
                 reLayoutConfig = layoutConfig,
                 reFontHeader = PDFFont fontHeader (round (sizeHeader fontConfig)),
-                reFontBody = PDFFont fontBody (round (sizeBody fontConfig))
+                reFontBody = PDFFont fontBody (round (sizeBody fontConfig)),
+                reInfoLayout = infoLayout
               }
       runPdf "out/cv.pdf" standardDocInfo (PDFRect 0 0 595 842) (renderCV env)
       putStrLn "cv.pdf generated."
