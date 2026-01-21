@@ -1,6 +1,4 @@
-node_modules
-outputs
-pid
 result
 .devenv
 .direnv
+cv.pdf
