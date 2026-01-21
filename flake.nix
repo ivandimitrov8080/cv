@@ -106,7 +106,7 @@
                 };
                 tasks = {
                   "clean:all" = {
-                    exec = "rm -rf cv.pdf";
+                    exec = "rm -rf {out,bin}";
                   };
                   "build:init" = {
                     exec = ''
