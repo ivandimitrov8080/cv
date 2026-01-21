@@ -52,8 +52,15 @@
             modules = [
               {
                 packages = with pkgs; [
-                  nixvim.haskell
-                  (ghc.withPackages (hp: with hp; [ HPDF ]))
+                  (nixvim.haskell.extend {
+                    lsp.servers.jsonls.enable = true;
+                  })
+                  (ghc.withPackages (
+                    hp: with hp; [
+                      HPDF
+                      aeson
+                    ]
+                  ))
                 ];
               }
             ];
