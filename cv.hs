@@ -79,7 +79,10 @@ defaultLayoutConfig = LayoutConfig 36 36 36 36 18
 -------------------------------------------------------------------------------
 -- CV Section: data types corresponding to sections in the CV
 -------------------------------------------------------------------------------
-data Link = Link {linkText :: String, linkHref :: String}
+data Link = Link
+  { linkText :: String,
+    linkHref :: String
+  }
   deriving (Show, Generic)
 
 instance FromJSON Link where
@@ -165,6 +168,19 @@ instance FromJSON CV where
 -------------------------------------------------------------------------------
 -- Render Section: rendering logic for transforming CV -> PDF
 -------------------------------------------------------------------------------
+
+-- | All config and fonts needed to render
+--   Also carries the full CV for convenient section extraction
+--   Can be extended with more environment/config fields as needed
+data RenderEnv = RenderEnv
+  { reCV :: CV,
+    reFontConfig :: FontConfig,
+    reColorConfig :: ColorConfig,
+    reLayoutConfig :: LayoutConfig,
+    reFontHeader :: PDFFont,
+    reFontBody :: PDFFont
+  }
+
 type Cursor = PDFFloat
 
 startY :: PDFFloat
@@ -175,11 +191,15 @@ drawInfoLines font y linesAll = foldM go y linesAll
   where
     go yc l = drawText (setFont font >> text font 72 yc (T.pack l)) >> return (yc - 16)
 
-drawSection :: PDFFont -> PDFFont -> String -> Cursor -> Draw Cursor
-drawSection fontHeader _ s y = drawText (setFont fontHeader >> text fontHeader 72 y (T.pack s)) >> return (y - 18)
+drawSection :: RenderEnv -> String -> Cursor -> Draw Cursor
+drawSection env s y =
+  let fontHeader = reFontHeader env
+   in drawText (setFont fontHeader >> text fontHeader 72 y (T.pack s)) >> return (y - 18)
 
-drawPersonalInfo :: PDFFont -> PersonalInfo -> Cursor -> Draw Cursor
-drawPersonalInfo fontHeader pi y = do
+drawPersonalInfo :: RenderEnv -> Cursor -> Draw Cursor
+drawPersonalInfo env y = do
+  let fontHeader = reFontHeader env
+      pi = cvPersonalInfo (reCV env)
   drawText $ do setFont fontHeader; text fontHeader 72 y (T.pack (piName pi))
   let linesAll =
         [ maybe "" id (piTitle pi),
@@ -193,57 +213,62 @@ drawPersonalInfo fontHeader pi y = do
       y' = y - 32
   drawInfoLines fontHeader y' nextLines
 
-drawExperience :: PDFFont -> Cursor -> Experience -> Draw Cursor
-drawExperience font y e = do
+drawExperience :: RenderEnv -> Cursor -> Experience -> Draw Cursor
+drawExperience env y e = do
+  let font = reFontBody env
   drawText $ do setFont font; text font 72 y . T.pack $ expCompany e ++ maybe "" (" / " ++) (expPosition e) ++ maybe "" (" — " ++) (expLocation e)
   let y1 = y - 14
   drawText $ text font 82 y1 . T.pack $ maybe "" id (expFrom e) ++ " - " ++ maybe "" id (expTo e)
   let y2 = y1 - 14
   case expDescription e of Just desc | not (null desc) -> drawText (text font 82 y2 (T.pack desc)) >> return (y2 - 14); _ -> return y2
 
-drawEducation :: PDFFont -> Cursor -> Education -> Draw Cursor
-drawEducation font y e = do
+drawEducation :: RenderEnv -> Cursor -> Education -> Draw Cursor
+drawEducation env y e = do
+  let font = reFontBody env
   drawText $ do setFont font; text font 72 y . T.pack $ eduInstitution e ++ maybe "" (", " ++) (eduDegree e) ++ maybe "" (", " ++) (eduField e)
   drawText $ text font 82 (y - 14) . T.pack $ maybe "" id (eduFrom e) ++ " - " ++ maybe "" id (eduTo e)
   case eduSummary e of Just summary | not (null summary) -> drawText (text font 82 (y - 28) (T.pack summary)) >> return (y - 42); _ -> return (y - 28)
 
-drawCertificate :: PDFFont -> Cursor -> Certificate -> Draw Cursor
-drawCertificate font y c = do
+drawCertificate :: RenderEnv -> Cursor -> Certificate -> Draw Cursor
+drawCertificate env y c = do
+  let font = reFontBody env
   drawText $ do setFont font; text font 72 y . T.pack $ certName c ++ maybe "" ((" (" ++) . (++ ")")) (certIssuer c)
   drawText $ text font 82 (y - 14) (T.pack (maybe "" id (certDate c)))
   case certDescription c of Just desc | not (null desc) -> drawText (text font 82 (y - 28) (T.pack desc)) >> return (y - 42); _ -> return (y - 28)
 
-drawSkill :: PDFFont -> Cursor -> Skill -> Draw Cursor
-drawSkill font y s = drawText (setFont font >> text font 72 y (T.pack (skillCategory s ++ ": " ++ unwords (skillItems s)))) >> return (y - 14)
+drawSkill :: RenderEnv -> Cursor -> Skill -> Draw Cursor
+drawSkill env y s =
+  let font = reFontBody env
+   in drawText (setFont font >> text font 72 y (T.pack (skillCategory s ++ ": " ++ unwords (skillItems s)))) >> return (y - 14)
 
-renderCVPage :: PDFFont -> PDFFont -> CV -> Draw ()
-renderCVPage fontHeader fontBody cv = do
-  let personal = cvPersonalInfo cv
+renderCVPage :: RenderEnv -> Draw ()
+renderCVPage env = do
+  let cv = reCV env
       experience = cvExperience cv
       education = cvEducation cv
       certificates = cvCertificates cv
       skills = cvSkills cv
-  y1 <- drawPersonalInfo fontHeader personal startY
-  y2 <- drawSection fontHeader fontBody "Experience" y1
-  y3 <- foldM (drawExperience fontBody) (y2 - 20) experience
-  y4 <- drawSection fontHeader fontBody "Education" (y3 - 30)
-  y5 <- foldM (drawEducation fontBody) (y4 - 20) education
+  y1 <- drawPersonalInfo env startY
+  y2 <- drawSection env "Experience" y1
+  y3 <- foldM (drawExperience env) (y2 - 20) experience
+  y4 <- drawSection env "Education" (y3 - 30)
+  y5 <- foldM (drawEducation env) (y4 - 20) education
   y6 <- case certificates of
     Just certs -> do
-      ycert <- drawSection fontHeader fontBody "Certificates" (y5 - 30)
-      foldM (drawCertificate fontBody) (ycert - 20) certs
+      ycert <- drawSection env "Certificates" (y5 - 30)
+      foldM (drawCertificate env) (ycert - 20) certs
     Nothing -> return y5
   _y7 <- case skills of
     Just sks -> do
-      yskill <- drawSection fontHeader fontBody "Skills" (y6 - 30)
-      foldM (drawSkill fontBody) (yskill - 20) sks
+      yskill <- drawSection env "Skills" (y6 - 30)
+      foldM (drawSkill env) (yskill - 20) sks
     Nothing -> return y6
   return ()
 
-renderCV :: AnyFont -> AnyFont -> CV -> PDF ()
-renderCV fontHeader fontBody cv = do
+renderCV :: RenderEnv -> PDF ()
+renderCV env = do
   page <- addPage Nothing
-  drawWithPage page (renderCVPage (PDFFont fontHeader 18) (PDFFont fontBody 11) cv)
+  drawWithPage page (renderCVPage env)
 
 -------------------------------------------------------------------------------
 -- Program Section: read JSON, parse and drive the rendering (main IO)
@@ -260,5 +285,18 @@ main = do
     Left err -> putStrLn $ "Error parsing cv.json: " ++ err
     Right cv -> do
       putStrLn "Successfully parsed cv.json! Generating cv.pdf..."
-      runPdf "out/cv.pdf" standardDocInfo (PDFRect 0 0 595 842) (renderCV fontHeader fontBody cv)
+      let cvConfig' = maybe (CVConfig Nothing Nothing Nothing) id (cvConfig cv)
+          fontConfig = maybe defaultFontConfig id (font cvConfig')
+          colorConfig = maybe defaultColorConfig id (color cvConfig')
+          layoutConfig = maybe defaultLayoutConfig id (layout cvConfig')
+          env =
+            RenderEnv
+              { reCV = cv,
+                reFontConfig = fontConfig,
+                reColorConfig = colorConfig,
+                reLayoutConfig = layoutConfig,
+                reFontHeader = PDFFont fontHeader (round (sizeHeader fontConfig)),
+                reFontBody = PDFFont fontBody (round (sizeBody fontConfig))
+              }
+      runPdf "out/cv.pdf" standardDocInfo (PDFRect 0 0 595 842) (renderCV env)
       putStrLn "cv.pdf generated."
