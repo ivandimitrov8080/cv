@@ -104,6 +104,29 @@
                     "ImportQualifiedPost"
                   ];
                 };
+                tasks = {
+                  "clean:all" = {
+                    exec = "rm -rf cv.pdf";
+                  };
+                  "build:init" = {
+                    exec = ''
+                      mkdir -p {out,bin}/
+                    '';
+                    before = [
+                      "build:cv"
+                      "build:bin"
+                    ];
+                  };
+                  "build:bin" = {
+                    exec = "ghc -outputdir out/ cv.hs -o bin/cv";
+                    before = [ "build:cv" ];
+                  };
+                  "build:cv" = {
+                    exec = ''
+                      bin/cv
+                    '';
+                  };
+                };
               }
             ];
           };

@@ -394,7 +394,7 @@ main = do
     Left err -> putStrLn $ "Error parsing cv.json: " ++ err
     Right cv -> do
       putStrLn "Successfully parsed cv.json! Generating cv.pdf..."
-      runPdf "cv.pdf" standardDocInfo (PDFRect 0 0 595 842) (renderCV fontHeader fontBody cv)
+      runPdf "out/cv.pdf" standardDocInfo (PDFRect 0 0 595 842) (renderCV fontHeader fontBody cv)
       putStrLn "cv.pdf generated."
 
 -------------------------------------------------------------------------------
