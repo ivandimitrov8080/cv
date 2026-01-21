@@ -15,7 +15,6 @@
   };
   outputs =
     inputs@{
-      self,
       nixpkgs,
       configuration,
       systems,
@@ -23,15 +22,46 @@
       neovim-nightly-overlay,
       devenv,
       treefmt-nix,
+      ...
     }:
     let
       eachSystem = nixpkgs.lib.genAttrs (import systems);
     in
     {
-      packages = eachSystem (_system: {
-        inherit (nixpkgs.legacyPackages.x86_64-linux) hello;
-        default = self.packages.x86_64-linux.hello;
-      });
+      packages = eachSystem (
+        system:
+        let
+          pkgs = import nixpkgs {
+            inherit system;
+          };
+        in
+        {
+          default = pkgs.stdenv.mkDerivation {
+            name = "cv";
+            version = "1.0";
+            src = ./.;
+            buildInputs = with pkgs; [
+              (ghc.withPackages (
+                hp: with hp; [
+                  HPDF
+                  aeson
+                ]
+              ))
+            ];
+            buildPhase = ''
+              runHook preBuild
+              runghc cv.hs
+              runHook postBuild
+            '';
+            installPhase = ''
+              runHook preBuild
+              mkdir -p $out
+              cp cv.pdf $out
+              runHook postBuild
+            '';
+          };
+        }
+      );
       devShells = eachSystem (
         system:
         let
