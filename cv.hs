@@ -381,13 +381,13 @@ drawSkill font y s = do
 main :: IO ()
 main = do
   fontHeaderResult <- mkStdFont Times_Bold
-  fontBodyResult   <- mkStdFont Times_Roman
+  fontBodyResult <- mkStdFont Times_Roman
   let fontHeader = case fontHeaderResult of
         Right fh -> fh
-        Left e   -> error ("Header font error: " ++ show e)
-      fontBody  = case fontBodyResult of
+        Left e -> error ("Header font error: " ++ show e)
+      fontBody = case fontBodyResult of
         Right fb -> fb
-        Left e   -> error ("Body font error: " ++ show e)
+        Left e -> error ("Body font error: " ++ show e)
   jsonData <- BSL.readFile "cv.json"
   let parseResult = eitherDecode jsonData :: Either String CV
   case parseResult of

@@ -1,4 +1,5 @@
 result
+.pre-commit-config.yaml
 .devenv
 .direnv
 cv.pdf

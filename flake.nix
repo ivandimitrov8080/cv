@@ -11,6 +11,7 @@
     neovim-nightly-overlay.inputs.nixpkgs.follows = "nixpkgs";
     devenv.url = "github:cachix/devenv";
     devenv.inputs.nixpkgs.follows = "nixpkgs";
+    treefmt-nix.url = "github:numtide/treefmt-nix";
   };
   outputs =
     inputs@{
@@ -21,13 +22,14 @@
       nixvim-flake,
       neovim-nightly-overlay,
       devenv,
+      treefmt-nix,
     }:
     let
       eachSystem = nixpkgs.lib.genAttrs (import systems);
     in
     {
-      packages = eachSystem (system: {
-        hello = nixpkgs.legacyPackages.x86_64-linux.hello;
+      packages = eachSystem (_system: {
+        inherit (nixpkgs.legacyPackages.x86_64-linux) hello;
         default = self.packages.x86_64-linux.hello;
       });
       devShells = eachSystem (
@@ -39,7 +41,7 @@
           pkgs = import nixpkgs {
             inherit system;
             overlays = [
-              (final: prev: {
+              (_final: _prev: {
                 nixvim = nixvim-default;
               })
               configuration.overlays.default
@@ -62,10 +64,39 @@
                     ]
                   ))
                 ];
+                git-hooks.hooks = {
+                  nixfmt.enable = true;
+                  prettier.enable = true;
+                  deadnix.enable = true;
+                  statix.enable = true;
+                  ormolu.enable = true;
+                  ormolu.settings.defaultExtensions = [
+                    "ImportQualifiedPost"
+                  ];
+                };
               }
             ];
           };
         }
+      );
+      formatter = eachSystem (
+        system:
+        let
+          pkgs = import nixpkgs { inherit system; };
+        in
+        (treefmt-nix.lib.evalModule pkgs {
+          projectRootFile = "flake.nix";
+          programs = {
+            nixfmt.enable = true;
+            prettier.enable = true;
+            deadnix.enable = true;
+            statix.enable = true;
+            ormolu.enable = true;
+            ormolu.ghcOpts = [
+              "ImportQualifiedPost"
+            ];
+          };
+        }).config.build.wrapper
       );
       checks = eachSystem (
         system:
