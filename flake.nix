@@ -40,17 +40,12 @@
             name = "cv";
             version = "1.0";
             src = ./.;
-            buildInputs = with pkgs; [
-              (ghc.withPackages (
-                hp: with hp; [
-                  HPDF
-                  aeson
-                ]
-              ))
+            nativeBuildInputs = with pkgs; [
+              typst
             ];
             buildPhase = ''
               runHook preBuild
-              runghc cv.hs
+              typst c cv.typ
               runHook postBuild
             '';
             installPhase = ''
@@ -84,16 +79,10 @@
             modules = [
               {
                 packages = with pkgs; [
-                  (nixvim.haskell.extend {
+                  (nixvim.main.extend {
                     lsp.servers.jsonls.enable = true;
                     lsp.servers.tinymist.enable = true;
                   })
-                  (ghc.withPackages (
-                    hp: with hp; [
-                      HPDF
-                      aeson
-                    ]
-                  ))
                   typst
                 ];
                 git-hooks.hooks = {
@@ -101,32 +90,13 @@
                   prettier.enable = true;
                   deadnix.enable = true;
                   statix.enable = true;
-                  ormolu.enable = true;
-                  ormolu.settings.defaultExtensions = [
-                    "ImportQualifiedPost"
-                  ];
                 };
                 tasks = {
                   "clean:all" = {
-                    exec = "rm -rf {out,bin}";
-                  };
-                  "build:init" = {
-                    exec = ''
-                      mkdir -p {out,bin}/
-                    '';
-                    before = [
-                      "build:cv"
-                      "build:bin"
-                    ];
-                  };
-                  "build:bin" = {
-                    exec = "ghc -outputdir out/ cv.hs -o bin/cv";
-                    before = [ "build:cv" ];
+                    exec = "rm -rf cv.pdf";
                   };
                   "build:cv" = {
-                    exec = ''
-                      bin/cv
-                    '';
+                    exec = "typst c cv.typ";
                   };
                 };
               }
@@ -146,10 +116,6 @@
             prettier.enable = true;
             deadnix.enable = true;
             statix.enable = true;
-            ormolu.enable = true;
-            ormolu.ghcOpts = [
-              "ImportQualifiedPost"
-            ];
           };
         }).config.build.wrapper
       );
