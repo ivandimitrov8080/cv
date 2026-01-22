@@ -1,9 +1,9 @@
 = Ivan Kirilov Dimitrov
 Software Developer
 
-#link("mailto:ivan@idimitrov.dev")[ivan\@idimitrov.dev]
-#link("https://github.com/ivandimitrov8080")[github.com/ivandimitrov8080]
-#link("https://idimitrov.dev")[idimitrov.dev]
+#link("mailto:ivan@idimitrov.dev")[ivan\@idimitrov.dev] |
+#link("https://github.com/ivandimitrov8080")[github.com/ivandimitrov8080] |
+#link("https://idimitrov.dev")[idimitrov.dev] |
 #link("https://www.upwork.com/freelancers/idimitrov")[upwork.com/idimitrov]
 
 #line()
