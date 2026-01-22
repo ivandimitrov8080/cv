@@ -86,6 +86,7 @@
                 packages = with pkgs; [
                   (nixvim.haskell.extend {
                     lsp.servers.jsonls.enable = true;
+                    lsp.servers.tinymist.enable = true;
                   })
                   (ghc.withPackages (
                     hp: with hp; [
@@ -93,6 +94,7 @@
                       aeson
                     ]
                   ))
+                  typst
                 ];
                 git-hooks.hooks = {
                   nixfmt.enable = true;
