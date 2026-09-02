@@ -1,15 +1,15 @@
-#set text(font: "FiraCode Nerd Font Mono")
+#set text(font: "FiraCode Nerd Font Mono", 11pt)
 
 #show heading: set align(center)
+#show heading: set text(12pt)
 #show link: underline
 
 = Ivan Kirilov Dimitrov
 == Software Developer
-#show link: set text(8pt)
+#show link: set text(10pt)
 
 #link("mailto:ivan@idimitrov.dev")[ivan\@idimitrov.dev] |
 #link("https://github.com/ivandimitrov8080")[github.com/ivandimitrov8080] |
-#link("https://idimitrov.dev")[idimitrov.dev] |
 #link("https://www.upwork.com/freelancers/idimitrov")[upwork.com/idimitrov]
 
 #show link: set text(11pt)
@@ -52,22 +52,8 @@ Spring Framework project with a react web frontend and an android app.
 === SWU 'Neofit Rilski', Bachelor's in Electronics
 ==== Blagoevgrad, Bulgaria — Sep 2016–Jun 2018
 
-This is an engineering degree focused on the science of electronics and electrical engineering. It studies the physical properties of individual electrons and the forces that take place when current is flowing through a circuit.
-
 == Certificates
 
-=== Oracle Certified Professional, Java SE 8 Programmer
+#link("https://www.credly.com/badges/281fbd5f-ca29-4235-b023-a9b93af2f6c5/public_url")[Oracle Certified Professional, Java SE 8 Programmer - Issued by Oracle — 19 May 2020]
 
-Issued by Oracle — 19 May 2020
-
-An Oracle Certified Professional, Java SE 8 Programmer has validated their Java development skills by answering challenging, real-world, scenario-based questions that measure problem solving skills using Java code.  
-
-#link("https://www.credly.com/badges/281fbd5f-ca29-4235-b023-a9b93af2f6c5/public_url")[Credly]
-
-=== Oracle Certified Associate, Java SE 8 Programmer
-
-Issued by Oracle — 17 Mar 2020
-
-An Oracle Certified Associate, Java SE 8 Programmer has demonstrated knowledge of object-oriented concepts, the Java programming language and general knowledge of Java platforms and technologies.  
-
-#link("https://www.credly.com/badges/910f311b-0f7f-4911-b945-5ded663408ec/public_url")[Credly]
+#link("https://www.credly.com/badges/910f311b-0f7f-4911-b945-5ded663408ec/public_url")[Oracle Certified Associate, Java SE 8 Programmer - Issued by Oracle — 17 Mar 2020]
