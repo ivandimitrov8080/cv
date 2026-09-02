@@ -63,20 +63,6 @@
                 packages = with pkgs; [
                   typst
                 ];
-                git-hooks.hooks = {
-                  nixfmt.enable = true;
-                  prettier.enable = true;
-                  deadnix.enable = true;
-                  statix.enable = true;
-                };
-                tasks = {
-                  "clean:all" = {
-                    exec = "rm -rf cv.pdf";
-                  };
-                  "build:cv" = {
-                    exec = "typst c cv.typ";
-                  };
-                };
               }
             ];
           };

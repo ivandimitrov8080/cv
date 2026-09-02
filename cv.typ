@@ -20,7 +20,7 @@
 
 My software consultancy engaging in enterprise web development.
 
-#link("https://www.upwork.com/freelancers/idimitrov")[Upwork] | #link("https://idimitrov.dev/cases")[Resume]
+#link("https://www.upwork.com/freelancers/idimitrov")[Upwork] | #link("https://idimitrov.dev/")[Resume]
 
 === Deutsche Börse AG, Senior Software Developer
 ==== Prague, Czechia — Feb 2024–Dec 2025
@@ -39,8 +39,8 @@ SAP hybris project (based on Spring+Maven+Ant with many extensions) integrating 
 Adyen, PayPal, WellsFargo, ParcelLab among others. The frontend was a mix of vanilla html,css,js,thymeleaf and react.
 
 #link("https://racreative.co.uk/")[RA Creative] |
-#link("https://idimitrov.dev/posts/parcellab.html")[Parcel Lab case study] |
-#link("https://idimitrov.dev/posts/wellsfargo.html")[Wells Fargo case study]
+#link("https://idimitrov.dev/posts/my-work/parcellab.html")[Parcel Lab case study] |
+#link("https://idimitrov.dev/posts/my-work/wellsfargo.html")[Wells Fargo case study]
 
 === Central Net, Full Stack + Mobile Software Developer
 ==== Blagoevgrad, Bulgaria — May 2016–May 2020
