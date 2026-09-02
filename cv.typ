@@ -1,7 +1,45 @@
-#set text(font: "FiraCode Nerd Font Mono", 11pt)
+#set page(
+  paper: "a4",
+  margin: (x: 1.6cm, y: 1.4cm),
+)
 
-#show heading: set align(center)
-#show heading: set text(12pt)
+#set text(
+  font: "FiraCode Nerd Font Mono",
+  10.5pt,
+  fill: rgb("#1f2933"),
+)
+
+#set par(
+  leading: 0.65em,
+  justify: true,
+)
+
+#set heading(numbering: none)
+
+#show heading.where(level: 1): it => block(above: 0pt, below: 0.15em)[
+  #set align(center)
+  #set text(20pt, weight: "bold", fill: rgb("#0f172a"))
+  #it.body
+]
+
+#show heading.where(level: 2): it => block(above: 1.2em, below: 0.55em)[
+  #set text(11.5pt, weight: "bold", fill: rgb("#0f172a"))
+  #it.body
+  #v(0.2em)
+  #line(length: 100%, stroke: (paint: rgb("#94a3b8"), thickness: 0.7pt))
+]
+
+#show heading.where(level: 3): it => block(above: 0.95em, below: 0.18em)[
+  #set text(10.7pt, weight: "bold", fill: rgb("#111827"))
+  #it.body
+]
+
+#show heading.where(level: 4): it => block(above: 0pt, below: 0.45em)[
+  #set text(9.6pt, fill: rgb("#475569"))
+  #it.body
+]
+
+#show link: set text(fill: rgb("#0f766e"))
 #show link: underline
 
 = Ivan Kirilov Dimitrov
