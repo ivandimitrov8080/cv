@@ -64,15 +64,14 @@ including SAP, GLEIF, Google, Wells Fargo, Adyen, PayPal, and parcelLab.
 
 == Skills
 
-*Languages:* Java, JavaScript, TypeScript, Haskell, Elm, SQL
+*Languages:* Java, JavaScript, TypeScript, SQL
 
-*Backend:* Spring Framework, Maven, REST APIs, SAP Commerce / Hybris,
-Next.js server features, NextAuth
+*Backend:* Spring Framework, Maven, REST APIs, SAP Commerce / Hybris
 
 *Frontend:* React, Redux, RTK Query, Bootstrap, TailwindCSS, DaisyUI,
 Thymeleaf, HTML, CSS
 
-*Data / Infra:* PostgreSQL, Prisma ORM, Nix, NixOS, Linux, JMX / VisualVM
+*Data / Infra:* PostgreSQL, OracleDB, NixOS, Linux, Docker, K8S, minikube
 
 *Integrations:* SAP, GLEIF, Google Drive and Docs APIs, Wells Fargo Open
 Banking, parcelLab, Adyen, PayPal
