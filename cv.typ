@@ -60,9 +60,8 @@ Software developer with 8+ years of experience across enterprise Java systems,
 eCommerce integrations, and modern web applications. Reduced GLEIF import time
 by 97% (5 hours to 10 minutes) and halved CI build time at Deutsche Börse AG,
 and led a Reporting ID redesign that cut production defects. Founded and ran a
-solo consultancy delivering 15 projects for 10 clients, and integrated
-providers including SAP, GLEIF, Google, Wells Fargo, Adyen, PayPal, and
-parcelLab.
+solo consultancy delivering client projects, and integrated providers
+including SAP, GLEIF, Google, Wells Fargo, Adyen, PayPal, and parcelLab.
 
 == Skills
 
@@ -105,11 +104,11 @@ Agile/Scrum, problem solving
 Software consultancy focused on enterprise web development, integrations,
 internal tooling, and custom web applications.
 
-- Founded and ran a solo software consultancy, delivering 15 projects for 10
-  clients since 2023, including repeat engagements.
+- Founded and ran a solo software consultancy since 2023, delivering client
+  projects including repeat engagements.
 - Rated 5.0/5.0 by clients across 6 reviews on Upwork, and solely responsible
-  for every stage of delivery on all 15 projects — requirements analysis,
-  architecture, implementation, deployment, and client communication.
+  for every stage of delivery — requirements analysis, architecture,
+  implementation, deployment, and client communication.
 - Built a multi-tenant knowledge base web app using Next.js, TypeScript,
   TailwindCSS, DaisyUI, PostgreSQL, Prisma, NextAuth, and Google Drive APIs,
   hosted on Vercel.
@@ -153,7 +152,7 @@ RTK Query, and Bootstrap.
   increasing team capacity on the project and shortening ramp-up through
   documented interfaces and setup notes.
 
-#link("https://www.eurex.com/ec-en/support/initiatives/c7-client-administration-service/C7-CAS-Releases-2900566?frag=3919554")[Release notes] | #link("https://idimitrov.dev/posts/my-work/c7cas.html")[Project notes]
+#link("https://www.eurex.com/ec-en/support/initiatives/c7-client-administration-service/C7-CAS-Releases-2900566?frag=4722664")[Release notes] | #link("https://idimitrov.dev/posts/my-work/c7cas.html")[Project notes]
 
 === RA Creative, Software Developer
 ==== Nottingham, UK — Dec 2020–Jan 2023
@@ -162,8 +161,8 @@ Worked on SAP Commerce / Hybris projects for international eCommerce brands in
 an agency environment delivering design, development, and integrations.
 
 - Delivered SAP Commerce / Hybris solutions for Watches of Switzerland Group
-  across five brands (Mayors, Mappin & Webb, Watches of Switzerland UK/US,
-  Goldsmiths), on an estate with £1.2 billion group revenue and seven retail
+  across its brands (Watches of Switzerland UK/US, Mappin & Webb, Goldsmiths,
+  and Mayors), on an estate with £1.2 billion group revenue and seven retail
   websites (FY22).
 - Integrated parcelLab across three of the group's brands (Watches of
   Switzerland UK, Mappin & Webb and Goldsmiths), introducing branded
