@@ -92,7 +92,8 @@ Android (Java)
 
 *Practices:* software development, DevOps practices, Git version control,
 code refactoring, code review, data structures and algorithms, security best
-practices, technical support, business analysis, Agile/Scrum, problem solving
+practices, technical support, business analysis, requirements analysis,
+Agile/Scrum, problem solving
 
 == Experience
 
@@ -102,7 +103,8 @@ practices, technical support, business analysis, Agile/Scrum, problem solving
 Software consultancy focused on enterprise web development, integrations,
 internal tooling, and custom web applications.
 
-- Delivered 15 projects for 10 clients as an independent software consultancy.
+- Founded and ran a solo software consultancy, delivering 15 projects for 10
+  clients end to end.
 - Built a multi-tenant knowledge base web app using Next.js, TypeScript,
   TailwindCSS, DaisyUI, PostgreSQL, Prisma, NextAuth, and Google Drive APIs,
   hosted on Vercel.
@@ -111,8 +113,9 @@ internal tooling, and custom web applications.
   API-heavy request flows.
 - Delivered documentation-oriented websites and supporting infrastructure,
   including a static Markdown wiki and a Hakyll-based site deployed on NixOS.
-- Operated as a solo consultancy, coordinating directly with each client's
-  engineering, product, and design teams.
+- Owned the full delivery lifecycle solo — requirements analysis, architecture,
+  implementation, and client communication — working directly with each
+  client's engineering, product, and design teams to ship projects end to end.
 
 #link("https://www.upwork.com/freelancers/idimitrov")[Upwork] | #link("https://idimitrov.dev/")[Portfolio] | #link("https://idimitrov.dev/posts/my-work/stepsy-wiki.html")[Knowledge base case study]
 
@@ -123,29 +126,27 @@ Worked on a data-driven Spring Framework Maven application integrating with
 SAP, GLEIF, and internal services, with a React frontend using Redux,
 RTK Query, and Bootstrap.
 
-- Reported to the Head of Unit and Director, coordinating with project managers
-  across delivery.
 - Reduced GLEIF import time from 5 hours to 10 minutes by optimizing the data
   import pipeline.
 - Redesigned the Reporting ID functionality that consolidates data from
   multiple Disclosed Clients into one report, introducing the OTC Report
   Receiver admission type with access to consolidated OTC daily reports
-  (CC203, CC204, CC209) and 5-letter Reporting ID setup via C7 CAS, which
-  reduced production defects and gave users a more flexible, streamlined
-  process.
+  (CC203, CC204, CC209) and 5-letter Reporting ID setup via C7 CAS (Release
+  2.293), which reduced production defects and gave users a more flexible,
+  streamlined process.
+- Delivered OTC IRS Products & Currencies maintenance, enabling Clearing
+  Members to manage OTC IRS product and currency setups paperless via C7 CAS
+  (Release 2.284.6, production 30 September 2024), replacing paper-based
+  administration for Eurex Clearing (~200 Clearing Members in 22 countries).
 - Enabled same-day submission of Segregation Change Requests and Position
   Account Requests that depend on not-yet-synced SAP data, removing a day of
   waiting for users.
-- Engineered release-backed features for C7 CAS, including OTC IRS product and
-  currency activation and deactivation workflows.
-- Led the transition from paper-based administration to digital request handling
-  in a regulated enterprise environment.
+- Cut continuous integration build time by half using Maven parallel builds,
+  while keeping automated code quality checks in the pipeline.
 - Led API development for third-party service integrations and documented
   interfaces and APIs for consuming teams.
-- Established continuous integration pipelines for automated code quality checks
-  and streamlined the software development lifecycle.
-- Reviewed code and refactored modules to maintain code quality and standards.
-- Recruited and onboarded a senior developer to the project.
+- Reviewed code and refactored modules to maintain code quality and standards,
+  and recruited and onboarded a senior developer to the project.
 
 #link("https://www.eurex.com/ec-en/support/initiatives/c7-client-administration-service/C7-CAS-Releases-2900566?frag=3919554")[Release notes] | #link("https://idimitrov.dev/posts/my-work/c7cas.html")[Project notes]
 
@@ -157,20 +158,20 @@ an agency environment delivering design, development, and integrations.
 
 - Delivered SAP Commerce / Hybris solutions for Watches of Switzerland Group
   across five brands (Mayors, Mappin & Webb, Watches of Switzerland UK/US,
-  Goldsmiths), supporting USD 1–2 billion in transaction volume.
+  Goldsmiths), on an estate with £1.2 billion group revenue and seven retail
+  websites (FY22).
+- Integrated parcelLab across the group's brands, bringing all order volume
+  under branded order-status tracking and proactive delivery and returns
+  notifications (130+ stores, average order value over £5,900).
+- Integrated payment and commerce providers including Adyen, PayPal,
+  Wells Fargo Open Banking, and parcelLab.
 - Built and maintained full-stack Spring, Maven, and Ant-based SAP Commerce
   solutions across storefront, backend, integration, and frontend layers,
   including vanilla HTML, CSS, JavaScript, Thymeleaf, and React.
-- Integrated payment and commerce providers including Adyen, PayPal,
-  Wells Fargo Open Banking, and parcelLab.
 - Integrated a watchdog service that automatically restarted a crash-prone
   internal application, cutting crashes from about one a week to near zero
   (near-100% uptime) and removing manual intervention.
-- Supported international retail eCommerce clients through secure payments,
-  post-purchase, and customer account workflows.
-- Collaborated within a team of 4 developers, 2 project managers, 1 tester, and
-  1 designer.
-- Tested releases and reviewed code to maintain quality.
+- Tested releases and reviewed code to maintain quality in a 4-developer team.
 
 #link("https://racreative.co.uk/")[RA Creative] |
 #link("https://idimitrov.dev/posts/my-work/parcellab.html")[Parcel Lab case study] |
@@ -181,9 +182,11 @@ an agency environment delivering design, development, and integrations.
 
 Worked on a Spring Framework product with a React web frontend and Android app.
 
-- Delivered features across backend, web, and mobile layers in a small team.
+- Delivered features across backend, web, and mobile layers of a product used
+  by 100+ technical students to track homework and news and vote on exam
+  dates.
 - Developed full-stack functionality spanning Java/Spring services, React UI,
-  and Android client code (mobile development).
+  and Android client code (mobile development), working in a small team.
 - Tested software across web and mobile platforms to ensure quality.
 
 == Education
