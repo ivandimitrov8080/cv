@@ -49,6 +49,7 @@
 #show link: set text(10pt)
 
 #link("mailto:ivan@idimitrov.dev")[ivan\@idimitrov.dev] |
+#link("tel:+31685743745")[+31 685 743 745] |
 #link("https://github.com/ivandimitrov8080")[github.com/ivandimitrov8080] |
 #link("https://www.upwork.com/freelancers/idimitrov")[upwork.com/idimitrov]
 
@@ -57,10 +58,11 @@
 
 Software developer with 8+ years of experience across enterprise Java systems,
 eCommerce integrations, and modern web applications. Reduced GLEIF import time
-from 5 hours to 10 minutes and led a Reporting ID redesign that cut production
-defects at Deutsche Börse AG. Delivered 15 projects for 10 clients as an
-independent consultant and integrated providers including SAP, GLEIF, Google,
-Wells Fargo, Adyen, PayPal, and parcelLab.
+by 97% (5 hours to 10 minutes) and halved CI build time at Deutsche Börse AG,
+and led a Reporting ID redesign that cut production defects. Founded and ran a
+solo consultancy delivering 15 projects for 10 clients, and integrated
+providers including SAP, GLEIF, Google, Wells Fargo, Adyen, PayPal, and
+parcelLab.
 
 == Skills
 
@@ -160,9 +162,10 @@ an agency environment delivering design, development, and integrations.
   across five brands (Mayors, Mappin & Webb, Watches of Switzerland UK/US,
   Goldsmiths), on an estate with £1.2 billion group revenue and seven retail
   websites (FY22).
-- Integrated parcelLab across the group's brands, bringing all order volume
-  under branded order-status tracking and proactive delivery and returns
-  notifications (130+ stores, average order value over £5,900).
+- Integrated parcelLab across three of the group's brands (Watches of
+  Switzerland UK, Mappin & Webb and Goldsmiths), bringing all order volume on
+  those brands under branded order-status tracking and proactive delivery and
+  returns notifications (130+ stores, average order value over £5,900).
 - Integrated payment and commerce providers including Adyen, PayPal,
   Wells Fargo Open Banking, and parcelLab.
 - Built and maintained full-stack Spring, Maven, and Ant-based SAP Commerce
