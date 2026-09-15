@@ -106,7 +106,11 @@ Software consultancy focused on enterprise web development, integrations,
 internal tooling, and custom web applications.
 
 - Founded and ran a solo software consultancy, delivering 15 projects for 10
-  clients end to end.
+  clients since 2023 — an average of 1.5 engagements per client, including
+  repeat business.
+- Solely responsible for every stage of delivery on all 15 projects —
+  requirements analysis, architecture, implementation, deployment, and client
+  communication.
 - Built a multi-tenant knowledge base web app using Next.js, TypeScript,
   TailwindCSS, DaisyUI, PostgreSQL, Prisma, NextAuth, and Google Drive APIs,
   hosted on Vercel.
@@ -115,9 +119,6 @@ internal tooling, and custom web applications.
   API-heavy request flows.
 - Delivered documentation-oriented websites and supporting infrastructure,
   including a static Markdown wiki and a Hakyll-based site deployed on NixOS.
-- Owned the full delivery lifecycle solo — requirements analysis, architecture,
-  implementation, and client communication — working directly with each
-  client's engineering, product, and design teams to ship projects end to end.
 
 #link("https://www.upwork.com/freelancers/idimitrov")[Upwork] | #link("https://idimitrov.dev/")[Portfolio] | #link("https://idimitrov.dev/posts/my-work/stepsy-wiki.html")[Knowledge base case study]
 
@@ -128,8 +129,8 @@ Worked on a data-driven Spring Framework Maven application integrating with
 SAP, GLEIF, and internal services, with a React frontend using Redux,
 RTK Query, and Bootstrap.
 
-- Reduced GLEIF import time from 5 hours to 10 minutes by optimizing the data
-  import pipeline.
+- Reduced GLEIF import time by 97%, from 5 hours to 10 minutes, by optimizing
+  the Spring/Maven data import pipeline.
 - Redesigned the Reporting ID functionality that consolidates data from
   multiple Disclosed Clients into one report, introducing the OTC Report
   Receiver admission type with access to consolidated OTC daily reports
@@ -143,12 +144,13 @@ RTK Query, and Bootstrap.
 - Enabled same-day submission of Segregation Change Requests and Position
   Account Requests that depend on not-yet-synced SAP data, removing a day of
   waiting for users.
-- Cut continuous integration build time by half using Maven parallel builds,
-  while keeping automated code quality checks in the pipeline.
+- Cut CI build time by 50% using Maven parallel builds while keeping automated
+  code quality checks in the pipeline; reviewed code and refactored modules to
+  maintain code quality and standards.
 - Led API development for third-party service integrations and documented
   interfaces and APIs for consuming teams.
-- Reviewed code and refactored modules to maintain code quality and standards,
-  and recruited and onboarded a senior developer to the project.
+- Recruited and onboarded a senior developer, increasing team capacity on the
+  project.
 
 #link("https://www.eurex.com/ec-en/support/initiatives/c7-client-administration-service/C7-CAS-Releases-2900566?frag=3919554")[Release notes] | #link("https://idimitrov.dev/posts/my-work/c7cas.html")[Project notes]
 
@@ -171,9 +173,9 @@ an agency environment delivering design, development, and integrations.
 - Built and maintained full-stack Spring, Maven, and Ant-based SAP Commerce
   solutions across storefront, backend, integration, and frontend layers,
   including vanilla HTML, CSS, JavaScript, Thymeleaf, and React.
-- Integrated a watchdog service that automatically restarted a crash-prone
-  internal application, cutting crashes from about one a week to near zero
-  (near-100% uptime) and removing manual intervention.
+- Integrated a DevOps watchdog service that automatically restarted a
+  crash-prone internal application, cutting crashes by ~99% (from about one a
+  week to near zero, near-100% uptime) and removing manual intervention.
 - Tested releases and reviewed code to maintain quality in a 4-developer team.
 
 #link("https://racreative.co.uk/")[RA Creative] |
@@ -186,10 +188,11 @@ an agency environment delivering design, development, and integrations.
 Worked on a Spring Framework product with a React web frontend and Android app.
 
 - Delivered features across backend, web, and mobile layers of a product used
-  by 100+ technical students to track homework and news and vote on exam
-  dates.
+  by 100+ technical students to track homework and news and vote on exam dates,
+  sustaining the product over four years (2016–2020).
 - Developed full-stack functionality spanning Java/Spring services, React UI,
-  and Android client code (mobile development), working in a small team.
+  and Android client code (mobile development) in a small team, owning delivery
+  from implementation through testing.
 - Tested software across web and mobile platforms to ensure quality.
 
 == Education
