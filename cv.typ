@@ -64,17 +64,29 @@ including SAP, GLEIF, Google, Wells Fargo, Adyen, PayPal, and parcelLab.
 
 == Skills
 
-*Languages:* Java, JavaScript, TypeScript, SQL
+*Languages:* Java, JavaScript, TypeScript, SQL, Bash, Python
 
-*Backend:* Spring Framework, Maven, REST APIs, SAP Commerce / Hybris
+*Backend:* Spring Framework, SAP Commerce / Hybris, Express, NextJS
 
 *Frontend:* React, Redux, RTK Query, Bootstrap, TailwindCSS, DaisyUI,
 Thymeleaf, HTML, CSS
 
 *Data / Infra:* PostgreSQL, OracleDB, NixOS, Linux, Docker, K8S, minikube
 
+*Build / Package:* Maven, Gradle, Ant, Webpack, Vite
+
 *Integrations:* SAP, GLEIF, Google Drive and Docs APIs, Wells Fargo Open
 Banking, parcelLab, Adyen, PayPal
+
+*API:* REST, SOAP, tRPC
+
+*Testing:* JUnit 4/5/6, Mockito, Postman, Hurl
+
+*Maintenance and technical documentation:* JavaDocs, Swagger
+
+*Debugging:* IntelliJ Idea debugger, JDB
+
+*Teamwork:* Agile, Scrum, Retrospective
 
 == Experience
 
@@ -107,6 +119,13 @@ RTK Query, and Bootstrap.
   Receiver admission type and related account-linking flows.
 - Helped replace paper-based administration with digital request handling in a
   regulated enterprise environment.
+- Performed code review to maintain code quality.
+- Applied DevOps practices to streamline the software development lifecycle.
+- Established continuous integration pipelines for automated code quality checks.
+- Provided technical support to resolve software issues.
+- Conducted software testing to ensure quality.
+- Employed agile methodologies to enhance project management.
+- Led API development for seamless integration with third party services.
 
 #link("https://www.eurex.com/ec-en/support/initiatives/c7-client-administration-service/C7-CAS-Releases-2900566?frag=3919554")[Release notes] | #link("https://idimitrov.dev/posts/my-work/c7cas.html")[Project notes]
 
@@ -124,6 +143,11 @@ an agency environment delivering design, development, and integrations.
   JavaScript, Thymeleaf, and React.
 - Supported international retail eCommerce clients through secure payments,
   post-purchase, and customer account workflows.
+- Provided technical support to resolve software issues.
+- Performed code review to maintain code quality.
+- Conducted software testing to ensure quality.
+- Employed agile methodologies to enhance project management.
+- Led API development for seamless integration with third party services.
 
 #link("https://racreative.co.uk/")[RA Creative] |
 #link("https://idimitrov.dev/posts/my-work/parcellab.html")[Parcel Lab case study] |
@@ -137,6 +161,7 @@ Worked on a Spring Framework product with a React web frontend and Android app.
 - Delivered features across backend, web, and mobile layers in a small team.
 - Contributed to full-stack development spanning Java services, React UI, and
   Android client functionality.
+- Conducted software testing to ensure quality.
 
 == Education
 
