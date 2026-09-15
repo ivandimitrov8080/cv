@@ -66,30 +66,33 @@ Wells Fargo, Adyen, PayPal, and parcelLab.
 
 *Languages:* Java, JavaScript, TypeScript, SQL, Bash, Python
 
-*Backend:* Spring Framework, SAP Commerce / Hybris, Node.js, Express, NextJS
+*Backend:* Spring Framework, SAP Commerce / Hybris, Node.js, Express, Next.js
 
 *Frontend:* React, Redux, RTK Query, Bootstrap, TailwindCSS, DaisyUI,
-Thymeleaf, HTML, CSS, UI/UX design
+Thymeleaf, HTML, CSS, user interface (UI) and user experience (UX) design
 
 *Database management:* PostgreSQL, OracleDB
 
-*Cloud / Infra:* Docker, Kubernetes (K8S), minikube, Vercel, NixOS, Linux
+*Cloud / Infra:* cloud computing, Docker, Kubernetes (K8S), minikube, Vercel,
+NixOS, Linux
 
 *Build / Package:* Maven, Gradle, Ant, Webpack, Vite
 
 *Integrations:* SAP, GLEIF, Google Drive and Docs APIs, Wells Fargo Open
 Banking, parcelLab, Adyen, PayPal
 
-*API:* REST, SOAP, tRPC
+*APIs:* REST, SOAP, tRPC
 
-*Testing:* JUnit 4/5/6, Mockito, Postman, Hurl
+*Software testing:* JUnit 4/5/6, Mockito, Postman, Hurl, debugging
 
-*Maintenance and technical documentation:* JavaDocs, Swagger
+*Software maintenance and technical documentation:* JavaDocs, Swagger
 
-*Mobile:* Android (Java)
+*Mobile:* mobile development, cross-platform development (PWA),
+Android (Java)
 
-*Practices:* Git version control, code refactoring, code review, algorithms,
-security best practices, business analysis, Agile/Scrum, problem solving
+*Practices:* software development, DevOps practices, Git version control,
+code refactoring, code review, data structures and algorithms, security best
+practices, technical support, business analysis, Agile/Scrum, problem solving
 
 == Experience
 
@@ -124,9 +127,12 @@ RTK Query, and Bootstrap.
   across delivery.
 - Reduced GLEIF import time from 5 hours to 10 minutes by optimizing the data
   import pipeline.
-- Redesigned the Reporting ID workflow, supporting the OTC Report Receiver
-  admission type and account-linking flows, which reduced production defects
-  and gave users a more flexible, streamlined process.
+- Redesigned the Reporting ID functionality that consolidates data from
+  multiple Disclosed Clients into one report, introducing the OTC Report
+  Receiver admission type with access to consolidated OTC daily reports
+  (CC203, CC204, CC209) and 5-letter Reporting ID setup via C7 CAS, which
+  reduced production defects and gave users a more flexible, streamlined
+  process.
 - Enabled same-day submission of Segregation Change Requests and Position
   Account Requests that depend on not-yet-synced SAP data, removing a day of
   waiting for users.
@@ -152,15 +158,14 @@ an agency environment delivering design, development, and integrations.
 - Delivered SAP Commerce / Hybris solutions for Watches of Switzerland Group
   across five brands (Mayors, Mappin & Webb, Watches of Switzerland UK/US,
   Goldsmiths), supporting USD 1–2 billion in transaction volume.
-- Built and maintained Spring, Maven, and Ant-based SAP Commerce solutions
-  across storefront, backend, and integration layers.
+- Built and maintained full-stack Spring, Maven, and Ant-based SAP Commerce
+  solutions across storefront, backend, integration, and frontend layers,
+  including vanilla HTML, CSS, JavaScript, Thymeleaf, and React.
 - Integrated payment and commerce providers including Adyen, PayPal,
   Wells Fargo Open Banking, and parcelLab.
-- Integrated a watchdog service into an internal application that automatically
-  restarted it after crashes (previously about weekly), improving uptime and
-  removing manual intervention.
-- Contributed frontend implementations across vanilla HTML, CSS, JavaScript,
-  Thymeleaf, and React.
+- Integrated a watchdog service that automatically restarted a crash-prone
+  internal application, cutting crashes from about one a week to near zero
+  (near-100% uptime) and removing manual intervention.
 - Supported international retail eCommerce clients through secure payments,
   post-purchase, and customer account workflows.
 - Collaborated within a team of 4 developers, 2 project managers, 1 tester, and
