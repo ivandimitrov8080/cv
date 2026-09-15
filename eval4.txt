@@ -1,0 +1,732 @@
+Resume Evaluation
+
+https://www.toptal.com/resume/portal/reports/149c5097d5f02b34e806da3a1e...
+
+1 of 8
+
+9/15/26, 09:19
+
+Resume Evaluation
+
+https://www.toptal.com/resume/portal/reports/149c5097d5f02b34e806da3a1e...
+
+Resume Evaluation
+
+Evaluation Name: Resume Evaluation #7
+
+Target Job Title: Software Developer
+
+We calculated your resume score by checking formatting, ATS compatibility, keyword usage, relevance to the job title you shared, and
+
+more. Find out how to format your resume, which keywords to add, and how to boost your measurable achievements.
+
+TOTAL SCORE
+
+93%
+
+88%
+Keyword
+Analysis
+
+100%
+Target Job Fit
+
+74%
+Achievements
+and Impact
+
+100%
+Formatting
+and ATS
+Readiness
+
+95%
+Language and
+Communication
+
+96%
+Personal and
+Professional
+Data
+
+100%
+Background
+and Expertise
+
+Keyword Analysis
+
+88%
+
+Your resume is missing important keywords related to your job title. Consider incorporating the
+keywords below to enhance your resume's effectiveness.
+
+Missing keywords to include in your resume
+
+Importance to your job title
+
+software development
+Example: Engaged in software development for various projects.
+
+mobile development
+Example: Executed mobile development for Android applications.
+
+debugging
+Example: Executed debugging processes to resolve software defects.
+
+cross-platform development
+Example: Engaged in cross-platform development for mobile applications.
+
+mysql
+Example: Managed databases using MySQL.
+
+microservices architecture
+Example: Designed applications using microservices architecture.
+
+requirements analysis
+Example: Conducted requirements analysis for software projects.
+
+technical support
+Example: Provided technical support for software applications.
+
+10/10
+
+10/10
+
+8/10
+
+7/10
+
+5/10
+
+5/10
+
+5/10
+
+5/10
+
+2 of 8
+
+9/15/26, 09:19
+
+Resume Evaluation
+
+https://www.toptal.com/resume/portal/reports/149c5097d5f02b34e806da3a1e...
+
+Example: Provided technical support for software applications.
+
+data structures
+Example: Implemented efficient data structures in software solutions.
+
+php
+Example: Built dynamic web applications using PHP.
+
+c++
+Example: Created performance-critical applications using C++.
+
+critical thinking
+Example: Applied critical thinking to solve complex software issues.
+
+communication
+Example: Facilitated communication between cross-functional teams.
+
+c#
+Example: Developed enterprise applications using C#.
+
+kotlin
+Example: Developed Android applications using Kotlin.
+
+jenkins
+Example: Implemented CI/CD pipelines using Jenkins.
+
+4/10
+
+4/10
+
+3/10
+
+3/10
+
+3/10
+
+3/10
+
+3/10
+
+3/10
+
+While you've used similar keywords, you haven't chosen the most effective ones for your job title.
+Consider using the exact keywords below to strengthen your resume.
+
+8 Exact keywords to include in your resume
+
+Importance to your job title
+
+software testing
+Example: Conducted software testing to ensure quality assurance.
+
+software maintenance
+Example: Performed software maintenance to ensure system reliability.
+
+agile/scrum
+Example: Participated in Agile/Scrum methodologies for project management.
+
+devops practices
+Example: Implemented DevOps practices for continuous integration.
+
+agile methodologies
+Example: Applied agile methodologies to enhance project delivery.
+
+user interface design
+Example: Designed user interfaces for enhanced user experience.
+
+user experience design
+Example: Focused on user experience design in application development.
+
+cloud computing
+Example: Utilized cloud computing for scalable application deployment.
+
+10/10
+
+10/10
+
+8/10
+
+7/10
+
+6/10
+
+6/10
+
+5/10
+
+5/10
+
+Target Job Fit
+This category evaluates how well your resume aligns with the job title you shared.
+
+100%
+
+Highlights
+
+•
+
+•
+
+•
+
+You demonstrate strong domain expertise in software development, with extensive experience in enterprise Java systems,
+eCommerce integrations, and modern web applications, all of which are highly relevant to the target Software Developer role.
+
+You provide clear, measurable achievements in your recent roles, such as reducing GLEIF import time and delivering multiple
+client projects, which directly demonstrate your impact and technical expertise.
+
+The resume showcases a robust set of specialized and technical skills, including proficiency in Java, Spring Framework, React,
+SAP Commerce/Hybris, and cloud technologies like Docker and Kubernetes, consistently reinforced across your skills and
+
+3 of 8
+
+9/15/26, 09:19
+
+Resume Evaluation
+
+https://www.toptal.com/resume/portal/reports/149c5097d5f02b34e806da3a1e...
+
+SAP Commerce/Hybris, and cloud technologies like Docker and Kubernetes, consistently reinforced across your skills and
+work experience sections.
+
+The resume is well-tailored to the software developer role, emphasizing relevant technologies, frameworks, and integration
+experience that align with industry expectations.
+
+Your achievements are clearly tailored to the requirements of a Software Developer position, with quantifiable impacts such as
+reducing import times and leading defect-reducing redesigns, reflecting both technical depth and an understanding of the
+seniority expected for the role.
+
+Your summary and work experience sections are structured to highlight your most significant accomplishments and leadership
+activities, ensuring your strengths are immediately visible to potential employers.
+
+•
+
+•
+
+•
+
+Great job—no further enhancements needed!
+
+Achievements and Impact
+This category evaluates how well your resume supports your accomplishments with quantifiable
+
+data and results-driven language.
+
+74%
+
+Highlights
+
+•
+
+•
+
+•
+
+•
+
+•
+
+•
+
+•
+
+•
+
+•
+
+•
+
+•
+
+You clearly demonstrate the impact of your problem-solving skills by quantifying improvements, such as reducing GLEIF import
+time from 5 hours to 10 minutes and cutting production defects through workflow redesigns.
+
+You clearly demonstrate your expertise in designing, optimizing, and maintaining complex systems, as seen in your work
+reducing GLEIF import times and leading workflow redesigns at Deutsche Börse AG.
+
+You provide clear, specific, and factual descriptions of your roles and achievements, which helps establish credibility and trust
+with potential employers.
+
+Each role features unique accomplishments tailored to its responsibilities, demonstrating that you avoid repetition and present
+a diverse range of experiences.
+
+Innovative solutions are showcased through your automation of manual processes, like transitioning paper-based
+administration to digital request handling and implementing watchdog services to improve system uptime.
+
+Significant projects are effectively linked to each job role, with detailed descriptions of their scope, such as supporting multi-
+billion dollar transaction volumes and integrating major payment providers.
+
+The use of consistent past-tense verbs in previous roles demonstrates strong attention to detail and professionalism in your
+work history.
+
+The use of quantifiable data is appropriate for your level of seniority and aligns well with industry standards in software
+development.
+
+Data-driven decision-making is evident in your use of metrics to guide process optimizations and performance enhancements,
+reflecting a strong analytical approach throughout your recent roles.
+
+Your resume showcases strong contributions to technical documentation and process standardization, including documenting
+APIs for consuming teams and delivering documentation-oriented websites.
+
+Your resume effectively showcases a logical progression in responsibilities and skills, illustrating notable growth and alignment
+with your career path.
+
+Job Descriptions
+
+1 Recommendation
+
+Score
+90%
+
+•
+
+Stronger resumes typically include between 4 and 8 bullet points for each past employment entry within the last 5 years. For
+example, your RA Creative role (Dec 2020–Jan 2023) contains 9 bullet points, which slightly exceeds the recommended
+maximum. Consider consolidating or combining closely related achievements to present a more concise summary of your
+responsibilities and impact. This adjustment can help maintain reader engagement and ensure each point stands out.
+
+4 of 8
+
+Score
+
+9/15/26, 09:19
+
+Resume Evaluation
+
+https://www.toptal.com/resume/portal/reports/149c5097d5f02b34e806da3a1e...
+
+Quantifiable Results
+
+6 Recommendations
+
+17%
+
+•
+
+•
+
+•
+
+•
+
+•
+
+•
+
+Stronger resumes typically include quantifiable, result-oriented metrics for all relevant roles. For example, while your work at
+Deutsche Börse AG highlights impressive achievements such as reducing GLEIF import time from 5 hours to 10 minutes, similar
+quantifiable outcomes are not provided for your roles at IDimitrov Ltd. and RA Creative. Consider adding specific metrics—such
+as project delivery timelines, client satisfaction scores, or measurable improvements in system performance—to these positions
+to further demonstrate your impact.
+
+We would have expected to see more explicit benchmarks, goals, or comparisons to previous performance across all recent
+roles. While you mention reducing production defects and improving import times at Deutsche Börse AG, other roles like
+IDimitrov Ltd. and RA Creative do not specify project outcomes relative to targets or prior states. You might enhance your
+resume by including statements such as “improved client onboarding speed by X% compared to previous process” or
+“delivered projects Y% faster than industry average.”
+
+For leadership or managerial responsibilities, measurable achievements such as team growth, project success rates, or
+employee development are not clearly quantified. At Deutsche Börse AG, you note recruiting and onboarding a senior
+developer but do not specify outcomes like reduced ramp-up time or improved team productivity. Including these details would
+better showcase your effectiveness in leadership roles.
+
+Although you reference transaction volumes and some integration achievements, relevant industry-specific KPIs or metrics
+(such as customer retention rates, lead conversion rates, or uptime percentages) are not consistently included for each
+applicable role. For instance, at RA Creative, mentioning the percentage improvement in uptime after integrating the watchdog
+service would provide clearer evidence of your impact. Adding such KPIs where appropriate will help align your experience
+with industry expectations.
+
+While technical skills are well-documented, direct links between these skills and measurable outcomes are limited outside of
+the Deutsche Börse AG role. For example, describing how your expertise in API development or cloud infrastructure led to
+specific efficiency gains or cost savings would strengthen your case. Consider adding statements such as “leveraged Docker
+and Kubernetes to reduce deployment times by X%” for each recent position.
+
+Relevant scope details—such as project budgets, deadlines met, or geographic coverage—are generally absent from your
+recent work experience descriptions. For example, specifying the size of client organizations served at IDimitrov Ltd., or the
+budgetary responsibility held during projects at RA Creative, would provide valuable context for the scale of your
+achievements.
+
+Formatting and ATS Readiness
+This category evaluates the format of your resume and its readiness to pass applicant tracking
+
+system.
+
+100%
+
+Highlights
+
+•
+
+•
+
+•
+
+•
+
+•
+
+•
+
+•
+
+You have ensured that all resume content is formatted as plain text without the use of graphics, tables, or text boxes, which
+maximizes compatibility with ATS systems.
+
+You maintain a highly professional and consistent layout, with clear section headers, uniform formatting, and logical
+organization that enhances readability.
+
+All important sections, including contact information and skills, are placed in easily accessible areas and follow a logical top-to-
+bottom reading flow, making your resume straightforward for both ATS parsing and human review.
+
+The resume uses a professional font style and size throughout, ensuring both ATS compatibility and easy reading for human
+reviewers.
+
+By using standard fonts and avoiding unusual characters or icons, you have further enhanced the readability and
+professionalism of your document for automated systems.
+
+Work history is prominently placed above the education section, following best practices for experienced candidates and
+making your practical experience immediately visible.
+
+Additional sections such as certifications are positioned logically at the end, supporting a smooth flow without disrupting the
+document’s structure.
+
+Great job—no further enhancements needed!
+
+5 of 8
+
+9/15/26, 09:19
+
+Resume Evaluation
+
+https://www.toptal.com/resume/portal/reports/149c5097d5f02b34e806da3a1e...
+
+Language and Communication
+This category assess the clarity, tone, and professionalism of the language used in your resume.
+
+95%
+
+Highlights
+
+•
+
+•
+
+•
+
+•
+
+•
+
+•
+
+•
+
+•
+
+•
+
+•
+•
+
+•
+
+•
+
+•
+
+•
+
+•
+
+You maintain a clear focus throughout your resume by including only relevant roles, certifications, and technical skills that
+directly support your software development expertise.
+
+You consistently use strong, varied action verbs throughout your recent job descriptions, which clearly convey both leadership
+and technical expertise.
+
+You provide a clear and concise summary that effectively communicates your professional identity, key strengths, and areas of
+expertise, making it easy for readers to quickly understand your background.
+
+You demonstrate strong command of professional and technical terminology, ensuring accurate spelling and appropriate
+usage across all sections.
+
+You maintain a consistently professional tone throughout your resume, avoiding casual language and ensuring clarity for an
+international audience.
+
+The use of concise bullet points and skimmable sections makes your experience easy to read and highlights your key
+accomplishments effectively.
+
+Each bullet point begins with a clear, action-oriented verb, making your achievements and responsibilities easy to follow and
+impactful.
+
+The summary is well-placed at the top of your resume and reinforces the rest of your content by highlighting major
+achievements and technical proficiencies that are substantiated in later sections.
+
+The resume is written in clear, standard English without grammar or spelling errors, which enhances readability and
+professionalism.
+
+The language used is confident and assertive without appearing boastful, which helps present your achievements credibly.
+
+All content is presented without redundancy or unnecessary wordiness, ensuring that each statement is impactful and directly
+related to your achievements.
+
+The resume effectively balances leadership-focused and technical verbs, demonstrating your ability to take initiative and own
+outcomes in both managerial and hands-on roles.
+
+Your summary avoids redundancy and overused buzzwords, instead offering specific accomplishments and technologies that
+demonstrate your value as a software developer.
+
+Sentences and bullet points are well-structured, maintaining grammatical parallelism and smooth phrasing throughout your
+work history and skills sections.
+
+Technical skills and project details are communicated using clear, internationally recognized terminology, making your
+expertise accessible to a broad range of employers.
+
+Volunteer roles, internships, and part-time positions are either omitted or clearly labeled, demonstrating careful curation of
+experiences that add value to your professional profile.
+
+Language Professionalism and Clarity
+
+1 Recommendation
+
+Score
+81%
+
+•
+
+Stronger resumes typically include more specific, measurable outcomes and clearly defined individual contributions in job
+descriptions. For example, in the RA Creative experience section, the bullet point "Collaborated within a team of 4 developers,
+2 project managers, 1 tester, and 1 designer" could be enhanced by specifying your unique role or achievements within that
+collaboration. Consider revising such statements to highlight your direct impact or quantifiable results, which can help
+employers better understand your value.
+
+Language Quality and Consistency
+
+2 Recommendations
+
+Score
+83%
+
+•
+
+Stronger resumes typically maintain uniform punctuation for bullet points throughout all sections. In your resume, some bullet
+points end with periods while others do not (for example, in the "Experience" section under "IDimitrov Ltd." and "RA Creative").
+Consider standardizing the use of periods at the end of each bullet point or omitting them entirely for consistency. This small
+
+6 of 8
+
+9/15/26, 09:19
+
+Resume Evaluation
+
+https://www.toptal.com/resume/portal/reports/149c5097d5f02b34e806da3a1e...
+
+adjustment can help present your experience in a more polished and professional manner.
+
+•
+
+We would have expected to see consistent formatting for abbreviations and acronyms. For instance, you use both “K8S” and
+“Kubernetes (K8S)” as well as “API” and “APIs.” Consider defining each acronym or abbreviation on first use and then using it
+consistently throughout the resume. This approach ensures clarity for all readers, especially those less familiar with certain
+technical terms.
+
+Personal and Professional Data
+This category checks for essential personal and professional details, such as contact information,
+
+96%
+
+education, and online presence.
+
+Highlights
+
+•
+
+•
+
+•
+
+•
+•
+
+•
+
+•
+•
+
+•
+
+•
+
+•
+
+•
+
+You have provided complete educational details, including the degree title, institution name, and graduation years, ensuring
+clarity for reviewers.
+
+You have maintained a clear and continuous employment history, with each role presented in strict reverse chronological order
+and all date formats used consistently. This demonstrates strong attention to detail and professionalism.
+
+You have included relevant professional online links such as your GitHub and Upwork profiles, which provide additional
+context for your technical skills and freelance experience.
+
+You have clearly presented your full name at the top, making your identity immediately visible to reviewers.
+
+All listed certifications are relevant, accurately named, and include both the issuing organization and issuance dates, which
+adds credibility to your technical qualifications.
+
+Each job entry includes clearly specified start and end years, with no unexplained gaps or ambiguous durations, which helps
+establish your reliability and commitment.
+
+All listed online profiles use professional handles, ensuring a polished and credible first impression for potential employers.
+
+The contact section is well-organized, featuring a professional email address and relevant links, and is positioned in a
+standard, visually distinct location.
+
+The education section is presented in reverse chronological order, making it easy for employers to quickly assess your most
+recent academic achievements.
+
+The consistent formatting of job titles and thorough explanations for each role contribute to a polished and easily navigable
+work experience section, making your career progression easy to follow.
+
+The contact section is focused solely on professionally relevant platforms, demonstrating a clear understanding of what
+information is most valuable to hiring managers.
+
+Unnecessary personal details and photographs are avoided, ensuring your resume maintains a professional focus and aligns
+with best practices.
+
+Contact Information Accuracy
+
+1 Recommendation
+
+Score
+87%
+
+•
+
+Stronger resumes typically include a phone number in the contact section to facilitate direct communication with potential
+employers or clients. Adding a professional phone number would make it easier for recruiters to reach you quickly and could
+improve your chances of moving forward in the hiring process.
+
+Background and Expertise
+This category evaluates the industry relevance of your resume, ensuring that skills, tools and
+
+100%
+
+industry knowledge are clearly presented.
+
+Highlights
+
+7 of 8
+
+9/15/26, 09:19
+
+Resume Evaluation
+
+https://www.toptal.com/resume/portal/reports/149c5097d5f02b34e806da3a1e...
+
+•
+
+•
+
+•
+
+•
+
+•
+
+•
+
+•
+
+•
+
+•
+
+•
+
+You demonstrate strong command of industry-specific terminology throughout your work experience, particularly in areas such
+as SAP Commerce, Spring Framework, and enterprise integrations, which aligns well with the expectations for software
+development roles.
+
+You present a clearly defined and well-organized skills section that effectively highlights your technical competencies, making
+it easy for reviewers to assess your expertise at a glance.
+
+You clearly demonstrate leadership and management experience, such as leading the transition to digital request handling at
+Deutsche Börse AG and recruiting and onboarding a senior developer, which showcases your ability to guide teams and drive
+organizational change.
+
+The resume effectively showcases domain expertise by quantifying achievements—such as reducing GLEIF import time and
+supporting high transaction volumes—which clearly illustrates your impact on project outcomes and stakeholder value.
+
+Technical skills are consistently demonstrated through detailed examples in your work experience, showing both depth in core
+areas and breadth across supporting tools and technologies.
+
+Adaptability is well illustrated through your successful navigation of diverse roles, including operating as a solo consultant,
+integrating new technologies, and responding to evolving client needs across multiple projects and industries.
+
+Your detailed project descriptions highlight both technical depth and the ability to deliver measurable results, reinforcing your
+alignment with industry standards and best practices.
+
+The resume reflects up-to-date industry knowledge, with relevant modern frameworks, cloud platforms, and best practices
+integrated throughout your recent roles.
+
+The resume effectively highlights your cross-functional collaboration skills by detailing coordination with engineering, product,
+and design teams, as well as direct engagement with clients and stakeholders in both consultancy and enterprise
+environments.
+
+Your ability to simplify complex technical concepts is evident in your work documenting APIs for consuming teams and
+delivering documentation-oriented websites, ensuring information is accessible to a broad range of audiences.
+
+Great job—no further enhancements needed!
+
+8 of 8
+
+9/15/26, 09:19
+
+

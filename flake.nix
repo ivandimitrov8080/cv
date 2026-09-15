@@ -70,6 +70,7 @@
                 };
                 packages = with pkgs; [
                   typst
+                  pdfminer
                 ];
               }
             ];
