@@ -106,11 +106,10 @@ Software consultancy focused on enterprise web development, integrations,
 internal tooling, and custom web applications.
 
 - Founded and ran a solo software consultancy, delivering 15 projects for 10
-  clients since 2023 — an average of 1.5 engagements per client, including
-  repeat business.
-- Solely responsible for every stage of delivery on all 15 projects —
-  requirements analysis, architecture, implementation, deployment, and client
-  communication.
+  clients since 2023, including repeat engagements.
+- Rated 5.0/5.0 by clients across 6 reviews on Upwork, and solely responsible
+  for every stage of delivery on all 15 projects — requirements analysis,
+  architecture, implementation, deployment, and client communication.
 - Built a multi-tenant knowledge base web app using Next.js, TypeScript,
   TailwindCSS, DaisyUI, PostgreSQL, Prisma, NextAuth, and Google Drive APIs,
   hosted on Vercel.
@@ -131,16 +130,17 @@ RTK Query, and Bootstrap.
 
 - Reduced GLEIF import time by 97%, from 5 hours to 10 minutes, by optimizing
   the Spring/Maven data import pipeline.
-- Redesigned the Reporting ID functionality that consolidates data from
-  multiple Disclosed Clients into one report, introducing the OTC Report
-  Receiver admission type with access to consolidated OTC daily reports
-  (CC203, CC204, CC209) and 5-letter Reporting ID setup via C7 CAS (Release
-  2.293), which reduced production defects and gave users a more flexible,
-  streamlined process.
-- Delivered OTC IRS Products & Currencies maintenance, enabling Clearing
-  Members to manage OTC IRS product and currency setups paperless via C7 CAS
-  (Release 2.284.6, production 30 September 2024), replacing paper-based
-  administration for Eurex Clearing (~200 Clearing Members in 22 countries).
+- Redesigned the Reporting ID functionality so data from multiple Disclosed
+  Clients consolidates into a single report — including across different
+  Clearing Members, which was not possible before. Introduced the OTC Report
+  Receiver admission type with consolidated OTC daily reports (CC203, CC204,
+  CC209) and 5-letter Reporting ID setup via C7 CAS (Release 2.293), cutting
+  production defects versus the previous process.
+- Delivered OTC IRS Products & Currencies maintenance, moving Clearing Members
+  from paper-based setup requests to paperless self-service management of OTC
+  IRS products and currencies via C7 CAS (Release 2.284.6, production 30
+  September 2024) across Eurex Clearing's ~200 Clearing Members in 22
+  countries.
 - Enabled same-day submission of Segregation Change Requests and Position
   Account Requests that depend on not-yet-synced SAP data, removing a day of
   waiting for users.
@@ -149,8 +149,9 @@ RTK Query, and Bootstrap.
   maintain code quality and standards.
 - Led API development for third-party service integrations and documented
   interfaces and APIs for consuming teams.
-- Introduced and trained a senior developer, increasing team capacity on the
-  project.
+- Introduced a senior developer to the project by telling him what I know,
+  increasing team capacity on the project and shortening ramp-up through
+  documented interfaces and setup notes.
 
 #link("https://www.eurex.com/ec-en/support/initiatives/c7-client-administration-service/C7-CAS-Releases-2900566?frag=3919554")[Release notes] | #link("https://idimitrov.dev/posts/my-work/c7cas.html")[Project notes]
 
@@ -165,11 +166,13 @@ an agency environment delivering design, development, and integrations.
   Goldsmiths), on an estate with £1.2 billion group revenue and seven retail
   websites (FY22).
 - Integrated parcelLab across three of the group's brands (Watches of
-  Switzerland UK, Mappin & Webb and Goldsmiths), bringing all order volume on
-  those brands under branded order-status tracking and proactive delivery and
-  returns notifications (130+ stores, average order value over £5,900).
+  Switzerland UK, Mappin & Webb and Goldsmiths), introducing branded
+  order-status tracking pages and proactive delivery and returns notifications
+  where none existed before, across 130+ stores with an average order value
+  over £5,900.
 - Integrated payment and commerce providers including Adyen, PayPal,
-  Wells Fargo Open Banking, and parcelLab.
+  Wells Fargo Open Banking, and parcelLab into production storefront, checkout
+  and customer-account workflows.
 - Built and maintained full-stack Spring, Maven, and Ant-based SAP Commerce
   solutions across storefront, backend, integration, and frontend layers,
   including vanilla HTML, CSS, JavaScript, Thymeleaf, and React.
