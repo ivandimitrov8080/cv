@@ -149,7 +149,7 @@ RTK Query, and Bootstrap.
   maintain code quality and standards.
 - Led API development for third-party service integrations and documented
   interfaces and APIs for consuming teams.
-- Recruited and onboarded a senior developer, increasing team capacity on the
+- Introduced and trained a senior developer, increasing team capacity on the
   project.
 
 #link("https://www.eurex.com/ec-en/support/initiatives/c7-client-administration-service/C7-CAS-Releases-2900566?frag=3919554")[Release notes] | #link("https://idimitrov.dev/posts/my-work/c7cas.html")[Project notes]
