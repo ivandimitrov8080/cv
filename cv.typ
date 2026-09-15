@@ -4,7 +4,7 @@
 )
 
 #set text(
-  font: "FiraCode Nerd Font Mono",
+  font: "Times New Roman",
   10.5pt,
   fill: rgb("#1f2933"),
 )

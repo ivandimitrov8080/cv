@@ -32,6 +32,7 @@
             src = ./.;
             nativeBuildInputs = with pkgs; [
               typst
+              corefonts
             ];
             buildPhase = ''
               runHook preBuild
@@ -41,7 +42,7 @@
             installPhase = ''
               runHook preBuild
               mkdir -p $out
-              cp cv.pdf $out
+              cp cv.pdf $out/Ivan_Dimitrov_Resume_Software_Developer.pdf
               runHook postBuild
             '';
           };
@@ -60,6 +61,13 @@
             modules = [
               {
                 devenv.root = "/home/ivand/src/cv";
+                languages = {
+                  typst = {
+                    enable = true;
+                    lsp.enable = true;
+                    fontPaths = with pkgs; [ "${corefonts}/share/fonts" ];
+                  };
+                };
                 packages = with pkgs; [
                   typst
                 ];
