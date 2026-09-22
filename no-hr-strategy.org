@@ -1,0 +1,257 @@
+#+title: No-HR Job Search Strategy
+#+subtitle: A reproducible pipeline for finding jobs where the first real interview is with the hiring manager
+#+author: Ivan Kirilov Dimitrov
+#+date: 2026-09-22
+#+filetags: :jobsearch:strategy:
+#+options: toc:2 num:nil
+
+* TL;DR
+
+"no HR" is not a filter you can apply to job boards. It is a property of *who
+wrote the posting*. So the strategy is: stop searching for jobs, start searching
+for *channels where the poster is structurally forced to be the hiring manager*.
+Then verify with a fixed 90-second checklist.
+
+Everything below is reproducible. The live yield for the current month is in
+[[#sec-yield]].
+
+* The structural law
+
+HR exists to absorb volume. So HR gatekeeping appears exactly when volume is
+expected. That correlates with the following markers:
+
+| Marker            | Threshold                                              | Why it predicts no-HR                                            |
+|-------------------+--------------------------------------------------------+------------------------------------------------------------------|
+| Headcount         | < ~40 people                                           | Below ~50 there is usually no dedicated recruiter, often no HR   |
+| Posting author    | first person singular ("I'm the Director of Technology")| The author *is* the decision maker                               |
+| Application route | mailto: or plain form, no ATS URL                       | No ATS => no sourcing pipeline => no HR process                  |
+| Reporting line    | "you'll report to <name>, <role>"                       | They expect to introduce you to that person, not a recruiter     |
+| Domain            | "boring" vertical software (dental, freight, clearing)   | Small teams, domain experts, zero recruiting theatre              |
+
+Companies with 200+ employees almost never do this, no matter what the ad
+claims. The "you'll speak to the hiring manager" line in a big-co ad usually
+means step 3 of 4.
+
+#+begin_quote
+Provenance note: this is a real, observed management practice, not folklore.
+From an HN thread (item 49798146): "Our successful hiring rate went up when we
+cut HR out of the hiring loop, contained them in salary fit and background
+checks. The hiring manager was responsible for keeping candidates informed."
+#+end_quote
+
+* Channel map, ranked by signal purity
+  :PROPERTIES:
+  :CUSTOM_ID: sec-channels
+  :END:
+
+Each channel has a /who-posts/ invariant. That invariant is the filter you
+cannot get from a job-board search.
+
+| # | Channel                          | Who posts (invariant)                                      | Reproducible query                                  |
+|---+----------------------------------+------------------------------------------------------------+-----------------------------------------------------|
+| 1 | HN "Who is hiring?" comments     | The thread *bans* recruiters and job boards                | Algolia API, see section 4                          |
+| 2 | YC Work at a Startup             | Founders post; filter team size 1-10 / 11-50               | workatastartup.com/companies?query=java&remote=yes  |
+| 3 | Niche vertical boards            | Hand-vetted, often "directly from hiring teams"            | e.g. sapcommercejobs.com (SAP Commerce ecosystem)   |
+| 4 | Static /careers pages w/ mailto  | Whoever wrote the page                                     | Google operator, see section 5                      |
+| 5 | Stack communities                | Practitioners, not TA                                      | Slack / Discord / Mastodon / user groups            |
+| 6 | B2B contract / freelance         | Procurement replaces HR; meet the tech lead in week 1      | Upwork + vendor networks                            |
+
+* Scoring rubric
+
+Apply to any listing. Takes 60 seconds. Score 0-8. *Act only at >= 5.*
+
+1. Poster uses "I" / names themselves as manager                      :: +2
+2. Direct email in the ad (not just an ATS link)                      :: +2
+3. No ATS domain in any link                                         :: +1
+4. No recruiter/talent/people-ops role on LinkedIn for that company   :: +1
+5. Ad states the process and step 1 is a person, not "a screening call":: +1
+6. Headcount < ~40                                                    :: +1
+7. LinkedIn posting is by an engineer/CTO, not the company page       :: +1
+
+For contract / B2B roles the rubric collapses: /does the ad name the tech lead,
+or link to a role where you will be interviewed by the client's engineer?/ That
+is an automatic 6.
+
+* The HN pipeline (the truly reproducible, API-driven channel)
+  :PROPERTIES:
+  :CUSTOM_ID: sec-hn
+  :END:
+
+The HN monthly thread's comments are exactly the population we want:
+self-posted, first-person, no agencies, ~400 comments / month.
+
+** Step 1 - get the current thread id (do this monthly, IDs rotate)
+
+#+begin_src bash
+curl -s 'https://hn.algolia.com/api/v1/search_by_date?query=%22who%20is%20hiring%22&tags=story,author_whoishiring&hitsPerPage=3'
+#+end_src
+
+Current one (September 2026) is story id 49522897:
+https://news.ycombinator.com/item?id=49522897
+
+** Step 2 - query *inside* that thread
+
+Copy-paste, swap the story id and the skill terms.
+
+#+begin_src bash
+# Postings where the poster names themselves as the hiring manager
+https://hn.algolia.com/api/v1/search?query=%22hiring%20manager%22&tags=comment,story_49522897
+
+# Postings with a direct email route
+https://hn.algolia.com/api/v1/search?query=%22email%20me%20directly%22&tags=comment,story_49522897
+
+# Anti-agency tells
+https://hn.algolia.com/api/v1/search?query=%22no%20recruiters%22%20OR%20%22no%20agencies%22&tags=comment,story_49522897
+
+# Your stack, scoped to remote, scoped to the thread
+https://hn.algolia.com/api/v1/search?query=%22Java%22%20%22REMOTE%22&tags=comment,story_49522897
+https://hn.algolia.com/api/v1/search?query=%22PostgreSQL%22%20%22Europe%22&tags=comment,story_49522897
+https://hn.algolia.com/api/v1/search?query=%22React%22%20%22TypeScript%22&tags=comment,story_49522897
+#+end_src
+
+Optional cross-month sweep with a date floor (Unix epoch):
+
+#+begin_src bash
+&numericFilters=created_at_i>1756684800
+#+end_src
+
+** Step 3 - scrape the whole thread once and grep locally
+
+Instead of 20 API calls, pull the entire comment tree as JSON and filter it:
+
+#+begin_src bash
+curl -s https://hn.algolia.com/api/v1/items/49522897 \
+ | python3 -c 'import json,sys,html,re; [print(c["id"], "|", re.sub("<[^>]+>"," ",html.unescape(c.get("text") or ""))[:400]) for c in json.load(sys.stdin)["children"]]' \
+ | grep -Ei 'hiring manager|email me|apply.*@|no recruiters|first call|I.m the|I am the'
+#+end_src
+
+This one-liner is the highest-ROI 90 seconds in the whole document: it lands on
+every first-person, direct-contact posting in the current month.
+
+* Search-operator cookbook
+
+For Bing / DuckDuckGo / Google:
+
+#+begin_src text
+"I am the hiring manager" ("engineer" OR "developer") -site:linkedin.com -site:indeed.com
+"email me directly" ("hiring manager" OR "engineering") java remote -site:ziprecruiter.com
+"no recruiters" OR "no agencies" remote developer europe -site:glassdoor.com
+"you'll report to" "first conversation" engineer -site:indeed.com
+"no HR" hiring engineer small team
+site:*.dev/careers "mailto" OR "send your CV" backend
+#+end_src
+
+*ATS-detection operator* (run it on the /company/ to confirm the negative):
+
+#+begin_src text
+site:<company>.com (greenhouse OR lever OR ashbyhq OR workday OR personio OR teamtailor OR recruitee OR smartrecruiters)
+#+end_src
+
+Zero hits => likely no formal recruiting process. Then check the careers page
+manually for a plain page with an email.
+
+EU / non-English boards worth putting in the loop: =berlinstartupjobs.com=,
+=germantechjobs.de=, =landing.jobs=, =eurotechjobs.com=, =dev.bg=,
+=welcomekit=. Filter by *team size*, not by role.
+
+* The 90-second verification pass
+
+Run this per company before investing any real effort.
+
+1. *LinkedIn -> company -> People -> filter title:* =recruiter=, =talent=,
+   =people=. Count 0 => no HR. Count 1 => that person *is* the gate; expect a
+   screen.
+2. *Careers page -> does the apply link leave the domain?* Leaves => ATS.
+   Stays or =mailto:= => direct.
+3. *Headcount band* on the same page. > 60 and hiring 3+ engineers => process
+   incoming.
+4. *If you can identify the eng manager:* their name in the ad beats everything.
+   Skip HR entirely and reply to /their/ comment or message.
+
+* Live run, September 2026 - the honest yield
+  :PROPERTIES:
+  :CUSTOM_ID: sec-yield
+  :END:
+
+~400 comments in the thread. Screening took ~15 minutes. Real examples of the
+exact tell being hunted:
+
+| Company               | Role                        | The tell                                                        | Fit                                              |
+|-----------------------+-----------------------------+-----------------------------------------------------------------+--------------------------------------------------|
+| Crossref (49562582)   | Head of Infrastructure Svc  | "I'm the Director of Technology... all applications screened by me" | Stretch (leadership); screening model is ideal |
+| Checkly (49537891)    | PM / Sales Eng              | "either me or the Hiring Manager will review your application"  | Watchlist; no dev role open                      |
+| DAT (49525544)        | Eng Manager                 | "Reach out directly at <fname>.<lname>+hn@dat.com; I am the hiring manager" | US hybrid; template not lead            |
+| Axo (49528399)        | Founding Engineer           | "email me directly"                                             | Texas only                                       |
+| Apex Dental (49553487)| Full-stack                  | "Email me directly", tiny dev team inside 1000-pers company     | US only; the company *shape* is the archetype    |
+| Vistulo (49523978)    | Java backend, B2B           | Client tech lead interviews; no HR by construction              | PL / RO residents only                           |
+
+*Honest conclusion:* HN yields roughly 5-8 genuine poster-is-the-boss
+engineering roles per month, but skews US. Treat it as one of six channels, not
+the strategy. Its real value is that the tell is verbatim, so it can be grepped.
+
+* Fit notes for this profile
+
+- Stack: Java / Spring / SAP Commerce (Hybris) / TypeScript / React / Postgres.
+- Proof assets that matter to small no-HR teams: 97% GLEIF import reduction
+  (5h -> 10m), 50% CI build-time cut (Deutsche Boerse), Reporting ID redesign
+  that cut production defects. Small companies buy *evidence*, not years of
+  service.
+- Reality check: the purest HN / vertical-SaaS leads skew US. For EU coverage,
+  weight channels 3, 5 and 6 (niche boards, communities, B2B contract) more
+  heavily than HN.
+
+* The loop (repeatable, timeboxed)
+
+** Day 0 (once, ~3h)
+
+- Build =watchlist.md=: 60-100 EU companies, 5-40 people, matching the stack
+  (SAP Commerce ecosystem, small Next.js/Postgres shops, clearing/fintech,
+  vertical SaaS). Sources: YC EU batches, SAP partner directory,
+  berlinstartupjobs.com, engineers seen in niche communities.
+- One-off credential asset: a public 2-page write-up of the 97% GLEIF reduction
+  and the 50% CI cut.
+
+** Weekly (90 min, same order every time)
+
+1. HN Algolia one-liner on the current thread -> grep -> score.          (20 min)
+2. YC Work at a Startup + one EU board, filtered by *team size* -> score. (20 min)
+3. LinkedIn: 5 watchlist companies -> People filter -> if 0 recruiters and >=1
+   engineer title matches, message the engineer directly.                 (30 min)
+4. Send 3 first-person emails. Never a cover letter.                      (20 min)
+
+** Monthly
+
+- Fetch the new HN thread id; re-run the ATS-detection operator on any company
+  about to be invested in.
+
+* The script that gets past a gatekeeper
+
+If a recruiter replies first, do not fight them - redirect:
+
+#+begin_quote
+Thanks - happy to do the intro call. Two things: (1) I've written up how I cut a
+Spring/Maven import pipeline from 5h to 10m and halved CI build time at Deutsche
+Boerse; (2) could you forward that to <name> before the screen? If they're the
+one who'd review my code, 10 minutes with them will save you both a round trip.
+#+end_quote
+
+Recruiters usually comply. That is how an HR-first process becomes
+manager-first, without asking for a favour.
+
+* Kill criteria - propaganda to ignore
+
+- *"We value our people / great culture"* :: noise. Look for the email address.
+- *Headcount 200+, ad says "you'll meet the hiring manager"* :: step 3 of 4. Skip.
+- *Recruiter outreach with no company name* :: 0 points, no reply.
+- *"Apply through our portal" + Workday* :: automatic fail, regardless of role.
+- *Intermediary consultancies* :: good work, but HR-first by design. Use them for
+  contract lanes, where procurement replaces HR.
+- *"We're like a family"* :: no.
+
+The trap is treating "remote job board" and "no-HR hiring" as correlated. They
+are not. The correlated variable is *organisational size and poster identity* -
+which is why the whole strategy reduces to one habit:
+
+#+begin_center
+*Read who signed the ad, then write to that person.*
+#+end_center
