@@ -90,6 +90,7 @@ Adyen, PayPal, WellsFargo, ParcelLab among others. The frontend was a mix of van
 ==== Blagoevgrad, Bulgaria — May 2016–May 2020
 
 Spring Framework project with a react web frontend and an android app.
+- Learned to program in Java and JavaScript. It was very difficult.
 
 == Education
 
