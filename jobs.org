@@ -1,0 +1,104 @@
+#+TITLE: Job Search Tracker
+#+TODO: LEAD(l) APPLIED(a) INTERVIEW(i) OFFER(o) | HIRED(h) REJECTED(r) IGNORED(x)
+#+FILETAGS: :jobsearch:
+#+STARTUP: indent
+
+# The keyword line above is file-local, so it overrides the main config's
+# org-todo-keywords only inside this file.  Capture a company with `C-c c j l'
+# and an application with `C-c c j a'.  View the pipeline with `C-c a j'.
+
+* Leads
+
+** APPLIED KAMORA — Golang / Flutter / Frontend            :small:english:
+   :PROPERTIES:
+   :URL: https://kamora.vn/careers
+   :LOCATION: Da Nang, Vietnam (Ngũ Hành Sơn)
+   :SIZE: small
+   :ENGLISH: yes
+   :CREATED: 2026-09-26
+   :NOTES: 100% product studio since 2019, serving European & US markets.
+   :END:
+
+** LEAD Innovaly Services — Full-Stack / Backend / Tech Lead :small:english:
+   :PROPERTIES:
+   :URL: https://innovaly.services/careers
+   :LOCATION: Da Nang, Vietnam (hybrid + remote)
+   :SIZE: small
+   :ENGLISH: yes
+   :CREATED: 2026-09-26
+   :NOTES: US startup; up to $1,800/mo for senior backend/full-stack.
+   :END:
+
+** LEAD Tekmium — Web / Mobile / AI / Cloud :small:english:
+   :PROPERTIES:
+   :URL: https://tekmium.com/en/careers
+   :LOCATION: Da Nang, Vietnam (on-site / hybrid / remote)
+   :SIZE: small
+   :ENGLISH: yes
+   :CREATED: 2026-09-26
+   :NOTES: Nimble studio, English site.
+   :END:
+
+** LEAD Xenia Tech — Full-Stack / React Native / QA :small:english:
+   :PROPERTIES:
+   :URL: https://xeniatech.vn/en/jobs
+   :LOCATION: Da Nang, Vietnam (+ HCMC / London)
+   :SIZE: small
+   :ENGLISH: yes
+   :CREATED: 2026-09-26
+   :NOTES: Founded 2017 by a UK entrepreneur; international clients.
+   :END:
+
+** LEAD Enable Startup — Software solutions :small:english:
+   :PROPERTIES:
+   :URL: https://enablestartup.com/about-us
+   :LOCATION: Da Nang, Vietnam
+   :SIZE: small
+   :ENGLISH: yes
+   :CREATED: 2026-09-26
+   :NOTES: Est. 2016; ~30 clients across 12 countries.
+   :END:
+
+** LEAD Enlab Software — Offshore software development :mid:english:
+   :PROPERTIES:
+   :URL: https://enlabsoftware.com/careers
+   :LOCATION: Da Nang, Vietnam
+   :SIZE: mid
+   :ENGLISH: yes
+   :CREATED: 2026-09-26
+   :NOTES: "US-led standards with Vietnam-based costs".
+   :END:
+
+** LEAD Enclave — Offshore Development Center :mid:english:
+   :PROPERTIES:
+   :URL: https://enclave.vn/careers
+   :LOCATION: Da Nang (also Hue)
+   :SIZE: mid
+   :ENGLISH: yes
+   :CREATED: 2026-09-26
+   :NOTES: ~250 engineers; explicitly collaborates in English.
+   :END:
+
+** LEAD DataHouse Asia — Software development :mid:english:
+   :PROPERTIES:
+   :URL: https://www.linkedin.com/company/datahousevietnam
+   :LOCATION: Da Nang, Vietnam
+   :SIZE: mid
+   :ENGLISH: yes
+   :CREATED: 2026-09-26
+   :NOTES: US-linked; check LinkedIn for openings.
+   :END:
+
+** LEAD Sioux High Tech Software — High-tech software :mid:english:
+   :PROPERTIES:
+   :URL: https://jobs.sioux.asia/
+   :LOCATION: Da Nang, Vietnam (+ HCMC / Singapore)
+   :SIZE: mid
+   :ENGLISH: yes
+   :CREATED: 2026-09-26
+   :NOTES: Dutch-founded (Sioux Group, 1996).
+   :END:
+
+* Applications
+
+* Archive
