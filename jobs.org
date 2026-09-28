@@ -22,7 +22,7 @@
    :NOTES: 100% product studio since 2019, serving European & US markets.
    :END:
 
-** LEAD Innovaly Services — Full-Stack / Backend / Tech Lead :small:english:
+** APPLIED Innovaly Services — Full-Stack / Backend / Tech Lead :small:english:
    :PROPERTIES:
    :URL: https://innovaly.services/careers
    :LOCATION: Da Nang, Vietnam (hybrid + remote)
@@ -33,7 +33,7 @@
    :NOTES: US startup; up to $1,800/mo for senior backend/full-stack.
    :END:
 
-** LEAD Tekmium — Web / Mobile / AI / Cloud :small:english:
+** APPLIED Tekmium — Web / Mobile / AI / Cloud             :small:english:
    :PROPERTIES:
    :URL: https://tekmium.com/en/careers
    :LOCATION: Da Nang, Vietnam (on-site / hybrid / remote)
@@ -44,7 +44,7 @@
    :NOTES: Nimble studio, English site.
    :END:
 
-** LEAD Xenia Tech — Full-Stack / React Native / QA :small:english:
+** APPLIED Xenia Tech — Full-Stack / React Native / QA     :small:english:
    :PROPERTIES:
    :URL: https://xeniatech.vn/en/jobs
    :LOCATION: Da Nang, Vietnam (+ HCMC / London)
@@ -66,7 +66,7 @@
    :NOTES: Est. 2016; ~30 clients across 12 countries.
    :END:
 
-** LEAD Enlab Software — Offshore software development :mid:english:
+** APPLIED Enlab Software — Offshore software development    :mid:english:
    :PROPERTIES:
    :URL: https://enlabsoftware.com/careers
    :LOCATION: Da Nang, Vietnam

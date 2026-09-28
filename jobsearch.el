@@ -77,11 +77,14 @@ ones (or your own) that happen to use the same keys.")
 (defun cv-jobs--setup-captures ()
   "Append the job-search capture templates to `org-capture-templates'.
 
-Existing templates are left exactly as they are: this file never overrides
-or removes a template it did not install itself, it only appends the
-job-search entries after them.  On a reload it first drops the entries it
-added previously so nothing gets duplicated."
-  ;; Remove only what we installed last time, then append the fresh set.
+This is strictly additive: every template that already exists -- including
+the built-in \"Task\" template, once it is defined as an ordinary entry --
+is left untouched and keeps its key.  The job-search entries are only
+*appended* after them, so they behave as an optional extra for this project
+rather than a replacement for your normal captures.  Re-running refreshes
+only the entries installed by this file, so nothing gets duplicated and
+nothing foreign is ever removed."
+  ;; First drop only the entries this file installed on a previous run.
   (setq org-capture-templates
         (seq-remove (lambda (entry)
                       (member entry cv-jobs--installed-capture-templates))
@@ -101,8 +104,15 @@ added previously so nothing gets duplicated."
                   "  :CREATED: %U\n"
                   "  :END:\n"
                   "  %?"))))
-  (setq org-capture-templates
-        (append org-capture-templates cv-jobs--installed-capture-templates)))
+  ;; `org-capture-select-template' only falls back to its built-in "Task"
+  ;; template when `org-capture-templates' is *empty*.  Since we are about to
+  ;; fill it, carry that default over explicitly (unless it is already there,
+  ;; e.g. defined in the init) so a plain TODO capture does not disappear.
+  (let ((base (or org-capture-templates
+                  '( ("t" "Task" entry (file+headline "" "Tasks")
+                      "* TODO %?\n  %u\n  %a") ))))
+    (setq org-capture-templates
+          (append base cv-jobs--installed-capture-templates))))
 
 (defun cv-jobs--setup-agenda ()
   "Wire jobs.org into the agenda and add the job pipeline view."
