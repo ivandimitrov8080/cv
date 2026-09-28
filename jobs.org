@@ -3,11 +3,13 @@
 #+FILETAGS: :jobsearch:
 #+STARTUP: indent
 
-# The keyword line above is file-local, so it overrides the main config's
-# org-todo-keywords only inside this file.  Capture a company with `C-c c j l'
-# and an application with `C-c c j a'.  View the pipeline with `C-c a j'.
+# One entry per company.  The TODO state is the pipeline stage:
+#   LEAD -> APPLIED -> INTERVIEW -> OFFER -> HIRED / REJECTED
+# Add a company with `C-c c j l'; apply with `C-c j A' (or `C-c C-t');
+# view the pipeline with `C-c a j'.  Closed companies go to * Archive
+# with `C-c j x' (or `C-c C-x C-a').
 
-* Leads
+* Pipeline
 
 ** APPLIED KAMORA — Golang / Flutter / Frontend            :small:english:
    :PROPERTIES:
@@ -15,6 +17,7 @@
    :LOCATION: Da Nang, Vietnam (Ngũ Hành Sơn)
    :SIZE: small
    :ENGLISH: yes
+   :CONTACT:
    :CREATED: 2026-09-26
    :NOTES: 100% product studio since 2019, serving European & US markets.
    :END:
@@ -25,6 +28,7 @@
    :LOCATION: Da Nang, Vietnam (hybrid + remote)
    :SIZE: small
    :ENGLISH: yes
+   :CONTACT:
    :CREATED: 2026-09-26
    :NOTES: US startup; up to $1,800/mo for senior backend/full-stack.
    :END:
@@ -35,6 +39,7 @@
    :LOCATION: Da Nang, Vietnam (on-site / hybrid / remote)
    :SIZE: small
    :ENGLISH: yes
+   :CONTACT:
    :CREATED: 2026-09-26
    :NOTES: Nimble studio, English site.
    :END:
@@ -45,6 +50,7 @@
    :LOCATION: Da Nang, Vietnam (+ HCMC / London)
    :SIZE: small
    :ENGLISH: yes
+   :CONTACT:
    :CREATED: 2026-09-26
    :NOTES: Founded 2017 by a UK entrepreneur; international clients.
    :END:
@@ -55,6 +61,7 @@
    :LOCATION: Da Nang, Vietnam
    :SIZE: small
    :ENGLISH: yes
+   :CONTACT:
    :CREATED: 2026-09-26
    :NOTES: Est. 2016; ~30 clients across 12 countries.
    :END:
@@ -65,6 +72,7 @@
    :LOCATION: Da Nang, Vietnam
    :SIZE: mid
    :ENGLISH: yes
+   :CONTACT:
    :CREATED: 2026-09-26
    :NOTES: "US-led standards with Vietnam-based costs".
    :END:
@@ -75,6 +83,7 @@
    :LOCATION: Da Nang (also Hue)
    :SIZE: mid
    :ENGLISH: yes
+   :CONTACT:
    :CREATED: 2026-09-26
    :NOTES: ~250 engineers; explicitly collaborates in English.
    :END:
@@ -85,6 +94,7 @@
    :LOCATION: Da Nang, Vietnam
    :SIZE: mid
    :ENGLISH: yes
+   :CONTACT:
    :CREATED: 2026-09-26
    :NOTES: US-linked; check LinkedIn for openings.
    :END:
@@ -95,10 +105,9 @@
    :LOCATION: Da Nang, Vietnam (+ HCMC / Singapore)
    :SIZE: mid
    :ENGLISH: yes
+   :CONTACT:
    :CREATED: 2026-09-26
    :NOTES: Dutch-founded (Sioux Group, 1996).
    :END:
-
-* Applications
 
 * Archive

@@ -2,29 +2,30 @@
 
 ;;; Commentary:
 
-;; This file is loaded on demand from ~/src/cv/.dir-locals.el, so none of the
-;; job-search / gptel glue has to live in the main init file.
+;; Loaded on demand from ~/src/cv/.dir-locals.el, so none of the job-search /
+;; gptel glue lives in the main init file.
 ;;
-;; It provides, additively and idempotently:
+;; Model: ONE entry per company.  The TODO state *is* the pipeline stage, so
+;; nothing is duplicated between "lead" and "application" sections:
 ;;
-;;   * two Org capture templates (a company "lead" and an "application")
-;;   * jobs.org wired into `org-agenda' plus a dedicated `C-c a j' pipeline
-;;   * local keys under C-c j inside jobs.org
-;;   * a `jobsearch-cv' gptel preset derived from the global `jobsearch'
-;;     preset, adding jobs.org as context and the MCP filesystem/git tools
-;;   * helpers to open the tracker, view the pipeline and commit with git
+;;   LEAD -> APPLIED -> INTERVIEW -> OFFER -> HIRED / REJECTED
+;;
+;; jobs.org holds a single "* Pipeline" tree; a "* Archive" tree keeps closed
+;; companies out of the way.  Capture only ever creates a new LEAD; "applying"
+;; is just a state change (`cv-jobs-apply' / C-c C-t).
 ;;
 ;; Nothing here modifies the global `jobsearch' preset.
 
 ;;; Code:
 
 (require 'org)
-(require 'org-capture)  ; installs the global "C-c c" binding
+(require 'org-capture)
+(require 'org-agenda)
 (require 'subr-x)
 (require 'seq)
 
 (defvar cv-jobs--loaded nil
-  "Non-nil once the CV job-search setup has run in this session.")
+  "Non-nil once the job-search setup has run in this session.")
 
 (defconst cv-jobs-directory
   (file-name-directory
@@ -44,40 +45,64 @@
   :type 'boolean
   :group 'org)
 
-(defun cv-jobs--register-capture (entry)
-  "Register org-capture ENTRY unless its key already exists."
-  (unless (assoc (car entry) org-capture-templates)
-    (setq org-capture-templates
-          (append org-capture-templates (list entry)))))
+(defcustom cv-jobs-follow-up-days 7
+  "Default number of days until the first follow-up, used by `cv-jobs-apply'."
+  :type 'integer
+  :group 'org)
+
+(defcustom cv-jobs-bind-org-keys t
+  "When non-nil, bind \"C-c c\" and \"C-c a\" to `org-capture'/`org-agenda'.
+
+Modern Org (9.7 / Emacs 29.2+) no longer installs these global entry points,
+so they are unbound unless you bind them.  Set this to nil if you already use
+\"C-c c\" as your own prefix."
+  :type 'boolean
+  :group 'org)
+
+;; Modern Org does not install the global entry points; provide them.
+(when cv-jobs-bind-org-keys
+  (dolist (spec '(("C-c c" . org-capture)
+                  ("C-c a" . org-agenda)))
+    (let ((key (kbd (car spec))))
+      (unless (eq (lookup-key global-map key) (cdr spec))
+        (define-key global-map key (cdr spec))))))
+
+(defvar cv-jobs--installed-capture-templates nil
+  "The exact `org-capture-templates' entries installed by this file.
+
+Remembered so that re-loading this file can replace *its own* templates
+without touching any template it did not install -- including the default
+ones (or your own) that happen to use the same keys.")
 
 (defun cv-jobs--setup-captures ()
-  "Install the job-search Org capture templates."
-  (cv-jobs--register-capture '("j" "Job search"))
-  (cv-jobs--register-capture
-   `("jl" "Lead (company found)" entry
-     (file+headline ,cv-jobs-file "Leads")
-     ,(concat
-       "* LEAD %^{Company} — %^{Role}\n"
-       "  :PROPERTIES:\n"
-       "  :URL: %^{URL}\n"
-       "  :LOCATION: %^{Location|Da Nang|Remote|Other}\n"
-       "  :SIZE: %^{Size|Small|Mid|Large}\n"
-       "  :ENGLISH: %^{English-speaking?|yes|unknown|no}\n"
-       "  :CONTACT: %^{Contact}\n"
-       "  :CREATED: %U\n"
-       "  :END:\n"
-       "  %?")))
-  (cv-jobs--register-capture
-   `("ja" "Application (with follow-up)" entry
-     (file+headline ,cv-jobs-file "Applications")
-     ,(concat
-       "* APPLIED %^{Company} — %^{Role}\n"
-       "  :PROPERTIES:\n"
-       "  :URL: %^{URL}\n"
-       "  :APPLIED: %U\n"
-       "  :END:\n"
-       "  SCHEDULED: %^{First follow-up}t\n"
-       "  %?"))))
+  "Append the job-search capture templates to `org-capture-templates'.
+
+Existing templates are left exactly as they are: this file never overrides
+or removes a template it did not install itself, it only appends the
+job-search entries after them.  On a reload it first drops the entries it
+added previously so nothing gets duplicated."
+  ;; Remove only what we installed last time, then append the fresh set.
+  (setq org-capture-templates
+        (seq-remove (lambda (entry)
+                      (member entry cv-jobs--installed-capture-templates))
+                    org-capture-templates))
+  (setq cv-jobs--installed-capture-templates
+        (list '("j" "Job search")
+              `("jl" "New lead" entry
+                (file+headline ,cv-jobs-file "Pipeline")
+                ,(concat
+                  "* LEAD %^{Company} — %^{Role}\n"
+                  "  :PROPERTIES:\n"
+                  "  :URL: %^{URL}\n"
+                  "  :LOCATION: %^{Location|Da Nang|Remote|Other}\n"
+                  "  :SIZE: %^{Size|small|mid|large}\n"
+                  "  :ENGLISH: %^{English-speaking?|yes|unknown|no}\n"
+                  "  :CONTACT: %^{Contact}\n"
+                  "  :CREATED: %U\n"
+                  "  :END:\n"
+                  "  %?"))))
+  (setq org-capture-templates
+        (append org-capture-templates cv-jobs--installed-capture-templates)))
 
 (defun cv-jobs--setup-agenda ()
   "Wire jobs.org into the agenda and add the job pipeline view."
@@ -86,9 +111,9 @@
     (add-to-list
      'org-agenda-custom-commands
      '("j" "Job search pipeline"
-       ((tags-todo "+TODO=\"LEAD\"" ((org-agenda-overriding-header "Open leads")))
+       ((tags-todo "+TODO=\"LEAD\"" ((org-agenda-overriding-header "Leads")))
         (tags-todo "+TODO=\"APPLIED\"" ((org-agenda-overriding-header "Applied — awaiting reply")))
-        (tags-todo "+TODO=\"INTERVIEW\"" ((org-agenda-overriding-header "Interviews")))
+        (tags-todo "+TODO=\"INTERVIEW\"" ((org-agenda-overriding-header "Interviewing")))
         (todo "OFFER" ((org-agenda-overriding-header "Offers")))
         (agenda "" ((org-agenda-overriding-header "Follow-ups (next 2 weeks)")
                     (org-agenda-span 14)
@@ -100,7 +125,10 @@
     (local-set-key (kbd "C-c j a") #'cv-jobs-agenda)
     (local-set-key (kbd "C-c j c") #'cv-jobs-commit)
     (local-set-key (kbd "C-c j g") #'cv-jobsearch)
-    (local-set-key (kbd "C-c j o") #'cv-jobs-open)))
+    (local-set-key (kbd "C-c j A") #'cv-jobs-apply)
+    (local-set-key (kbd "C-c j x") #'cv-jobs-archive)
+    ;; Closed companies go to the Archive tree in the same file.
+    (setq-local org-archive-location (concat cv-jobs-file "::* Archive"))))
 
 (defun cv-jobs--setup-gptel ()
   "Derive the `jobsearch-cv' gptel preset from the global `jobsearch' one."
@@ -117,9 +145,10 @@
                    "You also maintain the user's lead tracker at " cv-jobs-file
                    ". The user is looking for small, English-speaking software "
                    "firms in or near Da Nang, Vietnam. Consult jobs.org first "
-                   "and never duplicate an existing lead. When you identify a "
-                   "strong lead, append (never rewrite) a new entry under the "
-                   "'Leads' heading in exactly this Org format:\n"
+                   "and never duplicate an existing company. There is ONE entry "
+                   "per company, filed under the 'Pipeline' heading, and its "
+                   "TODO state tracks the stage. When you identify a strong "
+                   "lead, append (never rewrite) a new entry under 'Pipeline':\n"
                    "* LEAD <Company> — <Role>\n"
                    "  :PROPERTIES:\n"
                    "  :URL: <url>\n"
@@ -138,6 +167,29 @@
   "Open the job-search agenda pipeline."
   (interactive)
   (org-agenda nil "j"))
+
+(defun cv-jobs-apply ()
+  "Move the company at point to APPLIED and schedule a follow-up.
+
+This replaces the old duplicate \"application\" entry: the same node just
+changes state, so company details are never repeated."
+  (interactive)
+  (unless (derived-mode-p 'org-mode) (user-error "Not in an Org buffer"))
+  (org-back-to-heading t)
+  (when (eq (org-get-todo-state) 'LEAD)
+    (org-todo "APPLIED"))
+  (org-add-note "Application sent.")
+  (org-schedule nil (format-time-string
+                     "%Y-%m-%d"
+                     (time-add (current-time)
+                               (* cv-jobs-follow-up-days 24 60 60)))))
+
+(defun cv-jobs-archive ()
+  "Archive the entry at point into the file's Archive tree."
+  (interactive)
+  (org-back-to-heading t)
+  (let ((org-archive-location (concat cv-jobs-file "::* Archive")))
+    (org-archive-subtree)))
 
 (defun cv-jobs-commit (&optional message)
   "Stage and commit jobs.org to the cv git repository."
@@ -169,16 +221,36 @@
   "Commit jobs.org after a capture, when `cv-jobs-auto-commit' is non-nil."
   (when cv-jobs-auto-commit (cv-jobs-commit)))
 
-(unless cv-jobs--loaded
-  (setq cv-jobs--loaded t)
+(defun cv-jobs-verify ()
+  "Report whether the project-local job-search setup is actually active."
+  (interactive)
+  (let* ((bind (lookup-key global-map (kbd "C-c c")))
+         (bind-desc (cond ((keymapp bind) "C-c c is a prefix")
+                          ((null bind) "C-c c unbound")
+                          (t (format "C-c c => %s" bind)))))
+    (message (concat "jobsearch: %s | %s | capture keys: %s | "
+                     "jobs.org in agenda: %s")
+             (if (featurep 'jobsearch) "loaded" "NOT LOADED")
+             bind-desc
+             (mapcar #'car (seq-filter #'listp org-capture-templates))
+             (if (member cv-jobs-file org-agenda-files) "yes" "no"))))
+
+(defun cv-jobs-setup ()
+  "(Re)install the job-search capture, agenda, key and gptel wiring.
+
+Safe to call repeatedly; the capture templates this file adds are refreshed
+in place and the hooks and agenda entries are idempotent."
+  (interactive)
   (cv-jobs--setup-captures)
   (cv-jobs--setup-agenda)
   (add-hook 'org-mode-hook #'cv-jobs--setup-buffer)
   (add-hook 'org-capture-after-finalize-hook #'cv-jobs--maybe-auto-commit)
   (with-eval-after-load 'gptel (cv-jobs--setup-gptel))
-  ;; `org-mode-hook' already ran for the buffer that triggered this load,
-  ;; so configure it directly as well.
-  (cv-jobs--setup-buffer))
+  ;; `org-mode-hook' may already have run for the triggering buffer.
+  (cv-jobs--setup-buffer)
+  (setq cv-jobs--loaded t))
+
+(cv-jobs-setup)
 
 (provide 'jobsearch)
 ;;; jobsearch.el ends here
