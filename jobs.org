@@ -72,7 +72,7 @@
    :NOTES: "US-led standards with Vietnam-based costs".
    :END:
 
-** LEAD KMS Technology — Java / Spring / Cloud         :mid:english:
+** APPLIED KMS Technology — Java / Spring / Cloud            :mid:english:
    :PROPERTIES:
    :URL: https://careers.kms-technology.com/
    :LOCATION: Da Nang, Vietnam (+ HCMC / US / Mexico / Poland)
@@ -80,7 +80,8 @@
    :ENGLISH: yes
    :CONTACT:
    :CREATED: 2026-09-29
-   :NOTES: US-founded 2009; 1,100+ engineers. Explicit "Java Software Engineer (Spring/Azure/AWS), based in Da Nang" roles — direct stack match. VERIFY(2026-09-29): ATS=SmartRecruiters (jobs.smartrecruiters.com/KMSTechnology1); large-co HR process. Direct stack hit but ATS-gated (score ~2/8).
+   :NOTES: US-founded 2009; 1,100+ engineers. Explicit "Java Software Engineer (Spring/Azure/AWS), based in Da Nang" roles — direct stack match. VERIFY(2026-09-29): ATS=SmartRecruiters (jobs.smartrecruiters.com/KMSTechnology1); large-co HR process. Direct stack hit but ATS-gated (score ~2/8). Applied for Fullstack Engineer Typescript, nodejs
+   :APPLIED_ON: 2026-09-29
    :END:
 
 ** LEAD Orient Software — Outsourcing / Web / Mobile         :mid:english:
@@ -274,4 +275,3 @@
    :ARCHIVE_TODO: LEAD
    :ARCHIVE_ITAGS: jobsearch
    :END:
-
