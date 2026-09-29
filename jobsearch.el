@@ -263,6 +263,10 @@ in place and the hooks and agenda entries are idempotent."
 
 (cv-jobs-setup)
 
+(setq org-modern-todo-faces
+      '(("LEAD" . "⟳") ("APPLIED" . "⇒") ("INTERVIEW" . "★")
+        ("OFFER" . "★") ("HIRED" . "✔") ("REJECTED" . "✘")))
+
 (gptel-make-preset 'jobsearch
   :description "Search the web for remote software dev jobs."
   :backend "Deepseek"
