@@ -77,7 +77,8 @@
    :NOTES: "US-led standards with Vietnam-based costs".
    :END:
 
-** LEAD Enclave — Offshore Development Center :mid:english:
+* Archive (LEAD  no jobs for profile)
+** LEAD Enclave — Offshore Development Center      :jobsearch:mid:english:
    :PROPERTIES:
    :URL: https://enclave.vn/careers
    :LOCATION: Da Nang (also Hue)
@@ -85,10 +86,16 @@
    :ENGLISH: yes
    :CONTACT:
    :CREATED: 2026-09-26
-   :NOTES: ~250 engineers; explicitly collaborates in English.
+   :NOTES: ~250 engineers; explicitly collaborates in English. No jobs matching profile
+   :ARCHIVE_TIME: 2026-09-29 Tue 08:34
+   :ARCHIVE_FILE: ~/src/cv/jobs.org
+   :ARCHIVE_OLPATH: Pipeline
+   :ARCHIVE_CATEGORY: jobs
+   :ARCHIVE_TODO: LEAD
+   :ARCHIVE_ITAGS: jobsearch
    :END:
 
-** LEAD DataHouse Asia — Software development :mid:english:
+** LEAD DataHouse Asia — Software development      :jobsearch:mid:english:
    :PROPERTIES:
    :URL: https://www.linkedin.com/company/datahousevietnam
    :LOCATION: Da Nang, Vietnam
@@ -97,9 +104,15 @@
    :CONTACT:
    :CREATED: 2026-09-26
    :NOTES: US-linked; check LinkedIn for openings.
+   :ARCHIVE_TIME: 2026-09-29 Tue 08:34
+   :ARCHIVE_FILE: ~/src/cv/jobs.org
+   :ARCHIVE_OLPATH: Pipeline
+   :ARCHIVE_CATEGORY: jobs
+   :ARCHIVE_TODO: LEAD
+   :ARCHIVE_ITAGS: jobsearch
    :END:
 
-** LEAD Sioux High Tech Software — High-tech software :mid:english:
+** LEAD Sioux High Tech Software — High-tech software :jobsearch:mid:english:
    :PROPERTIES:
    :URL: https://jobs.sioux.asia/
    :LOCATION: Da Nang, Vietnam (+ HCMC / Singapore)
@@ -108,6 +121,11 @@
    :CONTACT:
    :CREATED: 2026-09-26
    :NOTES: Dutch-founded (Sioux Group, 1996).
+   :ARCHIVE_TIME: 2026-09-29 Tue 08:34
+   :ARCHIVE_FILE: ~/src/cv/jobs.org
+   :ARCHIVE_OLPATH: Pipeline
+   :ARCHIVE_CATEGORY: jobs
+   :ARCHIVE_TODO: LEAD
+   :ARCHIVE_ITAGS: jobsearch
    :END:
 
-* Archive

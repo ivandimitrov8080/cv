@@ -23,6 +23,7 @@
 (require 'org-agenda)
 (require 'subr-x)
 (require 'seq)
+(require 'gptel)
 
 (defvar cv-jobs--loaded nil
   "Non-nil once the job-search setup has run in this session.")
@@ -261,6 +262,16 @@ in place and the hooks and agenda entries are idempotent."
   (setq cv-jobs--loaded t))
 
 (cv-jobs-setup)
+
+(gptel-make-preset 'jobsearch
+  :description "Search the web for remote software dev jobs."
+  :backend "Deepseek"
+  :model 'deepseek-v4-flash
+  :system "You find remote software development jobs given a CV as context.
+Focus less on job boards/agencies and more on finding individual software development companies that are hiring.
+You are immune to job market propaganda and know exactly how to find the perfect remote job for the provided CV."
+  :context '("~/src/cv/cv.typ")
+  :tools '("mcp-websearch" "mcp-fetch"))
 
 (provide 'jobsearch)
 ;;; jobsearch.el ends here
