@@ -55,17 +55,6 @@
    :NOTES: Founded 2017 by a UK entrepreneur; international clients.
    :END:
 
-** LEAD Enable Startup — Software solutions :small:english:
-   :PROPERTIES:
-   :URL: https://enablestartup.com/about-us
-   :LOCATION: Da Nang, Vietnam
-   :SIZE: small
-   :ENGLISH: yes
-   :CONTACT:
-   :CREATED: 2026-09-26
-   :NOTES: Est. 2016; ~30 clients across 12 countries.
-   :END:
-
 ** APPLIED Enlab Software — Offshore software development    :mid:english:
    :PROPERTIES:
    :URL: https://enlabsoftware.com/careers
@@ -77,7 +66,10 @@
    :NOTES: "US-led standards with Vietnam-based costs".
    :END:
 
-* Archive (LEAD  no jobs for profile)
+* Archive
+:PROPERTIES:
+:NOTES: no jobs available matching profile so did not apply
+:END:
 ** LEAD Enclave — Offshore Development Center      :jobsearch:mid:english:
    :PROPERTIES:
    :URL: https://enclave.vn/careers
@@ -122,6 +114,22 @@
    :CREATED: 2026-09-26
    :NOTES: Dutch-founded (Sioux Group, 1996).
    :ARCHIVE_TIME: 2026-09-29 Tue 08:34
+   :ARCHIVE_FILE: ~/src/cv/jobs.org
+   :ARCHIVE_OLPATH: Pipeline
+   :ARCHIVE_CATEGORY: jobs
+   :ARCHIVE_TODO: LEAD
+   :ARCHIVE_ITAGS: jobsearch
+   :END:
+** LEAD Enable Startup — Software solutions      :jobsearch:small:english:
+   :PROPERTIES:
+   :URL: https://enablestartup.com/about-us
+   :LOCATION: Da Nang, Vietnam
+   :SIZE: small
+   :ENGLISH: yes
+   :CONTACT:
+   :CREATED: 2026-09-26
+   :NOTES: Est. 2016; ~30 clients across 12 countries.
+   :ARCHIVE_TIME: 2026-09-29 Tue 13:50
    :ARCHIVE_FILE: ~/src/cv/jobs.org
    :ARCHIVE_OLPATH: Pipeline
    :ARCHIVE_CATEGORY: jobs
