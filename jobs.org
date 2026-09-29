@@ -20,6 +20,7 @@
    :ENGLISH: yes
    :CONTACT:
    :CREATED: 2026-09-26
+   :APPLIED_ON: 2026-09-26
    :NOTES: 100% product studio since 2019, serving European & US markets.
    :END:
 
@@ -31,6 +32,7 @@
    :ENGLISH: yes
    :CONTACT:
    :CREATED: 2026-09-26
+   :APPLIED_ON: 2026-09-26
    :NOTES: US startup; up to $1,800/mo for senior backend/full-stack.
    :END:
 
@@ -42,6 +44,7 @@
    :ENGLISH: yes
    :CONTACT:
    :CREATED: 2026-09-26
+   :APPLIED_ON: 2026-09-26
    :NOTES: Nimble studio, English site.
    :END:
 
@@ -53,6 +56,7 @@
    :ENGLISH: yes
    :CONTACT:
    :CREATED: 2026-09-26
+   :APPLIED_ON: 2026-09-26
    :NOTES: Founded 2017 by a UK entrepreneur; international clients.
    :END:
 
@@ -64,6 +68,7 @@
    :ENGLISH: yes
    :CONTACT:
    :CREATED: 2026-09-26
+   :APPLIED_ON: 2026-09-26
    :NOTES: "US-led standards with Vietnam-based costs".
    :END:
 
