@@ -74,7 +74,7 @@
    :ENGLISH: yes
    :CONTACT:
    :CREATED: 2026-09-29
-   :NOTES: US-founded 2009; 1,100+ engineers. Explicit "Java Software Engineer (Spring/Azure/AWS), based in Da Nang" roles — direct stack match.
+   :NOTES: US-founded 2009; 1,100+ engineers. Explicit "Java Software Engineer (Spring/Azure/AWS), based in Da Nang" roles — direct stack match. VERIFY(2026-09-29): ATS=SmartRecruiters (jobs.smartrecruiters.com/KMSTechnology1); large-co HR process. Direct stack hit but ATS-gated (score ~2/8).
    :END:
 
 ** LEAD Orient Software — Outsourcing / Web / Mobile         :mid:english:
@@ -85,7 +85,7 @@
    :ENGLISH: yes
    :CONTACT:
    :CREATED: 2026-09-29
-   :NOTES: English careers site; hybrid model; open Python/full-stack roles in Da Nang.
+   :NOTES: English careers site; hybrid model; open Python/full-stack roles in Da Nang. VERIFY(2026-09-29): apply stays on own domain (custom careers portal, no named ATS vendor); mid-size => TA present. Senior Fullstack .NET role live.
    :END:
 
 ** LEAD Vinova — Java / Mobile / Full-Stack         :small:english:
@@ -96,7 +96,7 @@
    :ENGLISH: yes
    :CONTACT:
    :CREATED: 2026-09-29
-   :NOTES: "VIbrant inNOVAtors"; recurring Java Software Engineer and Senior Java roles in Da Nang.
+   :NOTES: "VIbrant inNOVAtors"; recurring Java Software Engineer and Senior Java roles in Da Nang. VERIFY(2026-09-29): ATS=hrpartner.io + vinova.careers-page.com; HR present (posted Employer Branding & Engagement Specialist). Java-stack fit but gated.
    :END:
 
 ** LEAD Seadev — Product / Agency Web & App         :small:english:
@@ -107,7 +107,7 @@
    :ENGLISH: yes
    :CONTACT:
    :CREATED: 2026-09-29
-   :NOTES: US-linked; hires Mid/Senior Developer and Tester roles in Da Nang.
+   :NOTES: US-linked; hires Mid/Senior Developer and Tester roles in Da Nang. VERIFY(2026-09-29): ATS=Workable (apply.workable.com/seadev). Good signal: postings "report directly to the Product Manager" (product-led, small). C#/ShedPro product focus.
    :END:
 
 ** LEAD Axon Active — Dedicated Teams / Agile         :mid:english:
@@ -118,7 +118,7 @@
    :ENGLISH: yes
    :CONTACT:
    :CREATED: 2026-09-29
-   :NOTES: Swiss-founded 2008; 650+ staff, 80+ teams; Swiss client work in English.
+   :NOTES: Swiss-founded 2008; 650+ staff, 80+ teams; Swiss client work in English. VERIFY(2026-09-29): careers on own subdomain (careers.axonactive.com), no named ATS vendor; but 650+ staff => HR exists. Open .Net/C#+ReactJS role.
    :END:
 
 ** LEAD D-Soft JSC — AI / IoT / Digital Transformation         :small:english:
@@ -129,7 +129,7 @@
    :ENGLISH: unknown
    :CONTACT:
    :CREATED: 2026-09-29
-   :NOTES: ``Software development company headquartered in Da Nang''; 15+ years know-how.
+   :NOTES: ``Software development company headquartered in Da Nang''; 15+ years know-how. VERIFY(2026-09-29): hiring is LinkedIn-post style, Vietnamese-language; open roles are BRSE (Japanese N2) / IT sales. Low signal for this profile.
    :END:
 
 ** LEAD iViettech — ERP Product Engineering         :small:english:
@@ -140,7 +140,7 @@
    :ENGLISH: unknown
    :CONTACT:
    :CREATED: 2026-09-29
-   :NOTES: Builds an ERP product used in Singapore/Malaysia/HK/Japan/Vietnam; hiring software engineers in Da Nang.
+   :NOTES: Builds an ERP product used in Singapore/Malaysia/HK/Japan/Vietnam; hiring software engineers in Da Nang. VERIFY(2026-09-29): primarily a programmer training center (iviettech.vn) + ERP product arm; postings in Vietnamese. Low signal for this profile.
    :END:
 
 ** LEAD Oivan — Web / Mobile / Cloud / Security         :mid:english:
@@ -151,7 +151,7 @@
    :ENGLISH: yes
    :CONTACT:
    :CREATED: 2026-09-29
-   :NOTES: Finland-based (151-300); Personio board lists Da Nang frontend/engineer roles.
+   :NOTES: Finland-based (151-300); Personio board lists Da Nang frontend/engineer roles. VERIFY(2026-09-29): ATS=Personio (personio.com). Live roles: Frontend (Angular) + Ruby on Rails — not Java/Spring; mid-size => HR present.
    :END:
 
 ** LEAD SmartDev — Web / Cloud / Fintech         :mid:english:
@@ -162,7 +162,7 @@
    :ENGLISH: yes
    :CONTACT:
    :CREATED: 2026-09-29
-   :NOTES: Swiss (Verysell Group); Da Nang dev center; ReactJS/Azure DevOps senior roles.
+   :NOTES: Swiss (Verysell Group); Da Nang dev center; ReactJS/Azure DevOps senior roles. VERIFY(2026-09-29): ATS=SmartRecruiters + HireHive (smartdev.hirehive.com) + smartdev.talent.vn; HR present, mid-large.
    :END:
 
 ** LEAD CoverGo — Insurance Platform (Product)         :mid:english:
@@ -173,7 +173,7 @@
    :ENGLISH: yes
    :CONTACT:
    :CREATED: 2026-09-29
-   :NOTES: No-code insurance platform, founded 2017; ~94% remote listings incl. Da Nang; actively hiring across Technology.
+   :NOTES: No-code insurance platform, founded 2017; ~94% remote listings incl. Da Nang; actively hiring across Technology. VERIFY(2026-09-29): ATS=Workable (apply.workable.com/covergo). Product co, remote-first — decent shape.
    :END:
 
 ** LEAD NashTech — Software Engineering Services         :large:english:
@@ -184,7 +184,7 @@
    :ENGLISH: yes
    :CONTACT:
    :CREATED: 2026-09-29
-   :NOTES: Large UK/Nash Squared group; recurring Senior Software Engineer Java/.Net/Python roles in Da Nang.
+   :NOTES: Large UK/Nash Squared group; recurring Senior Software Engineer Java/.Net/Python roles in Da Nang. VERIFY(2026-09-29): own portal careers.nashtechglobal.com; LinkedIn posts name a TA person ("Diem Ha") => HR-first, large (score ~1/8). Java roles exist.
    :END:
 
 ** LEAD LogiGear — QA / Test Automation         :mid:english:
@@ -195,7 +195,7 @@
    :ENGLISH: yes
    :CONTACT:
    :CREATED: 2026-09-29
-   :NOTES: 30+ yrs software testing/QA focus; mostly QA roles, some bridge-engineer posts.
+   :NOTES: 30+ yrs software testing/QA focus; mostly QA roles, some bridge-engineer posts. VERIFY(2026-09-29): own site + VietnamWorks/careerviet listings; QA-heavy, few dev roles. Weak fit for this Java/React profile.
    :END:
 
 * Archive
