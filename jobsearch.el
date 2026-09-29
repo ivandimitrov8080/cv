@@ -52,11 +52,10 @@
   :group 'org)
 
 (defcustom cv-jobs-bind-org-keys t
-  "When non-nil, bind \"C-c c\" and \"C-c a\" to `org-capture'/`org-agenda'.
-
+  "When non-nil, bind to `org-capture'/`org-agenda'.
 Modern Org (9.7 / Emacs 29.2+) no longer installs these global entry points,
 so they are unbound unless you bind them.  Set this to nil if you already use
-\"C-c c\" as your own prefix."
+as your own prefix."
   :type 'boolean
   :group 'org)
 
@@ -135,39 +134,10 @@ nothing foreign is ever removed."
   (when (and buffer-file-name (file-equal-p buffer-file-name cv-jobs-file))
     (local-set-key (kbd "C-c j a") #'cv-jobs-agenda)
     (local-set-key (kbd "C-c j c") #'cv-jobs-commit)
-    (local-set-key (kbd "C-c j g") #'cv-jobsearch)
     (local-set-key (kbd "C-c j A") #'cv-jobs-apply)
     (local-set-key (kbd "C-c j x") #'cv-jobs-archive)
     ;; Closed companies go to the Archive tree in the same file.
     (setq-local org-archive-location (concat cv-jobs-file "::* Archive"))))
-
-(defun cv-jobs--setup-gptel ()
-  "Derive the `jobsearch-cv' gptel preset from the global `jobsearch' one."
-  (when (gptel-get-preset 'jobsearch)
-    (gptel-make-preset 'jobsearch-cv
-      :description "jobsearch + local Org tracker (jobs.org)"
-      :parents '(jobsearch)
-      :context `(:append (,cv-jobs-file))
-      :tools '(:append ("mcp-filesystem" "mcp-git"))
-      :system
-      `(:function
-        ,(lambda (orig)
-           (concat orig "\n\n"
-                   "You also maintain the user's lead tracker at " cv-jobs-file
-                   ". The user is looking for small, English-speaking software "
-                   "firms in or near Da Nang, Vietnam. Consult jobs.org first "
-                   "and never duplicate an existing company. There is ONE entry "
-                   "per company, filed under the 'Pipeline' heading, and its "
-                   "TODO state tracks the stage. When you identify a strong "
-                   "lead, append (never rewrite) a new entry under 'Pipeline':\n"
-                   "* LEAD <Company> — <Role>\n"
-                   "  :PROPERTIES:\n"
-                   "  :URL: <url>\n"
-                   "  :LOCATION: <city>\n"
-                   "  :SIZE: <small|mid|large>\n"
-                   "  :ENGLISH: <yes|unknown|no>\n"
-                   "  :CREATED: <YYYY-MM-DD>\n"
-                   "  :END:\n"))))))
 
 (defun cv-jobs-open ()
   "Open the job-search tracker."
@@ -202,36 +172,6 @@ changes state, so company details are never repeated."
   (let ((org-archive-location (concat cv-jobs-file "::* Archive")))
     (org-archive-subtree)))
 
-(defun cv-jobs-commit (&optional message)
-  "Stage and commit jobs.org to the cv git repository."
-  (interactive)
-  (let* ((default-directory (file-name-as-directory cv-jobs-directory))
-         (msg (or message "jobsearch: update tracker"))
-         (status (string-trim
-                  (shell-command-to-string "git status --porcelain jobs.org"))))
-    (if (string-empty-p status)
-        (message "Nothing to commit in jobs.org")
-      (call-process "git" nil nil nil "add" "jobs.org")
-      (call-process "git" nil nil nil "commit" "-m" msg "jobs.org")
-      (message "Committed jobs.org: %s" msg))))
-
-(defun cv-jobsearch ()
-  "Open a gptel buffer primed with the `jobsearch-cv' preset."
-  (interactive)
-  (require 'gptel)
-  (let ((default-directory (file-name-as-directory cv-jobs-directory)))
-    (gptel "*cv-jobsearch*")
-    (goto-char (point-max))
-    (unless (save-excursion
-              (beginning-of-line)
-              (looking-at-p ".*@jobsearch-cv "))
-      (insert "@jobsearch-cv "))
-    (message "jobsearch-cv ready — type a request and send with C-c C-c")))
-
-(defun cv-jobs--maybe-auto-commit (&rest _)
-  "Commit jobs.org after a capture, when `cv-jobs-auto-commit' is non-nil."
-  (when cv-jobs-auto-commit (cv-jobs-commit)))
-
 (defun cv-jobs-verify ()
   "Report whether the project-local job-search setup is actually active."
   (interactive)
@@ -256,7 +196,6 @@ in place and the hooks and agenda entries are idempotent."
   (cv-jobs--setup-agenda)
   (add-hook 'org-mode-hook #'cv-jobs--setup-buffer)
   (add-hook 'org-capture-after-finalize-hook #'cv-jobs--maybe-auto-commit)
-  (with-eval-after-load 'gptel (cv-jobs--setup-gptel))
   ;; `org-mode-hook' may already have run for the triggering buffer.
   (cv-jobs--setup-buffer)
   (setq cv-jobs--loaded t))
@@ -271,10 +210,10 @@ in place and the hooks and agenda entries are idempotent."
   :description "Search the web for remote software dev jobs."
   :backend "Deepseek"
   :model 'deepseek-v4-flash
-  :system "You find remote software development jobs given a CV as context.
+  :system "You find remote software development jobs given a CV and previous application statuses as context.
 Focus less on job boards/agencies and more on finding individual software development companies that are hiring.
 You are immune to job market propaganda and know exactly how to find the perfect remote job for the provided CV."
-  :context '("~/src/cv/cv.typ")
+  :context '("~/src/cv/jobs.org" "~/src/cv/cv.typ")
   :tools '("mcp-websearch" "mcp-fetch"))
 
 (provide 'jobsearch)
