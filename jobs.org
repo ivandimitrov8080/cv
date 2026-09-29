@@ -66,6 +66,138 @@
    :NOTES: "US-led standards with Vietnam-based costs".
    :END:
 
+** LEAD KMS Technology — Java / Spring / Cloud         :mid:english:
+   :PROPERTIES:
+   :URL: https://careers.kms-technology.com/
+   :LOCATION: Da Nang, Vietnam (+ HCMC / US / Mexico / Poland)
+   :SIZE: mid
+   :ENGLISH: yes
+   :CONTACT:
+   :CREATED: 2026-09-29
+   :NOTES: US-founded 2009; 1,100+ engineers. Explicit "Java Software Engineer (Spring/Azure/AWS), based in Da Nang" roles — direct stack match.
+   :END:
+
+** LEAD Orient Software — Outsourcing / Web / Mobile         :mid:english:
+   :PROPERTIES:
+   :URL: https://www.orientsoftware.com/company/careers/
+   :LOCATION: Da Nang, Vietnam (+ HCMC / Hanoi / Hue)
+   :SIZE: mid
+   :ENGLISH: yes
+   :CONTACT:
+   :CREATED: 2026-09-29
+   :NOTES: English careers site; hybrid model; open Python/full-stack roles in Da Nang.
+   :END:
+
+** LEAD Vinova — Java / Mobile / Full-Stack         :small:english:
+   :PROPERTIES:
+   :URL: https://vinova.sg/jobs/
+   :LOCATION: Da Nang, Vietnam (+ HCMC / Hanoi)
+   :SIZE: small
+   :ENGLISH: yes
+   :CONTACT:
+   :CREATED: 2026-09-29
+   :NOTES: "VIbrant inNOVAtors"; recurring Java Software Engineer and Senior Java roles in Da Nang.
+   :END:
+
+** LEAD Seadev — Product / Agency Web & App         :small:english:
+   :PROPERTIES:
+   :URL: https://seadev.us/careers/
+   :LOCATION: Da Nang, Vietnam
+   :SIZE: small
+   :ENGLISH: yes
+   :CONTACT:
+   :CREATED: 2026-09-29
+   :NOTES: US-linked; hires Mid/Senior Developer and Tester roles in Da Nang.
+   :END:
+
+** LEAD Axon Active — Dedicated Teams / Agile         :mid:english:
+   :PROPERTIES:
+   :URL: https://www.careers.axonactive.com/
+   :LOCATION: Da Nang, Vietnam (+ HCMC / Can Tho / Switzerland)
+   :SIZE: mid
+   :ENGLISH: yes
+   :CONTACT:
+   :CREATED: 2026-09-29
+   :NOTES: Swiss-founded 2008; 650+ staff, 80+ teams; Swiss client work in English.
+   :END:
+
+** LEAD D-Soft JSC — AI / IoT / Digital Transformation         :small:english:
+   :PROPERTIES:
+   :URL: https://d-soft.com.vn/
+   :LOCATION: Da Nang, Vietnam
+   :SIZE: small
+   :ENGLISH: unknown
+   :CONTACT:
+   :CREATED: 2026-09-29
+   :NOTES: ``Software development company headquartered in Da Nang''; 15+ years know-how.
+   :END:
+
+** LEAD iViettech — ERP Product Engineering         :small:english:
+   :PROPERTIES:
+   :URL: https://iviettech.vn/
+   :LOCATION: Da Nang, Vietnam
+   :SIZE: small
+   :ENGLISH: unknown
+   :CONTACT:
+   :CREATED: 2026-09-29
+   :NOTES: Builds an ERP product used in Singapore/Malaysia/HK/Japan/Vietnam; hiring software engineers in Da Nang.
+   :END:
+
+** LEAD Oivan — Web / Mobile / Cloud / Security         :mid:english:
+   :PROPERTIES:
+   :URL: https://oivan.com/careers/
+   :LOCATION: Da Nang, Vietnam (+ HCMC / Finland)
+   :SIZE: mid
+   :ENGLISH: yes
+   :CONTACT:
+   :CREATED: 2026-09-29
+   :NOTES: Finland-based (151-300); Personio board lists Da Nang frontend/engineer roles.
+   :END:
+
+** LEAD SmartDev — Web / Cloud / Fintech         :mid:english:
+   :PROPERTIES:
+   :URL: https://careers.smartdev.com/
+   :LOCATION: Da Nang, Vietnam (+ Hanoi / Switzerland)
+   :SIZE: mid
+   :ENGLISH: yes
+   :CONTACT:
+   :CREATED: 2026-09-29
+   :NOTES: Swiss (Verysell Group); Da Nang dev center; ReactJS/Azure DevOps senior roles.
+   :END:
+
+** LEAD CoverGo — Insurance Platform (Product)         :mid:english:
+   :PROPERTIES:
+   :URL: https://covergo.com/careers/
+   :LOCATION: Da Nang, Vietnam (+ HCMC / Hanoi / remote-first)
+   :SIZE: mid
+   :ENGLISH: yes
+   :CONTACT:
+   :CREATED: 2026-09-29
+   :NOTES: No-code insurance platform, founded 2017; ~94% remote listings incl. Da Nang; actively hiring across Technology.
+   :END:
+
+** LEAD NashTech — Software Engineering Services         :large:english:
+   :PROPERTIES:
+   :URL: https://careers.nashtechglobal.com/
+   :LOCATION: Da Nang, Vietnam (+ Hanoi / HCMC)
+   :SIZE: large
+   :ENGLISH: yes
+   :CONTACT:
+   :CREATED: 2026-09-29
+   :NOTES: Large UK/Nash Squared group; recurring Senior Software Engineer Java/.Net/Python roles in Da Nang.
+   :END:
+
+** LEAD LogiGear — QA / Test Automation         :mid:english:
+   :PROPERTIES:
+   :URL: https://www.logigear.com/logigear-career
+   :LOCATION: Da Nang, Vietnam (+ HCMC)
+   :SIZE: mid
+   :ENGLISH: yes
+   :CONTACT:
+   :CREATED: 2026-09-29
+   :NOTES: 30+ yrs software testing/QA focus; mostly QA roles, some bridge-engineer posts.
+   :END:
+
 * Archive
 :PROPERTIES:
 :NOTES: no jobs available matching profile so did not apply
