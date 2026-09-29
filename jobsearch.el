@@ -157,13 +157,28 @@ changes state, so company details are never repeated."
   (interactive)
   (unless (derived-mode-p 'org-mode) (user-error "Not in an Org buffer"))
   (org-back-to-heading t)
-  (when (eq (org-get-todo-state) 'LEAD)
+  (when (equal (org-get-todo-state) "LEAD")
     (org-todo "APPLIED"))
   (org-add-note "Application sent.")
   (org-schedule nil (format-time-string
                      "%Y-%m-%d"
                      (time-add (current-time)
                                (* cv-jobs-follow-up-days 24 60 60)))))
+
+(defun cv-jobs--record-applied-date ()
+  "Stamp the :APPLIED: property whenever an entry enters APPLIED.
+
+Installed on `org-after-todo-state-change-hook' so the date is recorded no
+matter how the state changed -- `cv-jobs-apply', `C-c C-t', or a bulk change
+from the agenda.  Only entries in `cv-jobs-file' are touched.  The drawer is
+created on demand by `org-set-property', so entries captured before this
+existed need no migration."
+  (when (and (derived-mode-p 'org-mode)
+             buffer-file-name
+             (file-equal-p buffer-file-name cv-jobs-file)
+             (equal (org-get-todo-state) "APPLIED"))
+    (save-excursion
+      (org-set-property "APPLIED" (format-time-string "%Y-%m-%d")))))
 
 (defun cv-jobs-archive ()
   "Archive the entry at point into the file's Archive tree."
@@ -195,6 +210,7 @@ in place and the hooks and agenda entries are idempotent."
   (cv-jobs--setup-captures)
   (cv-jobs--setup-agenda)
   (add-hook 'org-mode-hook #'cv-jobs--setup-buffer)
+  (add-hook 'org-after-todo-state-change-hook #'cv-jobs--record-applied-date)
   (add-hook 'org-capture-after-finalize-hook #'cv-jobs--maybe-auto-commit)
   ;; `org-mode-hook' may already have run for the triggering buffer.
   (cv-jobs--setup-buffer)
