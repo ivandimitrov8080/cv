@@ -8,7 +8,7 @@
 # Add a company with `C-c c j l'; apply with `C-c j A' (or `C-c C-t');
 # view the pipeline with `C-c a j'.  Closed companies go to * Archive
 # with `C-c j x' (or `C-c C-x C-a').
-# Moving a company to APPLIED stamps an :APPLIED: property with today's date.
+# Moving a company to APPLIED stamps an :APPLIED_ON: property with today's date.
 
 * Pipeline
 

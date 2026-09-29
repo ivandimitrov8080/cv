@@ -166,7 +166,7 @@ changes state, so company details are never repeated."
                                (* cv-jobs-follow-up-days 24 60 60)))))
 
 (defun cv-jobs--record-applied-date ()
-  "Stamp the :APPLIED: property whenever an entry enters APPLIED.
+  "Stamp the :APPLIED_ON: property whenever an entry enters APPLIED.
 
 Installed on `org-after-todo-state-change-hook' so the date is recorded no
 matter how the state changed -- `cv-jobs-apply', `C-c C-t', or a bulk change
@@ -178,7 +178,7 @@ existed need no migration."
              (file-equal-p buffer-file-name cv-jobs-file)
              (equal (org-get-todo-state) "APPLIED"))
     (save-excursion
-      (org-set-property "APPLIED" (format-time-string "%Y-%m-%d")))))
+      (org-set-property "APPLIED_ON" (format-time-string "%Y-%m-%d")))))
 
 (defun cv-jobs-archive ()
   "Archive the entry at point into the file's Archive tree."
