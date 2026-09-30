@@ -84,18 +84,7 @@
    :APPLIED_ON: 2026-09-29
    :END:
 
-** LEAD Orient Software — Outsourcing / Web / Mobile         :mid:english:
-   :PROPERTIES:
-   :URL: https://www.orientsoftware.com/company/careers/
-   :LOCATION: Da Nang, Vietnam (+ HCMC / Hanoi / Hue)
-   :SIZE: mid
-   :ENGLISH: yes
-   :CONTACT:
-   :CREATED: 2026-09-29
-   :NOTES: English careers site; hybrid model; open Python/full-stack roles in Da Nang. VERIFY(2026-09-29): apply stays on own domain (custom careers portal, no named ATS vendor); mid-size => TA present. Senior Fullstack .NET role live.
-   :END:
-
-** LEAD Vinova — Java / Mobile / Full-Stack         :small:english:
+** APPLIED Vinova — Java / Mobile / Full-Stack             :small:english:
    :PROPERTIES:
    :URL: https://vinova.sg/jobs/
    :LOCATION: Da Nang, Vietnam (+ HCMC / Hanoi)
@@ -104,20 +93,10 @@
    :CONTACT:
    :CREATED: 2026-09-29
    :NOTES: "VIbrant inNOVAtors"; recurring Java Software Engineer and Senior Java roles in Da Nang. VERIFY(2026-09-29): ATS=hrpartner.io + vinova.careers-page.com; HR present (posted Employer Branding & Engagement Specialist). Java-stack fit but gated.
+   :APPLIED_ON: 2026-09-30
    :END:
 
-** LEAD Seadev — Product / Agency Web & App         :small:english:
-   :PROPERTIES:
-   :URL: https://seadev.us/careers/
-   :LOCATION: Da Nang, Vietnam
-   :SIZE: small
-   :ENGLISH: yes
-   :CONTACT:
-   :CREATED: 2026-09-29
-   :NOTES: US-linked; hires Mid/Senior Developer and Tester roles in Da Nang. VERIFY(2026-09-29): ATS=Workable (apply.workable.com/seadev). Good signal: postings "report directly to the Product Manager" (product-led, small). C#/ShedPro product focus.
-   :END:
-
-** LEAD Axon Active — Dedicated Teams / Agile         :mid:english:
+** APPLIED Axon Active — Dedicated Teams / Agile             :mid:english:
    :PROPERTIES:
    :URL: https://www.careers.axonactive.com/
    :LOCATION: Da Nang, Vietnam (+ HCMC / Can Tho / Switzerland)
@@ -126,31 +105,10 @@
    :CONTACT:
    :CREATED: 2026-09-29
    :NOTES: Swiss-founded 2008; 650+ staff, 80+ teams; Swiss client work in English. VERIFY(2026-09-29): careers on own subdomain (careers.axonactive.com), no named ATS vendor; but 650+ staff => HR exists. Open .Net/C#+ReactJS role.
+   :APPLIED_ON: 2026-09-30
    :END:
 
-** LEAD D-Soft JSC — AI / IoT / Digital Transformation         :small:english:
-   :PROPERTIES:
-   :URL: https://d-soft.com.vn/
-   :LOCATION: Da Nang, Vietnam
-   :SIZE: small
-   :ENGLISH: unknown
-   :CONTACT:
-   :CREATED: 2026-09-29
-   :NOTES: ``Software development company headquartered in Da Nang''; 15+ years know-how. VERIFY(2026-09-29): hiring is LinkedIn-post style, Vietnamese-language; open roles are BRSE (Japanese N2) / IT sales. Low signal for this profile.
-   :END:
-
-** LEAD iViettech — ERP Product Engineering         :small:english:
-   :PROPERTIES:
-   :URL: https://iviettech.vn/
-   :LOCATION: Da Nang, Vietnam
-   :SIZE: small
-   :ENGLISH: unknown
-   :CONTACT:
-   :CREATED: 2026-09-29
-   :NOTES: Builds an ERP product used in Singapore/Malaysia/HK/Japan/Vietnam; hiring software engineers in Da Nang. VERIFY(2026-09-29): primarily a programmer training center (iviettech.vn) + ERP product arm; postings in Vietnamese. Low signal for this profile.
-   :END:
-
-** LEAD Oivan — Web / Mobile / Cloud / Security         :mid:english:
+** APPLIED Oivan — Web / Mobile / Cloud / Security           :mid:english:
    :PROPERTIES:
    :URL: https://oivan.com/careers/
    :LOCATION: Da Nang, Vietnam (+ HCMC / Finland)
@@ -159,31 +117,10 @@
    :CONTACT:
    :CREATED: 2026-09-29
    :NOTES: Finland-based (151-300); Personio board lists Da Nang frontend/engineer roles. VERIFY(2026-09-29): ATS=Personio (personio.com). Live roles: Frontend (Angular) + Ruby on Rails — not Java/Spring; mid-size => HR present.
+   :APPLIED_ON: 2026-09-30
    :END:
 
-** LEAD SmartDev — Web / Cloud / Fintech         :mid:english:
-   :PROPERTIES:
-   :URL: https://careers.smartdev.com/
-   :LOCATION: Da Nang, Vietnam (+ Hanoi / Switzerland)
-   :SIZE: mid
-   :ENGLISH: yes
-   :CONTACT:
-   :CREATED: 2026-09-29
-   :NOTES: Swiss (Verysell Group); Da Nang dev center; ReactJS/Azure DevOps senior roles. VERIFY(2026-09-29): ATS=SmartRecruiters + HireHive (smartdev.hirehive.com) + smartdev.talent.vn; HR present, mid-large.
-   :END:
-
-** LEAD CoverGo — Insurance Platform (Product)         :mid:english:
-   :PROPERTIES:
-   :URL: https://covergo.com/careers/
-   :LOCATION: Da Nang, Vietnam (+ HCMC / Hanoi / remote-first)
-   :SIZE: mid
-   :ENGLISH: yes
-   :CONTACT:
-   :CREATED: 2026-09-29
-   :NOTES: No-code insurance platform, founded 2017; ~94% remote listings incl. Da Nang; actively hiring across Technology. VERIFY(2026-09-29): ATS=Workable (apply.workable.com/covergo). Product co, remote-first — decent shape.
-   :END:
-
-** LEAD NashTech — Software Engineering Services         :large:english:
+** APPLIED NashTech — Software Engineering Services        :large:english:
    :PROPERTIES:
    :URL: https://careers.nashtechglobal.com/
    :LOCATION: Da Nang, Vietnam (+ Hanoi / HCMC)
@@ -192,9 +129,10 @@
    :CONTACT:
    :CREATED: 2026-09-29
    :NOTES: Large UK/Nash Squared group; recurring Senior Software Engineer Java/.Net/Python roles in Da Nang. VERIFY(2026-09-29): own portal careers.nashtechglobal.com; LinkedIn posts name a TA person ("Diem Ha") => HR-first, large (score ~1/8). Java roles exist.
+   :APPLIED_ON: 2026-09-30
    :END:
 
-** LEAD LogiGear — QA / Test Automation         :mid:english:
+** APPLIED LogiGear — QA / Test Automation                   :mid:english:
    :PROPERTIES:
    :URL: https://www.logigear.com/logigear-career
    :LOCATION: Da Nang, Vietnam (+ HCMC)
@@ -203,6 +141,7 @@
    :CONTACT:
    :CREATED: 2026-09-29
    :NOTES: 30+ yrs software testing/QA focus; mostly QA roles, some bridge-engineer posts. VERIFY(2026-09-29): own site + VietnamWorks/careerviet listings; QA-heavy, few dev roles. Weak fit for this Java/React profile.
+   :APPLIED_ON: 2026-09-30
    :END:
 
 * Archive
@@ -275,3 +214,106 @@
    :ARCHIVE_TODO: LEAD
    :ARCHIVE_ITAGS: jobsearch
    :END:
+
+** LEAD Orient Software — Outsourcing / Web / Mobile :jobsearch:mid:english:
+   :PROPERTIES:
+   :URL: https://www.orientsoftware.com/company/careers/
+   :LOCATION: Da Nang, Vietnam (+ HCMC / Hanoi / Hue)
+   :SIZE: mid
+   :ENGLISH: yes
+   :CONTACT:
+   :CREATED: 2026-09-29
+   :NOTES: English careers site; hybrid model; open Python/full-stack roles in Da Nang. VERIFY(2026-09-29): apply stays on own domain (custom careers portal, no named ATS vendor); mid-size => TA present. Senior Fullstack .NET role live.
+   :ARCHIVE_TIME: 2026-09-30 Wed 07:51
+   :ARCHIVE_FILE: ~/src/cv/jobs.org
+   :ARCHIVE_OLPATH: Pipeline
+   :ARCHIVE_CATEGORY: jobs
+   :ARCHIVE_TODO: LEAD
+   :ARCHIVE_ITAGS: jobsearch
+   :END:
+
+** LEAD Seadev — Product / Agency Web & App      :jobsearch:small:english:
+   :PROPERTIES:
+   :URL: https://seadev.us/careers/
+   :LOCATION: Da Nang, Vietnam
+   :SIZE: small
+   :ENGLISH: yes
+   :CONTACT:
+   :CREATED: 2026-09-29
+   :NOTES: US-linked; hires Mid/Senior Developer and Tester roles in Da Nang. VERIFY(2026-09-29): ATS=Workable (apply.workable.com/seadev). Good signal: postings "report directly to the Product Manager" (product-led, small). C#/ShedPro product focus.
+   :ARCHIVE_TIME: 2026-09-30 Wed 07:58
+   :ARCHIVE_FILE: ~/src/cv/jobs.org
+   :ARCHIVE_OLPATH: Pipeline
+   :ARCHIVE_CATEGORY: jobs
+   :ARCHIVE_TODO: LEAD
+   :ARCHIVE_ITAGS: jobsearch
+   :END:
+
+** LEAD D-Soft JSC — AI / IoT / Digital Transformation :jobsearch:small:english:
+   :PROPERTIES:
+   :URL: https://d-soft.com.vn/
+   :LOCATION: Da Nang, Vietnam
+   :SIZE: small
+   :ENGLISH: unknown
+   :CONTACT:
+   :CREATED: 2026-09-29
+   :NOTES: ``Software development company headquartered in Da Nang''; 15+ years know-how. VERIFY(2026-09-29): hiring is LinkedIn-post style, Vietnamese-language; open roles are BRSE (Japanese N2) / IT sales. Low signal for this profile. This company spies on people and tries to put the human soul in a bottle.
+   :ARCHIVE_TIME: 2026-09-30 Wed 08:11
+   :ARCHIVE_FILE: ~/src/cv/jobs.org
+   :ARCHIVE_OLPATH: Pipeline
+   :ARCHIVE_CATEGORY: jobs
+   :ARCHIVE_TODO: LEAD
+   :ARCHIVE_ITAGS: jobsearch
+   :END:
+
+** LEAD iViettech — ERP Product Engineering      :jobsearch:small:english:
+   :PROPERTIES:
+   :URL: https://iviettech.vn/
+   :LOCATION: Da Nang, Vietnam
+   :SIZE: small
+   :ENGLISH: no
+   :CONTACT:
+   :CREATED: 2026-09-29
+   :NOTES: Builds an ERP product used in Singapore/Malaysia/HK/Japan/Vietnam; hiring software engineers in Da Nang. VERIFY(2026-09-29): primarily a programmer training center (iviettech.vn) + ERP product arm; postings in Vietnamese. Low signal for this profile.
+   :ARCHIVE_TIME: 2026-09-30 Wed 08:14
+   :ARCHIVE_FILE: ~/src/cv/jobs.org
+   :ARCHIVE_OLPATH: Pipeline
+   :ARCHIVE_CATEGORY: jobs
+   :ARCHIVE_TODO: LEAD
+   :ARCHIVE_ITAGS: jobsearch
+   :END:
+
+** LEAD SmartDev — Web / Cloud / Fintech           :jobsearch:mid:english:
+   :PROPERTIES:
+   :URL: https://careers.smartdev.com/
+   :LOCATION: Da Nang, Vietnam (+ Hanoi / Switzerland)
+   :SIZE: mid
+   :ENGLISH: yes
+   :CONTACT:
+   :CREATED: 2026-09-29
+   :NOTES: Swiss (Verysell Group); Da Nang dev center; ReactJS/Azure DevOps senior roles. VERIFY(2026-09-29): ATS=SmartRecruiters + HireHive (smartdev.hirehive.com) + smartdev.talent.vn; HR present, mid-large.
+   :ARCHIVE_TIME: 2026-09-30 Wed 08:20
+   :ARCHIVE_FILE: ~/src/cv/jobs.org
+   :ARCHIVE_OLPATH: Pipeline
+   :ARCHIVE_CATEGORY: jobs
+   :ARCHIVE_TODO: LEAD
+   :ARCHIVE_ITAGS: jobsearch
+   :END:
+
+** LEAD CoverGo — Insurance Platform (Product)     :jobsearch:mid:english:
+   :PROPERTIES:
+   :URL: https://covergo.com/careers/
+   :LOCATION: Da Nang, Vietnam (+ HCMC / Hanoi / remote-first)
+   :SIZE: mid
+   :ENGLISH: yes
+   :CONTACT:
+   :CREATED: 2026-09-29
+   :NOTES: No-code insurance platform, founded 2017; ~94% remote listings incl. Da Nang; actively hiring across Technology. VERIFY(2026-09-29): ATS=Workable (apply.workable.com/covergo). Product co, remote-first — decent shape. I hate the business model.
+   :ARCHIVE_TIME: 2026-09-30 Wed 08:22
+   :ARCHIVE_FILE: ~/src/cv/jobs.org
+   :ARCHIVE_OLPATH: Pipeline
+   :ARCHIVE_CATEGORY: jobs
+   :ARCHIVE_TODO: LEAD
+   :ARCHIVE_ITAGS: jobsearch
+   :END:
+
