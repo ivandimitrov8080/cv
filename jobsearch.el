@@ -136,6 +136,7 @@ nothing foreign is ever removed."
     (local-set-key (kbd "C-c j c") #'cv-jobs-commit)
     (local-set-key (kbd "C-c j A") #'cv-jobs-apply)
     (local-set-key (kbd "C-c j x") #'cv-jobs-archive)
+    (local-set-key (kbd "C-c j X") #'cv-jobs-archive-stale-applied)
     ;; Closed companies go to the Archive tree in the same file.
     (setq-local org-archive-location (concat cv-jobs-file "::* Archive"))))
 
@@ -186,6 +187,37 @@ existed need no migration."
   (org-back-to-heading t)
   (let ((org-archive-location (concat cv-jobs-file "::* Archive")))
     (org-archive-subtree)))
+
+(defun cv-jobs-archive-stale-applied (&optional days)
+  "Archive APPLIED entries whose :APPLIED_ON: is older than DAYS (default 7).
+
+Reuses the same Archive tree as `cv-jobs-archive'.  Candidates are collected
+first and archived bottom-up so buffer positions of the remaining ones stay
+valid.  With a numeric prefix argument, override the age in days, e.g.
+\[universal-argument] 4 M-x cv-jobs-archive-stale-applied for 4 days."
+  (interactive "P")
+  (let* ((days (if days (prefix-numeric-value days) 7))
+         (cutoff (time-subtract (current-time) (days-to-time days)))
+         (targets '()))
+    (with-current-buffer (find-file-noselect cv-jobs-file)
+      (org-map-entries
+       (lambda ()
+         (when (equal (org-get-todo-state) "APPLIED")
+           (let ((stamp (org-entry-get nil "APPLIED_ON")))
+             (when (and stamp
+                        (time-less-p (org-time-string-to-time stamp) cutoff))
+               (push (point-marker) targets)))))
+       nil 'file)
+      (dolist (m (sort targets (lambda (a b)
+                                 (> (marker-position a) (marker-position b)))))
+        (goto-char m)
+        (let ((org-archive-location (concat cv-jobs-file "::* Archive")))
+          (org-archive-subtree))
+        (set-marker m nil))
+      (message "Archived %d APPLIED entr%s older than %d days"
+               (length targets)
+               (if (= 1 (length targets)) "y" "ies")
+               days))))
 
 (defun cv-jobs-verify ()
   "Report whether the project-local job-search setup is actually active."

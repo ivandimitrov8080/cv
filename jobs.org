@@ -12,66 +12,6 @@
 
 * Pipeline
 
-** APPLIED KAMORA — Golang / Flutter / Frontend            :small:english:
-   :PROPERTIES:
-   :URL: https://kamora.vn/careers
-   :LOCATION: Da Nang, Vietnam (Ngũ Hành Sơn)
-   :SIZE: small
-   :ENGLISH: yes
-   :CONTACT:
-   :CREATED: 2026-09-26
-   :APPLIED_ON: 2026-09-26
-   :NOTES: 100% product studio since 2019, serving European & US markets.
-   :END:
-
-** APPLIED Innovaly Services — Full-Stack / Backend / Tech Lead :small:english:
-   :PROPERTIES:
-   :URL: https://innovaly.services/careers
-   :LOCATION: Da Nang, Vietnam (hybrid + remote)
-   :SIZE: small
-   :ENGLISH: yes
-   :CONTACT:
-   :CREATED: 2026-09-26
-   :APPLIED_ON: 2026-09-26
-   :NOTES: US startup; up to $1,800/mo for senior backend/full-stack.
-   :END:
-
-** APPLIED Tekmium — Web / Mobile / AI / Cloud             :small:english:
-   :PROPERTIES:
-   :URL: https://tekmium.com/en/careers
-   :LOCATION: Da Nang, Vietnam (on-site / hybrid / remote)
-   :SIZE: small
-   :ENGLISH: yes
-   :CONTACT:
-   :CREATED: 2026-09-26
-   :APPLIED_ON: 2026-09-26
-   :NOTES: Nimble studio, English site.
-   :END:
-
-** APPLIED Xenia Tech — Full-Stack / React Native / QA     :small:english:
-   :PROPERTIES:
-   :URL: https://xeniatech.vn/en/jobs
-   :LOCATION: Da Nang, Vietnam (+ HCMC / London)
-   :SIZE: small
-   :ENGLISH: yes
-   :CONTACT:
-   :CREATED: 2026-09-26
-   :APPLIED_ON: 2026-09-26
-   :NOTES: Founded 2017 by a UK entrepreneur; international clients.
-   :END:
-
-** APPLIED Enlab Software — Offshore software development    :mid:english:
-   :PROPERTIES:
-   :URL: https://enlabsoftware.com/careers
-   :LOCATION: Da Nang, Vietnam
-   :SIZE: mid
-   :ENGLISH: yes
-   :CONTACT:
-   :CREATED: 2026-09-26
-   :APPLIED_ON: 2026-09-26
-   :NOTES: "US-led standards with Vietnam-based costs".
-   :END:
-
 ** REJECTED KMS Technology — Java / Spring / Cloud           :mid:english:
 CLOSED: [2026-09-30 Wed 20:14]
    :PROPERTIES:
@@ -433,6 +373,96 @@ CLOSED: [2026-09-30 Wed 20:14]
    :ARCHIVE_OLPATH: Pipeline
    :ARCHIVE_CATEGORY: jobs
    :ARCHIVE_TODO: LEAD
+   :ARCHIVE_ITAGS: jobsearch
+   :END:
+
+** APPLIED Enlab Software — Offshore software development :jobsearch:mid:english:
+   :PROPERTIES:
+   :URL: https://enlabsoftware.com/careers
+   :LOCATION: Da Nang, Vietnam
+   :SIZE: mid
+   :ENGLISH: yes
+   :CONTACT:
+   :CREATED: 2026-09-26
+   :APPLIED_ON: 2026-09-26
+   :NOTES: "US-led standards with Vietnam-based costs".
+   :ARCHIVE_TIME: 2026-10-04 Sun 23:48
+   :ARCHIVE_FILE: ~/src/cv/jobs.org
+   :ARCHIVE_OLPATH: Pipeline
+   :ARCHIVE_CATEGORY: jobs
+   :ARCHIVE_TODO: APPLIED
+   :ARCHIVE_ITAGS: jobsearch
+   :END:
+
+** APPLIED Xenia Tech — Full-Stack / React Native / QA :jobsearch:small:english:
+   :PROPERTIES:
+   :URL: https://xeniatech.vn/en/jobs
+   :LOCATION: Da Nang, Vietnam (+ HCMC / London)
+   :SIZE: small
+   :ENGLISH: yes
+   :CONTACT:
+   :CREATED: 2026-09-26
+   :APPLIED_ON: 2026-09-26
+   :NOTES: Founded 2017 by a UK entrepreneur; international clients.
+   :ARCHIVE_TIME: 2026-10-04 Sun 23:48
+   :ARCHIVE_FILE: ~/src/cv/jobs.org
+   :ARCHIVE_OLPATH: Pipeline
+   :ARCHIVE_CATEGORY: jobs
+   :ARCHIVE_TODO: APPLIED
+   :ARCHIVE_ITAGS: jobsearch
+   :END:
+
+** APPLIED Tekmium — Web / Mobile / AI / Cloud   :jobsearch:small:english:
+   :PROPERTIES:
+   :URL: https://tekmium.com/en/careers
+   :LOCATION: Da Nang, Vietnam (on-site / hybrid / remote)
+   :SIZE: small
+   :ENGLISH: yes
+   :CONTACT:
+   :CREATED: 2026-09-26
+   :APPLIED_ON: 2026-09-26
+   :NOTES: Nimble studio, English site.
+   :ARCHIVE_TIME: 2026-10-04 Sun 23:48
+   :ARCHIVE_FILE: ~/src/cv/jobs.org
+   :ARCHIVE_OLPATH: Pipeline
+   :ARCHIVE_CATEGORY: jobs
+   :ARCHIVE_TODO: APPLIED
+   :ARCHIVE_ITAGS: jobsearch
+   :END:
+
+** APPLIED Innovaly Services — Full-Stack / Backend / Tech Lead :jobsearch:small:english:
+   :PROPERTIES:
+   :URL: https://innovaly.services/careers
+   :LOCATION: Da Nang, Vietnam (hybrid + remote)
+   :SIZE: small
+   :ENGLISH: yes
+   :CONTACT:
+   :CREATED: 2026-09-26
+   :APPLIED_ON: 2026-09-26
+   :NOTES: US startup; up to $1,800/mo for senior backend/full-stack.
+   :ARCHIVE_TIME: 2026-10-04 Sun 23:48
+   :ARCHIVE_FILE: ~/src/cv/jobs.org
+   :ARCHIVE_OLPATH: Pipeline
+   :ARCHIVE_CATEGORY: jobs
+   :ARCHIVE_TODO: APPLIED
+   :ARCHIVE_ITAGS: jobsearch
+   :END:
+
+** APPLIED KAMORA — Golang / Flutter / Frontend  :jobsearch:small:english:
+   :PROPERTIES:
+   :URL: https://kamora.vn/careers
+   :LOCATION: Da Nang, Vietnam (Ngũ Hành Sơn)
+   :SIZE: small
+   :ENGLISH: yes
+   :CONTACT:
+   :CREATED: 2026-09-26
+   :APPLIED_ON: 2026-09-26
+   :NOTES: 100% product studio since 2019, serving European & US markets.
+   :ARCHIVE_TIME: 2026-10-04 Sun 23:48
+   :ARCHIVE_FILE: ~/src/cv/jobs.org
+   :ARCHIVE_OLPATH: Pipeline
+   :ARCHIVE_CATEGORY: jobs
+   :ARCHIVE_TODO: APPLIED
    :ARCHIVE_ITAGS: jobsearch
    :END:
 
