@@ -191,17 +191,6 @@ CLOSED: [2026-09-30 Wed 20:14]
    :NOTES: Ubuntu / OpenStack publisher. Remote-first, hires across the globe. Reported remote bands modest (~$48k–$70k) but real FTE + benefits and one of the few truly worldwide openings. Large co => HR.
    :END:
 
-** LEAD Toptal — Vetted Freelance Talent Network   :large:english:global:
-   :PROPERTIES:
-   :URL: https://www.toptal.com/
-   :LOCATION: Remote — worldwide
-   :SIZE: large
-   :ENGLISH: yes
-   :CONTACT:
-   :CREATED: 2026-10-02
-   :NOTES: Screening is hard (English + test project + live interview) before you reach clients; then matched to global projects. VN engineers typically clear ~$30–$70/hr. Procurement replaces HR (strategy channel 6). Not a guaranteed role.
-   :END:
-
 ** LEAD Arc.dev — Vetted Remote Developer Network   :mid:english:global:
    :PROPERTIES:
    :URL: https://arc.dev/
@@ -423,6 +412,23 @@ CLOSED: [2026-09-30 Wed 20:14]
    :CREATED: 2026-09-29
    :NOTES: No-code insurance platform, founded 2017; ~94% remote listings incl. Da Nang; actively hiring across Technology. VERIFY(2026-09-29): ATS=Workable (apply.workable.com/covergo). Product co, remote-first — decent shape. I hate the business model.
    :ARCHIVE_TIME: 2026-09-30 Wed 08:22
+   :ARCHIVE_FILE: ~/src/cv/jobs.org
+   :ARCHIVE_OLPATH: Pipeline
+   :ARCHIVE_CATEGORY: jobs
+   :ARCHIVE_TODO: LEAD
+   :ARCHIVE_ITAGS: jobsearch
+   :END:
+
+** LEAD Toptal — Vetted Freelance Talent Network :jobsearch:large:english:global:
+   :PROPERTIES:
+   :URL: https://www.toptal.com/
+   :LOCATION: Remote — worldwide
+   :SIZE: large
+   :ENGLISH: yes
+   :CONTACT:
+   :CREATED: 2026-10-02
+   :NOTES: Screening is hard (English + test project + live interview) before you reach clients; then matched to global projects. VN engineers typically clear ~$30–$70/hr. Procurement replaces HR (strategy channel 6). Not a guaranteed role. This place sucks balls.
+   :ARCHIVE_TIME: 2026-10-04 Sun 23:38
    :ARCHIVE_FILE: ~/src/cv/jobs.org
    :ARCHIVE_OLPATH: Pipeline
    :ARCHIVE_CATEGORY: jobs
