@@ -147,6 +147,116 @@ CLOSED: [2026-09-30 Wed 20:14]
    :APPLIED_ON: 2026-09-30
    :END:
 
+** LEAD KSC Trading — Senior Backend Engineer (Java)   :small:english:global:
+   :PROPERTIES:
+   :URL: https://news.ycombinator.com/item?id=46108941
+   :LOCATION: Remote (worldwide) — needs ~4h overlap with US East
+   :SIZE: small
+   :ENGLISH: yes
+   :CONTACT: hiring@ksctrading.com
+   :CREATED: 2026-10-02
+   :NOTES: Prop algorithmic trading (sports & prediction markets), founded 2020; team of 2 growing to ~6. Stack: Java, Google Cloud, Postgres. $200k–$250k total comp. Ad gives a direct email and names no ATS => strong no-HR signal (strategy rubric ~7/8). HN Oct 2026.
+   :END:
+
+** LEAD Seeq — Backend + Full-Stack (JVM/React)   :mid:english:global:
+   :PROPERTIES:
+   :URL: https://apply.workable.com/seeq/
+   :LOCATION: Remote (worldwide; some PST overlap) — pay adjusted by country
+   :SIZE: mid
+   :ENGLISH: yes
+   :CONTACT:
+   :CREATED: 2026-10-02
+   :NOTES: Industrial-process data analytics. Core JVM + Postgres; React front-end. $170k–$205k + bonus + equity (US base; "local adjustments for other countries" => genuinely open to non-US). Roles: Principal Backend (JVM, Postgres) j/CD7BA6EE7B; Senior Full-Stack (React, JVM) j/763AE68666; Staff DevEx (Java/Gradle) j/A966C8897D; Principal AI (Python). ATS=Workable. HN Oct 2026.
+   :END:
+
+** LEAD Automattic — Experienced Software Engineer   :large:english:global:
+   :PROPERTIES:
+   :URL: https://automattic.com/work-with-us/jobs/
+   :LOCATION: Remote — "work from wherever you like" (worldwide)
+   :SIZE: large
+   :ENGLISH: yes
+   :CONTACT:
+   :CREATED: 2026-10-02
+   :NOTES: WordPress.com / WooCommerce / Jetpack / Tumblr. Fully distributed since day one; explicitly hires worldwide. Eng band ~$70k–$170k (geo-adjustable). Well above VN market, but large co => HR process.
+   :END:
+
+** LEAD Canonical — Software Engineer (Ubuntu / open source)   :large:english:global:
+   :PROPERTIES:
+   :URL: https://canonical.com/careers
+   :LOCATION: Remote-first — worldwide
+   :SIZE: large
+   :ENGLISH: yes
+   :CONTACT:
+   :CREATED: 2026-10-02
+   :NOTES: Ubuntu / OpenStack publisher. Remote-first, hires across the globe. Reported remote bands modest (~$48k–$70k) but real FTE + benefits and one of the few truly worldwide openings. Large co => HR.
+   :END:
+
+** LEAD Toptal — Vetted Freelance Talent Network   :large:english:global:
+   :PROPERTIES:
+   :URL: https://www.toptal.com/
+   :LOCATION: Remote — worldwide
+   :SIZE: large
+   :ENGLISH: yes
+   :CONTACT:
+   :CREATED: 2026-10-02
+   :NOTES: Screening is hard (English + test project + live interview) before you reach clients; then matched to global projects. VN engineers typically clear ~$30–$70/hr. Procurement replaces HR (strategy channel 6). Not a guaranteed role.
+   :END:
+
+** LEAD Arc.dev — Vetted Remote Developer Network   :mid:english:global:
+   :PROPERTIES:
+   :URL: https://arc.dev/
+   :LOCATION: Remote — worldwide
+   :SIZE: mid
+   :ENGLISH: yes
+   :CONTACT:
+   :CREATED: 2026-10-02
+   :NOTES: Vetted marketplace for freelance + full-time remote dev roles. Global-open, well above VN market. Channel-6 contract lane.
+   :END:
+
+** LEAD FusionAuth — Principal / Senior Java Engineer   :mid:english:
+   :PROPERTIES:
+   :URL: https://fusionauth.io/careers/
+   :LOCATION: Remote (US) — Europe limited to account-exec
+   :SIZE: mid
+   :ENGLISH: yes
+   :CONTACT:
+   :CREATED: 2026-10-02
+   :NOTES: Auth/authz product built on modern Java, Postgres, Docker, K8s, OAuth/SAML/OIDC. Principal SWE $225k–$270k. Direct stack hit but engineering is US-gated => likely closed to a VN resident. HN Oct 2026.
+   :END:
+
+** LEAD Tivly — Principal Software Engineer (Java)   :mid:english:
+   :PROPERTIES:
+   :URL: https://tivly.com/careers
+   :LOCATION: Remote (US only — named states)
+   :SIZE: mid
+   :ENGLISH: yes
+   :CONTACT:
+   :CREATED: 2026-10-02
+   :NOTES: SMB insurance marketplace. Java 17+, Spring Boot, microservices, AWS, Kafka, Postgres. $170k–$190k + bonus. Direct stack match, but restricted to ~11 US states (AL/FL/GA/MI/MS/MO/NC/OK/TN/TX/VA) => closed to VN resident. HN Oct 2026.
+   :END:
+
+** LEAD Vistulo — Senior Java / React / Calypso (B2B contract)   :small:english:
+   :PROPERTIES:
+   :URL: https://ats.vistulo.com/
+   :LOCATION: Remote (Poland or Romania residents only)
+   :SIZE: small
+   :ENGLISH: yes
+   :CONTACT: contact@vistulo.com
+   :CREATED: 2026-10-02
+   :NOTES: Front-office trading systems for a top North American bank; B2B contract. Senior Java trading eng 270–300 PLN/hr (~$68–76/hr); Java backend 220–240 PLN/hr; React frontend 220–250 PLN/hr. Client tech-lead interviews => no HR by construction (strategy channel 6), but geo-gated to PL/RO. HN Oct 2026.
+   :END:
+
+** LEAD Avision GmbH — Full-Stack Java + Angular/React   :small:english:
+   :PROPERTIES:
+   :URL: https://news.ycombinator.com/item?id=46108941
+   :LOCATION: Remote (Germany only) — German B2 required
+   :SIZE: small
+   :ENGLISH: yes
+   :CONTACT:
+   :CREATED: 2026-10-02
+   :NOTES: Modernizing legacy business software. Java, Spring Boot, Angular/React, Kafka, Postgres, Docker, K8s, GitLab CI, Gradle/Maven. Fully remote within Germany; 32 vacation days. Geo + German-language gate => closed to VN resident. HN Oct 2026.
+   :END:
+
 * Archive
 :PROPERTIES:
 :NOTES: no jobs available matching profile so did not apply
