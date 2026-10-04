@@ -12,21 +12,6 @@
 
 * Pipeline
 
-** REJECTED KMS Technology — Java / Spring / Cloud           :mid:english:
-CLOSED: [2026-09-30 Wed 20:14]
-   :PROPERTIES:
-   :URL: https://careers.kms-technology.com/
-   :LOCATION: Da Nang, Vietnam (+ HCMC / US / Mexico / Poland)
-   :SIZE: mid
-   :ENGLISH: yes
-   :CONTACT:
-   :CREATED: 2026-09-29
-   :NOTES: US-founded 2009; 1,100+ engineers. Explicit "Java Software Engineer (Spring/Azure/AWS), based in Da Nang" roles — direct stack match. VERIFY(2026-09-29): ATS=SmartRecruiters (jobs.smartrecruiters.com/KMSTechnology1); large-co HR process. Direct stack hit but ATS-gated (score ~2/8). Applied for Fullstack Engineer Typescript, nodejs.
-   :APPLIED_ON: 2026-09-29
-   :END:
-
-   - CLOSING NOTE [2026-09-30 Wed 20:14] \\
-     They need someone who can speak Vietnamese
 ** APPLIED Vinova — Java / Mobile / Full-Stack             :small:english:
    :PROPERTIES:
    :URL: https://vinova.sg/jobs/
@@ -466,3 +451,24 @@ CLOSED: [2026-09-30 Wed 20:14]
    :ARCHIVE_ITAGS: jobsearch
    :END:
 
+** REJECTED KMS Technology — Java / Spring / Cloud :jobsearch:mid:english:
+CLOSED: [2026-09-30 Wed 20:14]
+   :PROPERTIES:
+   :URL: https://careers.kms-technology.com/
+   :LOCATION: Da Nang, Vietnam (+ HCMC / US / Mexico / Poland)
+   :SIZE: mid
+   :ENGLISH: yes
+   :CONTACT:
+   :CREATED: 2026-09-29
+   :NOTES: US-founded 2009; 1,100+ engineers. Explicit "Java Software Engineer (Spring/Azure/AWS), based in Da Nang" roles — direct stack match. VERIFY(2026-09-29): ATS=SmartRecruiters (jobs.smartrecruiters.com/KMSTechnology1); large-co HR process. Direct stack hit but ATS-gated (score ~2/8). Applied for Fullstack Engineer Typescript, nodejs.
+   :APPLIED_ON: 2026-09-29
+   :ARCHIVE_TIME: 2026-10-04 Sun 23:49
+   :ARCHIVE_FILE: ~/src/cv/jobs.org
+   :ARCHIVE_OLPATH: Pipeline
+   :ARCHIVE_CATEGORY: jobs
+   :ARCHIVE_TODO: REJECTED
+   :ARCHIVE_ITAGS: jobsearch
+   :END:
+
+   - CLOSING NOTE [2026-09-30 Wed 20:14] \\
+     They need someone who can speak Vietnamese
