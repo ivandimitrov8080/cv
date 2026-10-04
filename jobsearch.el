@@ -211,7 +211,6 @@ in place and the hooks and agenda entries are idempotent."
   (cv-jobs--setup-agenda)
   (add-hook 'org-mode-hook #'cv-jobs--setup-buffer)
   (add-hook 'org-after-todo-state-change-hook #'cv-jobs--record-applied-date)
-  (add-hook 'org-capture-after-finalize-hook #'cv-jobs--maybe-auto-commit)
   ;; `org-mode-hook' may already have run for the triggering buffer.
   (cv-jobs--setup-buffer)
   (setq cv-jobs--loaded t))
