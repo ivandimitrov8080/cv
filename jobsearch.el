@@ -253,6 +253,8 @@ in place and the hooks and agenda entries are idempotent."
       '(("LEAD" . "⟳") ("APPLIED" . "⇒") ("INTERVIEW" . "★")
         ("OFFER" . "★") ("HIRED" . "✔") ("REJECTED" . "✘")))
 
+(setq org-export-with-properties t)
+
 (gptel-make-preset 'jobsearch
   :description "Search the web for remote software dev jobs."
   :backend "Deepseek"
