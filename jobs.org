@@ -12,66 +12,6 @@
 
 * Pipeline
 
-** APPLIED Vinova — Java / Mobile / Full-Stack             :small:english:
-   :PROPERTIES:
-   :URL: https://vinova.sg/jobs/
-   :LOCATION: Da Nang, Vietnam (+ HCMC / Hanoi)
-   :SIZE: small
-   :ENGLISH: yes
-   :CONTACT:
-   :CREATED: 2026-09-29
-   :NOTES: "VIbrant inNOVAtors"; recurring Java Software Engineer and Senior Java roles in Da Nang. VERIFY(2026-09-29): ATS=hrpartner.io + vinova.careers-page.com; HR present (posted Employer Branding & Engagement Specialist). Java-stack fit but gated.
-   :APPLIED_ON: 2026-09-30
-   :END:
-
-** APPLIED Axon Active — Dedicated Teams / Agile             :mid:english:
-   :PROPERTIES:
-   :URL: https://www.careers.axonactive.com/
-   :LOCATION: Da Nang, Vietnam (+ HCMC / Can Tho / Switzerland)
-   :SIZE: mid
-   :ENGLISH: yes
-   :CONTACT:
-   :CREATED: 2026-09-29
-   :NOTES: Swiss-founded 2008; 650+ staff, 80+ teams; Swiss client work in English. VERIFY(2026-09-29): careers on own subdomain (careers.axonactive.com), no named ATS vendor; but 650+ staff => HR exists. Open .Net/C#+ReactJS role.
-   :APPLIED_ON: 2026-09-30
-   :END:
-
-** APPLIED Oivan — Web / Mobile / Cloud / Security           :mid:english:
-   :PROPERTIES:
-   :URL: https://oivan.com/careers/
-   :LOCATION: Da Nang, Vietnam (+ HCMC / Finland)
-   :SIZE: mid
-   :ENGLISH: yes
-   :CONTACT:
-   :CREATED: 2026-09-29
-   :NOTES: Finland-based (151-300); Personio board lists Da Nang frontend/engineer roles. VERIFY(2026-09-29): ATS=Personio (personio.com). Live roles: Frontend (Angular) + Ruby on Rails — not Java/Spring; mid-size => HR present.
-   :APPLIED_ON: 2026-09-30
-   :END:
-
-** APPLIED NashTech — Software Engineering Services        :large:english:
-   :PROPERTIES:
-   :URL: https://careers.nashtechglobal.com/
-   :LOCATION: Da Nang, Vietnam (+ Hanoi / HCMC)
-   :SIZE: large
-   :ENGLISH: yes
-   :CONTACT:
-   :CREATED: 2026-09-29
-   :NOTES: Large UK/Nash Squared group; recurring Senior Software Engineer Java/.Net/Python roles in Da Nang. VERIFY(2026-09-29): own portal careers.nashtechglobal.com; LinkedIn posts name a TA person ("Diem Ha") => HR-first, large (score ~1/8). Java roles exist.
-   :APPLIED_ON: 2026-09-30
-   :END:
-
-** APPLIED LogiGear — QA / Test Automation                   :mid:english:
-   :PROPERTIES:
-   :URL: https://www.logigear.com/logigear-career
-   :LOCATION: Da Nang, Vietnam (+ HCMC)
-   :SIZE: mid
-   :ENGLISH: yes
-   :CONTACT:
-   :CREATED: 2026-09-29
-   :NOTES: 30+ yrs software testing/QA focus; mostly QA roles, some bridge-engineer posts. VERIFY(2026-09-29): own site + VietnamWorks/careerviet listings; QA-heavy, few dev roles. Weak fit for this Java/React profile.
-   :APPLIED_ON: 2026-09-30
-   :END:
-
 ** LEAD KSC Trading — Senior Backend Engineer (Java)   :small:english:global:
    :PROPERTIES:
    :URL: https://news.ycombinator.com/item?id=46108941
@@ -361,96 +301,6 @@
    :ARCHIVE_ITAGS: jobsearch
    :END:
 
-** APPLIED Enlab Software — Offshore software development :jobsearch:mid:english:
-   :PROPERTIES:
-   :URL: https://enlabsoftware.com/careers
-   :LOCATION: Da Nang, Vietnam
-   :SIZE: mid
-   :ENGLISH: yes
-   :CONTACT:
-   :CREATED: 2026-09-26
-   :APPLIED_ON: 2026-09-26
-   :NOTES: "US-led standards with Vietnam-based costs".
-   :ARCHIVE_TIME: 2026-10-04 Sun 23:48
-   :ARCHIVE_FILE: ~/src/cv/jobs.org
-   :ARCHIVE_OLPATH: Pipeline
-   :ARCHIVE_CATEGORY: jobs
-   :ARCHIVE_TODO: APPLIED
-   :ARCHIVE_ITAGS: jobsearch
-   :END:
-
-** APPLIED Xenia Tech — Full-Stack / React Native / QA :jobsearch:small:english:
-   :PROPERTIES:
-   :URL: https://xeniatech.vn/en/jobs
-   :LOCATION: Da Nang, Vietnam (+ HCMC / London)
-   :SIZE: small
-   :ENGLISH: yes
-   :CONTACT:
-   :CREATED: 2026-09-26
-   :APPLIED_ON: 2026-09-26
-   :NOTES: Founded 2017 by a UK entrepreneur; international clients.
-   :ARCHIVE_TIME: 2026-10-04 Sun 23:48
-   :ARCHIVE_FILE: ~/src/cv/jobs.org
-   :ARCHIVE_OLPATH: Pipeline
-   :ARCHIVE_CATEGORY: jobs
-   :ARCHIVE_TODO: APPLIED
-   :ARCHIVE_ITAGS: jobsearch
-   :END:
-
-** APPLIED Tekmium — Web / Mobile / AI / Cloud   :jobsearch:small:english:
-   :PROPERTIES:
-   :URL: https://tekmium.com/en/careers
-   :LOCATION: Da Nang, Vietnam (on-site / hybrid / remote)
-   :SIZE: small
-   :ENGLISH: yes
-   :CONTACT:
-   :CREATED: 2026-09-26
-   :APPLIED_ON: 2026-09-26
-   :NOTES: Nimble studio, English site.
-   :ARCHIVE_TIME: 2026-10-04 Sun 23:48
-   :ARCHIVE_FILE: ~/src/cv/jobs.org
-   :ARCHIVE_OLPATH: Pipeline
-   :ARCHIVE_CATEGORY: jobs
-   :ARCHIVE_TODO: APPLIED
-   :ARCHIVE_ITAGS: jobsearch
-   :END:
-
-** APPLIED Innovaly Services — Full-Stack / Backend / Tech Lead :jobsearch:small:english:
-   :PROPERTIES:
-   :URL: https://innovaly.services/careers
-   :LOCATION: Da Nang, Vietnam (hybrid + remote)
-   :SIZE: small
-   :ENGLISH: yes
-   :CONTACT:
-   :CREATED: 2026-09-26
-   :APPLIED_ON: 2026-09-26
-   :NOTES: US startup; up to $1,800/mo for senior backend/full-stack.
-   :ARCHIVE_TIME: 2026-10-04 Sun 23:48
-   :ARCHIVE_FILE: ~/src/cv/jobs.org
-   :ARCHIVE_OLPATH: Pipeline
-   :ARCHIVE_CATEGORY: jobs
-   :ARCHIVE_TODO: APPLIED
-   :ARCHIVE_ITAGS: jobsearch
-   :END:
-
-** APPLIED KAMORA — Golang / Flutter / Frontend  :jobsearch:small:english:
-   :PROPERTIES:
-   :URL: https://kamora.vn/careers
-   :LOCATION: Da Nang, Vietnam (Ngũ Hành Sơn)
-   :SIZE: small
-   :ENGLISH: yes
-   :CONTACT:
-   :CREATED: 2026-09-26
-   :APPLIED_ON: 2026-09-26
-   :NOTES: 100% product studio since 2019, serving European & US markets.
-   :ARCHIVE_TIME: 2026-10-04 Sun 23:48
-   :ARCHIVE_FILE: ~/src/cv/jobs.org
-   :ARCHIVE_OLPATH: Pipeline
-   :ARCHIVE_CATEGORY: jobs
-   :ARCHIVE_TODO: APPLIED
-   :ARCHIVE_ITAGS: jobsearch
-   :END:
-
 ** REJECTED KMS Technology — Java / Spring / Cloud :jobsearch:mid:english:
 CLOSED: [2026-09-30 Wed 20:14]
    :PROPERTIES:
@@ -472,3 +322,184 @@ CLOSED: [2026-09-30 Wed 20:14]
 
    - CLOSING NOTE [2026-09-30 Wed 20:14] \\
      They need someone who can speak Vietnamese
+
+** APPLIED KAMORA — Golang / Flutter / Frontend  :jobsearch:small:english:
+   :PROPERTIES:
+   :URL: https://kamora.vn/careers
+   :LOCATION: Da Nang, Vietnam (Ngũ Hành Sơn)
+   :SIZE: small
+   :ENGLISH: yes
+   :CONTACT:
+   :CREATED: 2026-09-26
+   :APPLIED_ON: 2026-09-26
+   :NOTES: 100% product studio since 2019, serving European & US markets.
+   :ARCHIVE_TIME: 2026-10-09 Fri 15:13
+   :ARCHIVE_FILE: ~/src/cv/jobs.org
+   :ARCHIVE_OLPATH: Archive
+   :ARCHIVE_CATEGORY: jobs
+   :ARCHIVE_TODO: APPLIED
+   :ARCHIVE_ITAGS: jobsearch
+   :END:
+
+** APPLIED Innovaly Services — Full-Stack / Backend / Tech Lead :jobsearch:small:english:
+   :PROPERTIES:
+   :URL: https://innovaly.services/careers
+   :LOCATION: Da Nang, Vietnam (hybrid + remote)
+   :SIZE: small
+   :ENGLISH: yes
+   :CONTACT:
+   :CREATED: 2026-09-26
+   :APPLIED_ON: 2026-09-26
+   :NOTES: US startup; up to $1,800/mo for senior backend/full-stack.
+   :ARCHIVE_TIME: 2026-10-09 Fri 15:13
+   :ARCHIVE_FILE: ~/src/cv/jobs.org
+   :ARCHIVE_OLPATH: Archive
+   :ARCHIVE_CATEGORY: jobs
+   :ARCHIVE_TODO: APPLIED
+   :ARCHIVE_ITAGS: jobsearch
+   :END:
+
+** APPLIED Tekmium — Web / Mobile / AI / Cloud   :jobsearch:small:english:
+   :PROPERTIES:
+   :URL: https://tekmium.com/en/careers
+   :LOCATION: Da Nang, Vietnam (on-site / hybrid / remote)
+   :SIZE: small
+   :ENGLISH: yes
+   :CONTACT:
+   :CREATED: 2026-09-26
+   :APPLIED_ON: 2026-09-26
+   :NOTES: Nimble studio, English site.
+   :ARCHIVE_TIME: 2026-10-09 Fri 15:13
+   :ARCHIVE_FILE: ~/src/cv/jobs.org
+   :ARCHIVE_OLPATH: Archive
+   :ARCHIVE_CATEGORY: jobs
+   :ARCHIVE_TODO: APPLIED
+   :ARCHIVE_ITAGS: jobsearch
+   :END:
+
+** APPLIED Xenia Tech — Full-Stack / React Native / QA :jobsearch:small:english:
+   :PROPERTIES:
+   :URL: https://xeniatech.vn/en/jobs
+   :LOCATION: Da Nang, Vietnam (+ HCMC / London)
+   :SIZE: small
+   :ENGLISH: yes
+   :CONTACT:
+   :CREATED: 2026-09-26
+   :APPLIED_ON: 2026-09-26
+   :NOTES: Founded 2017 by a UK entrepreneur; international clients.
+   :ARCHIVE_TIME: 2026-10-09 Fri 15:13
+   :ARCHIVE_FILE: ~/src/cv/jobs.org
+   :ARCHIVE_OLPATH: Archive
+   :ARCHIVE_CATEGORY: jobs
+   :ARCHIVE_TODO: APPLIED
+   :ARCHIVE_ITAGS: jobsearch
+   :END:
+
+** APPLIED Enlab Software — Offshore software development :jobsearch:mid:english:
+   :PROPERTIES:
+   :URL: https://enlabsoftware.com/careers
+   :LOCATION: Da Nang, Vietnam
+   :SIZE: mid
+   :ENGLISH: yes
+   :CONTACT:
+   :CREATED: 2026-09-26
+   :APPLIED_ON: 2026-09-26
+   :NOTES: "US-led standards with Vietnam-based costs".
+   :ARCHIVE_TIME: 2026-10-09 Fri 15:13
+   :ARCHIVE_FILE: ~/src/cv/jobs.org
+   :ARCHIVE_OLPATH: Archive
+   :ARCHIVE_CATEGORY: jobs
+   :ARCHIVE_TODO: APPLIED
+   :ARCHIVE_ITAGS: jobsearch
+   :END:
+
+** APPLIED LogiGear — QA / Test Automation         :jobsearch:mid:english:
+   :PROPERTIES:
+   :URL: https://www.logigear.com/logigear-career
+   :LOCATION: Da Nang, Vietnam (+ HCMC)
+   :SIZE: mid
+   :ENGLISH: yes
+   :CONTACT:
+   :CREATED: 2026-09-29
+   :NOTES: 30+ yrs software testing/QA focus; mostly QA roles, some bridge-engineer posts. VERIFY(2026-09-29): own site + VietnamWorks/careerviet listings; QA-heavy, few dev roles. Weak fit for this Java/React profile.
+   :APPLIED_ON: 2026-09-30
+   :ARCHIVE_TIME: 2026-10-09 Fri 15:13
+   :ARCHIVE_FILE: ~/src/cv/jobs.org
+   :ARCHIVE_OLPATH: Pipeline
+   :ARCHIVE_CATEGORY: jobs
+   :ARCHIVE_TODO: APPLIED
+   :ARCHIVE_ITAGS: jobsearch
+   :END:
+
+** APPLIED NashTech — Software Engineering Services :jobsearch:large:english:
+   :PROPERTIES:
+   :URL: https://careers.nashtechglobal.com/
+   :LOCATION: Da Nang, Vietnam (+ Hanoi / HCMC)
+   :SIZE: large
+   :ENGLISH: yes
+   :CONTACT:
+   :CREATED: 2026-09-29
+   :NOTES: Large UK/Nash Squared group; recurring Senior Software Engineer Java/.Net/Python roles in Da Nang. VERIFY(2026-09-29): own portal careers.nashtechglobal.com; LinkedIn posts name a TA person ("Diem Ha") => HR-first, large (score ~1/8). Java roles exist.
+   :APPLIED_ON: 2026-09-30
+   :ARCHIVE_TIME: 2026-10-09 Fri 15:13
+   :ARCHIVE_FILE: ~/src/cv/jobs.org
+   :ARCHIVE_OLPATH: Pipeline
+   :ARCHIVE_CATEGORY: jobs
+   :ARCHIVE_TODO: APPLIED
+   :ARCHIVE_ITAGS: jobsearch
+   :END:
+
+** APPLIED Oivan — Web / Mobile / Cloud / Security :jobsearch:mid:english:
+   :PROPERTIES:
+   :URL: https://oivan.com/careers/
+   :LOCATION: Da Nang, Vietnam (+ HCMC / Finland)
+   :SIZE: mid
+   :ENGLISH: yes
+   :CONTACT:
+   :CREATED: 2026-09-29
+   :NOTES: Finland-based (151-300); Personio board lists Da Nang frontend/engineer roles. VERIFY(2026-09-29): ATS=Personio (personio.com). Live roles: Frontend (Angular) + Ruby on Rails — not Java/Spring; mid-size => HR present.
+   :APPLIED_ON: 2026-09-30
+   :ARCHIVE_TIME: 2026-10-09 Fri 15:13
+   :ARCHIVE_FILE: ~/src/cv/jobs.org
+   :ARCHIVE_OLPATH: Pipeline
+   :ARCHIVE_CATEGORY: jobs
+   :ARCHIVE_TODO: APPLIED
+   :ARCHIVE_ITAGS: jobsearch
+   :END:
+
+** APPLIED Axon Active — Dedicated Teams / Agile   :jobsearch:mid:english:
+   :PROPERTIES:
+   :URL: https://www.careers.axonactive.com/
+   :LOCATION: Da Nang, Vietnam (+ HCMC / Can Tho / Switzerland)
+   :SIZE: mid
+   :ENGLISH: yes
+   :CONTACT:
+   :CREATED: 2026-09-29
+   :NOTES: Swiss-founded 2008; 650+ staff, 80+ teams; Swiss client work in English. VERIFY(2026-09-29): careers on own subdomain (careers.axonactive.com), no named ATS vendor; but 650+ staff => HR exists. Open .Net/C#+ReactJS role.
+   :APPLIED_ON: 2026-09-30
+   :ARCHIVE_TIME: 2026-10-09 Fri 15:13
+   :ARCHIVE_FILE: ~/src/cv/jobs.org
+   :ARCHIVE_OLPATH: Pipeline
+   :ARCHIVE_CATEGORY: jobs
+   :ARCHIVE_TODO: APPLIED
+   :ARCHIVE_ITAGS: jobsearch
+   :END:
+
+** APPLIED Vinova — Java / Mobile / Full-Stack   :jobsearch:small:english:
+   :PROPERTIES:
+   :URL: https://vinova.sg/jobs/
+   :LOCATION: Da Nang, Vietnam (+ HCMC / Hanoi)
+   :SIZE: small
+   :ENGLISH: yes
+   :CONTACT:
+   :CREATED: 2026-09-29
+   :NOTES: "VIbrant inNOVAtors"; recurring Java Software Engineer and Senior Java roles in Da Nang. VERIFY(2026-09-29): ATS=hrpartner.io + vinova.careers-page.com; HR present (posted Employer Branding & Engagement Specialist). Java-stack fit but gated.
+   :APPLIED_ON: 2026-09-30
+   :ARCHIVE_TIME: 2026-10-09 Fri 15:13
+   :ARCHIVE_FILE: ~/src/cv/jobs.org
+   :ARCHIVE_OLPATH: Pipeline
+   :ARCHIVE_CATEGORY: jobs
+   :ARCHIVE_TODO: APPLIED
+   :ARCHIVE_ITAGS: jobsearch
+   :END:
+
