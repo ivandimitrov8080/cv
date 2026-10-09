@@ -20,6 +20,7 @@
    :ENGLISH: yes
    :CONTACT: hiring@ksctrading.com
    :CREATED: 2026-10-02
+   :INTERVIEW: No public reports (boutique prop firm; hires via the founder's direct email). INFERRED: intro call with founder -> live coding / short take-home -> 1-2 deeper technical rounds with the team. Tiny team (2->6), so likely compressed and fast.
    :NOTES: Prop algorithmic trading (sports & prediction markets), founded 2020; team of 2 growing to ~6. Stack: Java, Google Cloud, Postgres. $200k–$250k total comp. Ad gives a direct email and names no ATS => strong no-HR signal (strategy rubric ~7/8). HN Oct 2026.
    :END:
 
@@ -31,6 +32,7 @@
    :ENGLISH: yes
    :CONTACT:
    :CREATED: 2026-10-02
+   :INTERVIEW: Glassdoor (~13 reports): ~2-week process; recruiter screen -> hiring-manager call -> technical exercise (take-home or live coding) -> team panel. Difficulty 3.4/5; only ~23% report a positive experience. Exact rounds vary by role.
    :NOTES: Industrial-process data analytics. Core JVM + Postgres; React front-end. $170k–$205k + bonus + equity (US base; "local adjustments for other countries" => genuinely open to non-US). Roles: Principal Backend (JVM, Postgres) j/CD7BA6EE7B; Senior Full-Stack (React, JVM) j/763AE68666; Staff DevEx (Java/Gradle) j/A966C8897D; Principal AI (Python). ATS=Workable. HN Oct 2026.
    :END:
 
@@ -42,6 +44,7 @@
    :ENGLISH: yes
    :CONTACT:
    :CREATED: 2026-10-02
+   :INTERVIEW: Documented (automattic.com/how-we-hire): Application -> Intro Slack chat with an engineer -> take-home coding challenge (~1 week) -> PAID trial project (2-8 weeks, ~15-35h) -> offer. Fully async/text-based, no whiteboard; ~2-3 months end-to-end.
    :NOTES: WordPress.com / WooCommerce / Jetpack / Tumblr. Fully distributed since day one; explicitly hires worldwide. Eng band ~$70k–$170k (geo-adjustable). Well above VN market, but large co => HR process.
    :END:
 
@@ -53,6 +56,7 @@
    :ENGLISH: yes
    :CONTACT:
    :CREATED: 2026-10-02
+   :INTERVIEW: Documented (canonical.com/careers/hiring-process), ~3 months: application Qs -> written interview (essay, graded by 2 domain experts, anonymised) -> psychometric GIA (5-part, 30-45 min) -> role-specific technical assessment -> 3 early-stage technical interviews -> talent interview (10-min personality profile + comp) -> late-stage interviews (manager, Hiring Lead; CEO for leadership) -> offer. Own words only, no AI aids.
    :NOTES: Ubuntu / OpenStack publisher. Remote-first, hires across the globe. Reported remote bands modest (~$48k–$70k) but real FTE + benefits and one of the few truly worldwide openings. Large co => HR.
    :END:
 
@@ -64,6 +68,7 @@
    :ENGLISH: yes
    :CONTACT:
    :CREATED: 2026-10-02
+   :INTERVIEW: Platform vetting, then client rounds. Funnel: profile screening (~55% pass) -> communication assessment (~14%) -> 1h technical interview / pair-programming (~2% pass) -> final review. Passing = "vetted"; a hiring company then runs its own interviews.
    :NOTES: Vetted marketplace for freelance + full-time remote dev roles. Global-open, well above VN market. Channel-6 contract lane.
    :END:
 
@@ -75,6 +80,7 @@
    :ENGLISH: yes
    :CONTACT:
    :CREATED: 2026-10-02
+   :INTERVIEW: SE loop documented (GitHub: FusionAuth/se-code-challenge): 7-day take-home code challenge -> 1h technical interview split into code walkthrough + product demo + prospect architecture review, then Q&A. INFERRED for eng roles: People/recruiter screen -> take-home coding challenge -> 1-2 technical rounds (design/code review) -> team fit.
    :NOTES: Auth/authz product built on modern Java, Postgres, Docker, K8s, OAuth/SAML/OIDC. Principal SWE $225k–$270k. Direct stack hit but engineering is US-gated => likely closed to a VN resident. HN Oct 2026.
    :END:
 
@@ -86,6 +92,7 @@
    :ENGLISH: yes
    :CONTACT:
    :CREATED: 2026-10-02
+   :INTERVIEW: Sparse public data (Glassdoor 5-6 reports; Indeed Q&A). INFERRED: recruiter screen -> hiring-manager interview -> technical/architecture round -> team or leadership interview. Note: role reports directly to the hands-on CTO, so a founder-style technical pass is likely.
    :NOTES: SMB insurance marketplace. Java 17+, Spring Boot, microservices, AWS, Kafka, Postgres. $170k–$190k + bonus. Direct stack match, but restricted to ~11 US states (AL/FL/GA/MI/MS/MO/NC/OK/TN/TX/VA) => closed to VN resident. HN Oct 2026.
    :END:
 
@@ -97,6 +104,7 @@
    :ENGLISH: yes
    :CONTACT: contact@vistulo.com
    :CREATED: 2026-10-02
+   :INTERVIEW: Documented on role pages: submit CV -> written questions + short programming exercise (self-paced) -> three-stage process: written screen -> technical screen interview -> three technical interviews with future team members. Led by the client's tech lead (no HR). BA track: CV -> written Qs -> experience interview + panel.
    :NOTES: Front-office trading systems for a top North American bank; B2B contract. Senior Java trading eng 270–300 PLN/hr (~$68–76/hr); Java backend 220–240 PLN/hr; React frontend 220–250 PLN/hr. Client tech-lead interviews => no HR by construction (strategy channel 6), but geo-gated to PL/RO. HN Oct 2026.
    :END:
 
@@ -108,6 +116,7 @@
    :ENGLISH: yes
    :CONTACT:
    :CREATED: 2026-10-02
+   :INTERVIEW: Little public detail (kununu lists 12 interview reports). INFERRED for a German SMB: application -> recruiter/phone screen -> technical interview (+ possibly a short coding task) -> team interview. German B2 is assessed along the way.
    :NOTES: Modernizing legacy business software. Java, Spring Boot, Angular/React, Kafka, Postgres, Docker, K8s, GitLab CI, Gradle/Maven. Fully remote within Germany; 32 vacation days. Geo + German-language gate => closed to VN resident. HN Oct 2026.
    :END:
 
