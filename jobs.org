@@ -36,7 +36,7 @@
    :NOTES: Industrial-process data analytics. Core JVM + Postgres; React front-end. $170k–$205k + bonus + equity (US base; "local adjustments for other countries" => genuinely open to non-US). Roles: Principal Backend (JVM, Postgres) j/CD7BA6EE7B; Senior Full-Stack (React, JVM) j/763AE68666; Staff DevEx (Java/Gradle) j/A966C8897D; Principal AI (Python). ATS=Workable. HN Oct 2026.
    :END:
 
-** LEAD Automattic — Experienced Software Engineer   :large:english:global:
+** APPLIED Automattic — Experienced Software Engineer :large:english:global:
    :PROPERTIES:
    :URL: https://automattic.com/work-with-us/jobs/
    :LOCATION: Remote — "work from wherever you like" (worldwide)
@@ -46,6 +46,7 @@
    :CREATED: 2026-10-02
    :INTERVIEW: Documented (automattic.com/how-we-hire): Application -> Intro Slack chat with an engineer -> take-home coding challenge (~1 week) -> PAID trial project (2-8 weeks, ~15-35h) -> offer. Fully async/text-based, no whiteboard; ~2-3 months end-to-end.
    :NOTES: WordPress.com / WooCommerce / Jetpack / Tumblr. Fully distributed since day one; explicitly hires worldwide. Eng band ~$70k–$170k (geo-adjustable). Well above VN market, but large co => HR process.
+   :APPLIED_ON: 2026-10-11
    :END:
 
 ** LEAD Canonical — Software Engineer (Ubuntu / open source)   :large:english:global:
