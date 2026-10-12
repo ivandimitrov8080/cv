@@ -49,7 +49,7 @@
 #show link: set text(10pt)
 
 #link("mailto:ivan@idimitrov.dev")[ivan\@idimitrov.dev] |
-#link("tel:+31685743745")[+31 685 743 745] |
+#link("tel:+84898532337")[+84 898 532 337] |
 #link("https://github.com/ivandimitrov8080")[github.com/ivandimitrov8080] |
 #link("https://www.upwork.com/freelancers/idimitrov")[upwork.com/idimitrov]
 

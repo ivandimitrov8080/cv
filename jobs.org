@@ -254,7 +254,7 @@
    :NATION: Poland
    :SIZE: mid
    :ENGLISH: yes
-   :CONTACT:
+   :CONTACT: jobs@netguru.com
    :CREATED: 2026-10-11
    :INTERVIEW: No single documented loop (consultancy, role-dependent). INFERRED: recruiter screen -> tech interview -> client/team.
    :NOTES: Software house / consultancy; Java/Spring + React/Angular. Long remote-first track record. Mid => HR present.
