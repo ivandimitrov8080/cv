@@ -35,7 +35,7 @@
    :CONTACT:
    :CREATED: 2026-10-02
    :INTERVIEW: Glassdoor (~13 reports): ~2-week process; recruiter screen -> hiring-manager call -> technical exercise (take-home or live coding) -> team panel. Difficulty 3.4/5; only ~23% report a positive experience. Exact rounds vary by role.
-   :NOTES: Industrial-process data analytics. Core JVM + Postgres; React front-end. $170k–$205k + bonus + equity (US base; "local adjustments for other countries" => genuinely open to non-US). Roles: Principal Backend (JVM, Postgres) j/CD7BA6EE7B; Senior Full-Stack (React, JVM) j/763AE68666; Staff DevEx (Java/Gradle) j/A966C8897D; Principal AI (Python). ATS=Workable. HN Oct 2026.
+   :NOTES: Industrial-process data analytics. Core JVM + Postgres; React front-end. $170k–$205k + bonus + equity (US base; "local adjustments for other countries" => genuinely open to non-US). Roles: Principal Backend (JVM, Postgres) j/CD7BA6EE7B; Senior Full-Stack (React, JVM) j/763AE68666; Staff DevEx (Java/Gradle) j/A966C8897D; Principal AI (Python). ATS=Workable. HN Oct 2026. CONTACT SOURCE: contact page lists an "Employment Inquiries" address but the fetch tool masks it (unreadable) — https://www.seeq.com/contact/
    :END:
 
 ** APPLIED Automattic — Experienced Software Engineer :large:english:global:
@@ -98,10 +98,10 @@
    :NATION: United States
    :SIZE: mid
    :ENGLISH: yes
-   :CONTACT:
+   :CONTACT: amber.sharp@tivly.com
    :CREATED: 2026-10-02
    :INTERVIEW: Sparse public data (Glassdoor 5-6 reports; Indeed Q&A). INFERRED: recruiter screen -> hiring-manager interview -> technical/architecture round -> team or leadership interview. Note: role reports directly to the hands-on CTO, so a founder-style technical pass is likely.
-   :NOTES: SMB insurance marketplace. Java 17+, Spring Boot, microservices, AWS, Kafka, Postgres. $170k–$190k + bonus. Direct stack match, but restricted to ~11 US states (AL/FL/GA/MI/MS/MO/NC/OK/TN/TX/VA) => closed to VN resident. HN Oct 2026.
+   :NOTES: SMB insurance marketplace. Java 17+, Spring Boot, microservices, AWS, Kafka, Postgres. $170k–$190k + bonus. Direct stack match, but restricted to ~11 US states (AL/FL/GA/MI/MS/MO/NC/OK/TN/TX/VA) => closed to VN resident. HN Oct 2026. CONTACT SOURCE: amber.sharp@tivly.com (named; lead buy/sell desk, NOT a hiring inbox) — https://tivly.com/contact-us ; the same page also lists an "Employment Inquiries" address that the fetch tool masks.
    :END:
 
 ** LEAD Vistulo — Senior Java / React / Calypso (B2B contract)   :small:english:
@@ -176,10 +176,10 @@
    :NATION: Germany
    :SIZE: large
    :ENGLISH: yes
-   :CONTACT:
+   :CONTACT: info@auto1-group.com
    :CREATED: 2026-10-11
    :INTERVIEW: No public loop detail. INFERRED: recruiter screen -> technical interview -> team. Large co => ATS.
-   :NOTES: Europe's leading digital used-car platform. Java/Spring Boot backend. Explicit live "Senior Java Engineer — Remote (f/m/x)" postings. ATS=SmartRecruiters. Non-US HQ but large/HR-gated.
+   :NOTES: Europe's leading digital used-car platform. Java/Spring Boot backend. Explicit live "Senior Java Engineer — Remote (f/m/x)" postings. ATS=SmartRecruiters. Non-US HQ but large/HR-gated. CONTACT SOURCE: info@auto1-group.com (general company inbox, NOT hiring) — https://www.auto1-group.com/imprint/
    :END:
 
 ** LEAD commercetools — Backend Engineer (Java)   :mid:english:
@@ -257,7 +257,7 @@
    :CONTACT: jobs@netguru.com
    :CREATED: 2026-10-11
    :INTERVIEW: No single documented loop (consultancy, role-dependent). INFERRED: recruiter screen -> tech interview -> client/team.
-   :NOTES: Software house / consultancy; Java/Spring + React/Angular. Long remote-first track record. Mid => HR present.
+   :NOTES: Software house / consultancy; Java/Spring + React/Angular. Long remote-first track record. Mid => HR present. CONTACT SOURCE: jobs@netguru.com (recruitment inbox) — https://apply.workable.com/netguru/j/1FD6B35D70/apply/ ; hello@netguru.com (general) — https://www.netguru.com/contact
    :END:
 
 ** LEAD SoftwareMill — Java / Scala Developer   :small:english:
@@ -270,7 +270,7 @@
    :CONTACT:
    :CREATED: 2026-10-11
    :INTERVIEW: Documented 5 steps: resume + online form -> video call -> technical task -> technical interview -> lunch meeting. Always detailed feedback.
-   :NOTES: "100% remote forever", B2B contract (fits IDimitrov Ltd.). Scala/Akka/Java. Full financial transparency. Live rates: Scala Senior/Staff 125-185 PLN net/h; Regular/Senior 83-160 PLN net/h. Poland's Best Workplace (50-99). Developer-led => strong no-HR signal.
+   :NOTES: "100% remote forever", B2B contract (fits IDimitrov Ltd.). Scala/Akka/Java. Full financial transparency. Live rates: Scala Senior/Staff 125-185 PLN net/h; Regular/Senior 83-160 PLN net/h. Poland's Best Workplace (50-99). Developer-led => strong no-HR signal. CONTACT SOURCE: hello@softwaremill.com (general contact, NOT a hiring inbox) — https://softwaremill.com/contact/
    :END:
 
    - NOTE: Live reqs are Scala-first (Scala Developer Senior/Staff, Regular/Senior). Java is in their stack but Scala is the gate -> stack stretch.
@@ -295,10 +295,10 @@
    :NATION: Austria
    :SIZE: mid
    :ENGLISH: yes
-   :CONTACT:
+   :CONTACT: legal@storyblok.com
    :CREATED: 2026-10-11
    :INTERVIEW: No public loop detail. INFERRED: screen -> technical -> team.
-   :NOTES: Headless CMS. Node/TS (NOT Java). Fully remote, non-US HQ (AT).
+   :NOTES: Headless CMS. Node/TS (NOT Java). Fully remote, non-US HQ (AT). CONTACT SOURCE: legal@storyblok.com (legal / media-owner contact, NOT hiring) — https://www.storyblok.com/legal/legal-notice
    :END:
 
 ** LEAD Prezi — Software Engineer (Java / Scala)   :mid:english:
@@ -308,10 +308,10 @@
    :NATION: Hungary
    :SIZE: mid
    :ENGLISH: yes
-   :CONTACT:
+   :CONTACT: privacy@prezi.com
    :CREATED: 2026-10-11
    :INTERVIEW: No public loop detail. INFERRED: screen -> technical -> team.
-   :NOTES: Presentation SaaS. Java/Scala. Distributed, non-US HQ (HU).
+   :NOTES: Presentation SaaS. Java/Scala. Distributed, non-US HQ (HU). CONTACT SOURCE: privacy@prezi.com (privacy / data-subject contact, NOT hiring) — https://prezi.com/contact/
    :END:
 
 ** LEAD Toggl — Backend Engineer   :small:english:global:
