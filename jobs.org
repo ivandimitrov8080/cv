@@ -12,32 +12,6 @@
 
 * Pipeline
 
-** LEAD KSC Trading — Senior Backend Engineer (Java)   :small:english:global:
-   :PROPERTIES:
-   :URL: https://news.ycombinator.com/item?id=46108941
-   :LOCATION: Remote (worldwide) — needs ~4h overlap with US East
-   :NATION: unknown
-   :SIZE: small
-   :ENGLISH: yes
-   :CONTACT: hiring@ksctrading.com
-   :CREATED: 2026-10-02
-   :INTERVIEW: No public reports (boutique prop firm; hires via the founder's direct email). INFERRED: intro call with founder -> live coding / short take-home -> 1-2 deeper technical rounds with the team. Tiny team (2->6), so likely compressed and fast.
-   :NOTES: Prop algorithmic trading (sports & prediction markets), founded 2020; team of 2 growing to ~6. Stack: Java, Google Cloud, Postgres. $200k–$250k total comp. Ad gives a direct email and names no ATS => strong no-HR signal (strategy rubric ~7/8). HN Oct 2026.
-   :END:
-
-** LEAD Seeq — Backend + Full-Stack (JVM/React)   :mid:english:global:
-   :PROPERTIES:
-   :URL: https://apply.workable.com/seeq/
-   :LOCATION: Remote (worldwide; some PST overlap) — pay adjusted by country
-   :NATION: United States
-   :SIZE: mid
-   :ENGLISH: yes
-   :CONTACT:
-   :CREATED: 2026-10-02
-   :INTERVIEW: Glassdoor (~13 reports): ~2-week process; recruiter screen -> hiring-manager call -> technical exercise (take-home or live coding) -> team panel. Difficulty 3.4/5; only ~23% report a positive experience. Exact rounds vary by role.
-   :NOTES: Industrial-process data analytics. Core JVM + Postgres; React front-end. $170k–$205k + bonus + equity (US base; "local adjustments for other countries" => genuinely open to non-US). Roles: Principal Backend (JVM, Postgres) j/CD7BA6EE7B; Senior Full-Stack (React, JVM) j/763AE68666; Staff DevEx (Java/Gradle) j/A966C8897D; Principal AI (Python). ATS=Workable. HN Oct 2026. CONTACT SOURCE: contact page lists an "Employment Inquiries" address but the fetch tool masks it (unreadable) — https://www.seeq.com/contact/
-   :END:
-
 ** APPLIED Automattic — Experienced Software Engineer :large:english:global:
    :PROPERTIES:
    :URL: https://automattic.com/work-with-us/jobs/
@@ -52,163 +26,7 @@
    :APPLIED_ON: 2026-10-11
    :END:
 
-** LEAD Canonical — Software Engineer (Ubuntu / open source)   :large:english:global:
-   :PROPERTIES:
-   :URL: https://canonical.com/careers
-   :LOCATION: Remote-first — worldwide
-   :NATION: United Kingdom
-   :SIZE: large
-   :ENGLISH: yes
-   :CONTACT:
-   :CREATED: 2026-10-02
-   :INTERVIEW: Documented (canonical.com/careers/hiring-process), ~3 months: application Qs -> written interview (essay, graded by 2 domain experts, anonymised) -> psychometric GIA (5-part, 30-45 min) -> role-specific technical assessment -> 3 early-stage technical interviews -> talent interview (10-min personality profile + comp) -> late-stage interviews (manager, Hiring Lead; CEO for leadership) -> offer. Own words only, no AI aids.
-   :NOTES: Ubuntu / OpenStack publisher. Remote-first, hires across the globe. Reported remote bands modest (~$48k–$70k) but real FTE + benefits and one of the few truly worldwide openings. Large co => HR.
-   :END:
-
-** LEAD Arc.dev — Vetted Remote Developer Network   :mid:english:global:
-   :PROPERTIES:
-   :URL: https://arc.dev/
-   :LOCATION: Remote — worldwide
-   :NATION: United States
-   :SIZE: mid
-   :ENGLISH: yes
-   :CONTACT:
-   :CREATED: 2026-10-02
-   :INTERVIEW: Platform vetting, then client rounds. Funnel: profile screening (~55% pass) -> communication assessment (~14%) -> 1h technical interview / pair-programming (~2% pass) -> final review. Passing = "vetted"; a hiring company then runs its own interviews.
-   :NOTES: Vetted marketplace for freelance + full-time remote dev roles. Global-open, well above VN market. Channel-6 contract lane.
-   :END:
-
-** LEAD FusionAuth — Principal / Senior Java Engineer   :mid:english:
-   :PROPERTIES:
-   :URL: https://fusionauth.io/careers/
-   :LOCATION: Remote (US) — Europe limited to account-exec
-   :NATION: United States
-   :SIZE: mid
-   :ENGLISH: yes
-   :CONTACT:
-   :CREATED: 2026-10-02
-   :INTERVIEW: SE loop documented (GitHub: FusionAuth/se-code-challenge): 7-day take-home code challenge -> 1h technical interview split into code walkthrough + product demo + prospect architecture review, then Q&A. INFERRED for eng roles: People/recruiter screen -> take-home coding challenge -> 1-2 technical rounds (design/code review) -> team fit.
-   :NOTES: Auth/authz product built on modern Java, Postgres, Docker, K8s, OAuth/SAML/OIDC. Principal SWE $225k–$270k. Direct stack hit but engineering is US-gated => likely closed to a VN resident. HN Oct 2026.
-   :END:
-
-** LEAD Tivly — Principal Software Engineer (Java)   :mid:english:
-   :PROPERTIES:
-   :URL: https://tivly.com/careers
-   :LOCATION: Remote (US only — named states)
-   :NATION: United States
-   :SIZE: mid
-   :ENGLISH: yes
-   :CONTACT: amber.sharp@tivly.com
-   :CREATED: 2026-10-02
-   :INTERVIEW: Sparse public data (Glassdoor 5-6 reports; Indeed Q&A). INFERRED: recruiter screen -> hiring-manager interview -> technical/architecture round -> team or leadership interview. Note: role reports directly to the hands-on CTO, so a founder-style technical pass is likely.
-   :NOTES: SMB insurance marketplace. Java 17+, Spring Boot, microservices, AWS, Kafka, Postgres. $170k–$190k + bonus. Direct stack match, but restricted to ~11 US states (AL/FL/GA/MI/MS/MO/NC/OK/TN/TX/VA) => closed to VN resident. HN Oct 2026. CONTACT SOURCE: amber.sharp@tivly.com (named; lead buy/sell desk, NOT a hiring inbox) — https://tivly.com/contact-us ; the same page also lists an "Employment Inquiries" address that the fetch tool masks.
-   :END:
-
-** LEAD Vistulo — Senior Java / React / Calypso (B2B contract)   :small:english:
-   :PROPERTIES:
-   :URL: https://ats.vistulo.com/
-   :LOCATION: Remote (Poland or Romania residents only)
-   :NATION: Poland
-   :SIZE: small
-   :ENGLISH: yes
-   :CONTACT: contact@vistulo.com
-   :CREATED: 2026-10-02
-   :INTERVIEW: Documented on role pages: submit CV -> written questions + short programming exercise (self-paced) -> three-stage process: written screen -> technical screen interview -> three technical interviews with future team members. Led by the client's tech lead (no HR). BA track: CV -> written Qs -> experience interview + panel.
-   :NOTES: Front-office trading systems for a top North American bank; B2B contract. Senior Java trading eng 270–300 PLN/hr (~$68–76/hr); Java backend 220–240 PLN/hr; React frontend 220–250 PLN/hr. Client tech-lead interviews => no HR by construction (strategy channel 6), but geo-gated to PL/RO. HN Oct 2026.
-   :END:
-
-** LEAD Avision GmbH — Full-Stack Java + Angular/React   :small:english:
-   :PROPERTIES:
-   :URL: https://news.ycombinator.com/item?id=46108941
-   :LOCATION: Remote (Germany only) — German B2 required
-   :NATION: Germany
-   :SIZE: small
-   :ENGLISH: yes
-   :CONTACT:
-   :CREATED: 2026-10-02
-   :INTERVIEW: Little public detail (kununu lists 12 interview reports). INFERRED for a German SMB: application -> recruiter/phone screen -> technical interview (+ possibly a short coding task) -> team interview. German B2 is assessed along the way.
-   :NOTES: Modernizing legacy business software. Java, Spring Boot, Angular/React, Kafka, Postgres, Docker, K8s, GitLab CI, Gradle/Maven. Fully remote within Germany; 32 vacation days. Geo + German-language gate => closed to VN resident. HN Oct 2026.
-   :END:
-
-** LEAD Sonar (SonarSource) — Software Engineer (Java / Platform)   :large:english:global:
-   :PROPERTIES:
-   :URL: https://www.sonarsource.com/company/careers/
-   :LOCATION: Remote / hybrid across 12 offices (Geneva HQ, Switzerland)
-   :NATION: Switzerland
-   :SIZE: large
-   :ENGLISH: yes
-   :CONTACT:
-   :CREATED: 2026-10-11
-   :INTERVIEW: No public eng-loop detail gathered. INFERRED: recruiter screen -> hiring-manager call -> technical interview (Java / code quality) -> team fit. 800+ staff => HR present.
-   :NOTES: SonarQube / SonarCloud code-quality & security platform; 7M+ devs. Java/Kotlin core. 100+ openings, 12 offices. Non-US HQ (Switzerland) => less US-revenue exposure; direct stack hit (the Android app is pure Java). Rubric: large co, ATS-gated (~2/8).
-   :END:
-
-** LEAD Elastic — Backend / Distributed Systems Engineer   :large:english:global:
-   :PROPERTIES:
-   :URL: https://www.elastic.co/careers
-   :LOCATION: Remote — "distributed by design" (Amsterdam HQ, Netherlands)
-   :NATION: Netherlands
-   :SIZE: large
-   :ENGLISH: yes
-   :CONTACT:
-   :CREATED: 2026-10-11
-   :INTERVIEW: Documented as long/async-friendly: recruiter screen -> technical screen -> multiple loops (coding + systems design). Distributed-interview norms.
-   :NOTES: Elasticsearch / Kibana / Logstash; Java (Lucene). One of the original remote-first companies. Non-US HQ (NL). Large => HR, but async culture is real. Confirm timezone overlap for non-EU.
-   :END:
-
-** LEAD Camunda — Java / Platform Engineer   :mid:english:
-   :PROPERTIES:
-   :URL: https://camunda.com/careers/
-   :LOCATION: Remote across Europe (Berlin HQ, Germany)
-   :NATION: Germany
-   :SIZE: mid
-   :ENGLISH: yes
-   :CONTACT:
-   :CREATED: 2026-10-11
-   :INTERVIEW: No public eng-loop detail gathered. INFERRED for a German distributed co: recruiter screen -> technical interview (Java/Spring) -> team/fit. Written-first culture.
-   :NOTES: Process orchestration / BPMN; Zeebe engine is Java/Spring. Fully distributed across Europe, documented async/written norms. EU-HQ => native EU exposure. Verify CET overlap requirement.
-   :END:
-
-** LEAD AUTO1 Group — Senior Java Engineer (Remote)   :large:english:
-   :PROPERTIES:
-   :URL: https://www.auto1-group.com/careers/
-   :LOCATION: Remote (Germany HQ Berlin, with Poland tech hubs)
-   :NATION: Germany
-   :SIZE: large
-   :ENGLISH: yes
-   :CONTACT: info@auto1-group.com
-   :CREATED: 2026-10-11
-   :INTERVIEW: No public loop detail. INFERRED: recruiter screen -> technical interview -> team. Large co => ATS.
-   :NOTES: Europe's leading digital used-car platform. Java/Spring Boot backend. Explicit live "Senior Java Engineer — Remote (f/m/x)" postings. ATS=SmartRecruiters. Non-US HQ but large/HR-gated. CONTACT SOURCE: info@auto1-group.com (general company inbox, NOT hiring) — https://www.auto1-group.com/imprint/
-   :END:
-
-** LEAD commercetools — Backend Engineer (Java)   :mid:english:
-   :PROPERTIES:
-   :URL: https://commercetools.com/careers
-   :LOCATION: Remote-friendly EMEA (Munich HQ, Germany)
-   :NATION: Germany
-   :SIZE: mid
-   :ENGLISH: yes
-   :CONTACT:
-   :CREATED: 2026-10-11
-   :INTERVIEW: No public loop detail. INFERRED: screen -> technical -> team.
-   :NOTES: MACH-architecture commerce APIs. Java, AWS. Non-US HQ (DE). Mid-large => HR present.
-   :END:
-
-** LEAD Personio — Backend Engineer (Java / Kotlin)   :large:english:
-   :PROPERTIES:
-   :URL: https://www.personio.com/careers/
-   :LOCATION: Remote across EMEA (Munich HQ, Germany)
-   :NATION: Germany
-   :SIZE: large
-   :ENGLISH: yes
-   :CONTACT:
-   :CREATED: 2026-10-11
-   :INTERVIEW: No public loop detail. INFERRED: recruiter screen -> technical -> team. ATS=Personio (own product).
-   :NOTES: HR SaaS. Java/Kotlin. Non-US HQ (DE). Large => HR-gated.
-   :END:
-
-** LEAD Codacy — Backend Engineer (Java / Scala)   :small:english:
+** APPLIED Codacy — Backend Engineer (Java / Scala)        :small:english:
    :PROPERTIES:
    :URL: https://www.codacy.com/careers
    :LOCATION: Remote (Lisbon HQ, Portugal)
@@ -219,35 +37,10 @@
    :CREATED: 2026-10-11
    :INTERVIEW: No public loop detail. INFERRED (small co): screen -> technical/code review -> team.
    :NOTES: Automated code-quality platform. Java/Scala, AWS. Small, remote-friendly, non-US HQ (PT).
+   :APPLIED_ON: 2026-10-13
    :END:
 
-** LEAD Rows — Backend Engineer (Java / Kotlin)   :small:english:
-   :PROPERTIES:
-   :URL: https://rows.com/careers
-   :LOCATION: Remote (Porto HQ, Portugal)
-   :NATION: Portugal
-   :SIZE: small
-   :ENGLISH: yes
-   :CONTACT:
-   :CREATED: 2026-10-11
-   :INTERVIEW: No public loop detail. INFERRED: screen -> technical -> team.
-   :NOTES: Spreadsheet/database hybrid product. Java/Kotlin. Small, remote, non-US (PT).
-   :END:
-
-** LEAD Venly — Java Engineer (Web3 infra)   :small:english:
-   :PROPERTIES:
-   :URL: https://www.venly.io/careers
-   :LOCATION: Remote (Antwerp HQ, Belgium)
-   :NATION: Belgium
-   :SIZE: small
-   :ENGLISH: yes
-   :CONTACT:
-   :CREATED: 2026-10-11
-   :INTERVIEW: No public loop detail. INFERRED: screen -> technical -> team.
-   :NOTES: Blockchain wallet / API infrastructure. Java (+ C#). Small, remote, non-US (BE).
-   :END:
-
-** LEAD Netguru — Java / Spring Engineer   :mid:english:
+** APPLIED Netguru — Java / Spring Engineer                  :mid:english:
    :PROPERTIES:
    :URL: https://www.netguru.com/careers
    :LOCATION: Remote-first (Poznan HQ, Poland)
@@ -258,9 +51,10 @@
    :CREATED: 2026-10-11
    :INTERVIEW: No single documented loop (consultancy, role-dependent). INFERRED: recruiter screen -> tech interview -> client/team.
    :NOTES: Software house / consultancy; Java/Spring + React/Angular. Long remote-first track record. Mid => HR present. CONTACT SOURCE: jobs@netguru.com (recruitment inbox) — https://apply.workable.com/netguru/j/1FD6B35D70/apply/ ; hello@netguru.com (general) — https://www.netguru.com/contact
+   :APPLIED_ON: 2026-10-13
    :END:
 
-** LEAD SoftwareMill — Java / Scala Developer   :small:english:
+** APPLIED SoftwareMill — Java / Scala Developer           :small:english:
    :PROPERTIES:
    :URL: https://softwaremill.com/join-us/
    :LOCATION: 100% remote (Warsaw HQ, Poland)
@@ -271,76 +65,12 @@
    :CREATED: 2026-10-11
    :INTERVIEW: Documented 5 steps: resume + online form -> video call -> technical task -> technical interview -> lunch meeting. Always detailed feedback.
    :NOTES: "100% remote forever", B2B contract (fits IDimitrov Ltd.). Scala/Akka/Java. Full financial transparency. Live rates: Scala Senior/Staff 125-185 PLN net/h; Regular/Senior 83-160 PLN net/h. Poland's Best Workplace (50-99). Developer-led => strong no-HR signal. CONTACT SOURCE: hello@softwaremill.com (general contact, NOT a hiring inbox) — https://softwaremill.com/contact/
+   :APPLIED_ON: 2026-10-13
    :END:
 
    - NOTE: Live reqs are Scala-first (Scala Developer Senior/Staff, Regular/Senior). Java is in their stack but Scala is the gate -> stack stretch.
 
-** LEAD n8n — Software Engineer   :mid:english:
-   :PROPERTIES:
-   :URL: https://n8n.io/careers/
-   :LOCATION: Remote across Europe (Berlin HQ, Germany)
-   :NATION: Germany
-   :SIZE: mid
-   :ENGLISH: yes
-   :CONTACT:
-   :CREATED: 2026-10-11
-   :INTERVIEW: No public loop detail. INFERRED: screen -> technical -> team. Low-ego, high-velocity culture.
-   :NOTES: OSS workflow automation / AI orchestration. Node/TS (NOT Java) — adjacent only. Non-US HQ (DE). Explicit low-ego, community-first culture; $1bn ARR with <500 people.
-   :END:
-
-** LEAD Storyblok — Software Engineer   :mid:english:
-   :PROPERTIES:
-   :URL: https://www.storyblok.com/jobs
-   :LOCATION: Fully remote across Europe (Linz HQ, Austria)
-   :NATION: Austria
-   :SIZE: mid
-   :ENGLISH: yes
-   :CONTACT: legal@storyblok.com
-   :CREATED: 2026-10-11
-   :INTERVIEW: No public loop detail. INFERRED: screen -> technical -> team.
-   :NOTES: Headless CMS. Node/TS (NOT Java). Fully remote, non-US HQ (AT). CONTACT SOURCE: legal@storyblok.com (legal / media-owner contact, NOT hiring) — https://www.storyblok.com/legal/legal-notice
-   :END:
-
-** LEAD Prezi — Software Engineer (Java / Scala)   :mid:english:
-   :PROPERTIES:
-   :URL: https://prezi.com/jobs/
-   :LOCATION: Remote / distributed (Budapest HQ, Hungary)
-   :NATION: Hungary
-   :SIZE: mid
-   :ENGLISH: yes
-   :CONTACT: privacy@prezi.com
-   :CREATED: 2026-10-11
-   :INTERVIEW: No public loop detail. INFERRED: screen -> technical -> team.
-   :NOTES: Presentation SaaS. Java/Scala. Distributed, non-US HQ (HU). CONTACT SOURCE: privacy@prezi.com (privacy / data-subject contact, NOT hiring) — https://prezi.com/contact/
-   :END:
-
-** LEAD Toggl — Backend Engineer   :small:english:global:
-   :PROPERTIES:
-   :URL: https://toggl.com/jobs
-   :LOCATION: Fully remote since 2014 (Tallinn HQ, Estonia)
-   :NATION: Estonia
-   :SIZE: small
-   :ENGLISH: yes
-   :CONTACT:
-   :CREATED: 2026-10-11
-   :INTERVIEW: No formal loop documented publicly. INFERRED: async take-home + interviews. Culture = RAFT (Results and Accountability First).
-   :NOTES: Time-tracking / capacity planning tools. Go/Ruby/JS (NOT Java) — adjacent. Fully remote since 2014, colleagues worldwide, twice-yearly covered meetups. Small, high-trust => low-HR signal.
-   :END:
-
-** LEAD Doist — Engineer (Backend / Product)   :small:english:global:
-   :PROPERTIES:
-   :URL: https://doist.com/careers
-   :LOCATION: Work from anywhere — "no location restrictions" (fully distributed)
-   :NATION: none (fully distributed)
-   :SIZE: small
-   :ENGLISH: yes
-   :CONTACT:
-   :CREATED: 2026-10-11
-   :INTERVIEW: Documented: application + form questions -> interview(s) over Google Meet (salary range shared early) -> task assignment -> reference/background check -> offer. Onboarding incl. an in-person co-working week with a mentor.
-   :NOTES: Todoist / Twist. Explicit: "Todoisters can work from anywhere in the world. We never place restrictions on locations." Formula-based geo-adjusted comp; 8 weeks PTO. Python/Go/React (NOT Java) — lateral. Strongest "no asterisks" remote policy in this set.
-   :END:
-
-** LEAD Money Forward X — Backend Developer (Kotlin/Java + Spring Boot)   :mid:english:
+** APPLIED Money Forward X — Backend Developer (Kotlin/Java + Spring Boot) :mid:english:
    :PROPERTIES:
    :URL: https://www.tokyodev.com/jobs/java
    :LOCATION: Tokyo, Japan — partially remote; Japan residents only (per listing)
@@ -351,9 +81,10 @@
    :CREATED: 2026-10-11
    :INTERVIEW: TokyoDev listing only; no loop detail. INFERRED: screen (Japanese) -> technical -> team.
    :NOTES: Fintech, Japan. Kotlin/Java + Spring Boot + Next.js + AWS. JPY 6.4M-9.5M. Partially remote. BLOCKER: conversational Japanese + Japan residency required (per TokyoDev) -> only viable if relocating to JP.
+   :APPLIED_ON: 2026-10-13
    :END:
 
-** LEAD Mercari — Backend Engineer   :large:english:
+** APPLIED Mercari — Backend Engineer                      :large:english:
    :PROPERTIES:
    :URL: https://careers.mercari.com/en/
    :LOCATION: Tokyo, Japan (some remote)
@@ -364,35 +95,10 @@
    :CREATED: 2026-10-11
    :INTERVIEW: Established process (English-mode company). INFERRED: screen -> coding -> system design -> team.
    :NOTES: Marketplace / fintech. Java/Go. English-mode international company with established remote hiring. Non-US HQ (JP).
+   :APPLIED_ON: 2026-10-13
    :END:
 
-** LEAD Rakuten — Software Engineer (Java)   :large:english:
-   :PROPERTIES:
-   :URL: https://japan-job-en.rakuten.careers/
-   :LOCATION: Tokyo, Japan
-   :NATION: Japan
-   :SIZE: large
-   :ENGLISH: yes
-   :CONTACT:
-   :CREATED: 2026-10-11
-   :INTERVIEW: Large-co process. INFERRED: recruiter -> technical -> team.
-   :NOTES: Java-heavy. English job postings exist. Non-US HQ (JP) but large/HR-heavy.
-   :END:
-
-** LEAD Airwallex — Backend Engineer (Java)   :large:english:
-   :PROPERTIES:
-   :URL: https://careers.airwallex.com/
-   :LOCATION: Remote-friendly APAC (Melbourne HQ, Australia)
-   :NATION: Australia
-   :SIZE: large
-   :ENGLISH: yes
-   :CONTACT:
-   :CREATED: 2026-10-11
-   :INTERVIEW: No public loop detail. INFERRED: screen -> technical -> team. Large => ATS.
-   :NOTES: Fintech payments. Java. Non-US HQ (AU). Large => HR-gated.
-   :END:
-
-** LEAD Grab — Software Engineer   :large:english:
+** APPLIED Grab — Software Engineer                        :large:english:
    :PROPERTIES:
    :URL: https://www.grab.careers/en/jobs/
    :LOCATION: Singapore HQ (SEA regional remote)
@@ -403,9 +109,10 @@
    :CREATED: 2026-10-11
    :INTERVIEW: No public loop detail. INFERRED: recruiter -> technical -> team. Large => ATS.
    :NOTES: Super-app (mobility / delivery / fintech). Java. Remote within SEA; large => ATS-gated. SG-HQ.
+   :APPLIED_ON: 2026-10-13
    :END:
 
-** LEAD Sea Group (Shopee) — Software Engineer   :large:english:
+** APPLIED Sea Group (Shopee) — Software Engineer          :large:english:
    :PROPERTIES:
    :URL: https://career.sea.com/jobs
    :LOCATION: Singapore HQ
@@ -416,68 +123,13 @@
    :CREATED: 2026-10-11
    :INTERVIEW: No public loop detail. INFERRED: recruiter -> technical -> team. Large => ATS.
    :NOTES: E-commerce / gaming / fintech. Java. Large, ATS-gated. SG-HQ.
-   :END:
-
-** LEAD Kitopi — Backend Engineer (Java)   :mid:english:global:
-   :PROPERTIES:
-   :URL: https://europeanremote.com/teams/kitopi
-   :LOCATION: Dubai, UAE (GCC)
-   :NATION: UAE
-   :SIZE: mid
-   :ENGLISH: yes
-   :CONTACT:
-   :CREATED: 2026-10-11
-   :INTERVIEW: No public loop detail. INFERRED: screen -> technical -> team.
-   :NOTES: Cloud-kitchen platform. Java, AWS. English working language. Non-US-aligned; GCC pays well and is short of senior JVM engineers.
-   :END:
-
-** LEAD Noon — Backend Engineer (Java)   :large:english:
-   :PROPERTIES:
-   :URL: https://www.noon.com/careers
-   :LOCATION: Dubai / Riyadh (GCC)
-   :NATION: UAE
-   :SIZE: large
-   :ENGLISH: yes
-   :CONTACT:
-   :CREATED: 2026-10-11
-   :INTERVIEW: No public loop detail. INFERRED: recruiter -> technical -> team. Large => ATS.
-   :NOTES: Amazon-competitor marketplace. Java. Non-US-aligned (GCC). Large => HR-gated.
-   :END:
-
-** LEAD Careem — Backend Engineer   :large:english:
-   :PROPERTIES:
-   :URL: https://www.careem.com/careers
-   :LOCATION: Dubai, UAE (GCC)
-   :NATION: UAE
-   :SIZE: large
-   :ENGLISH: yes
-   :CONTACT:
-   :CREATED: 2026-10-11
-   :INTERVIEW: No public loop detail. INFERRED: recruiter -> technical -> team. Large => ATS.
-   :NOTES: Super-app. Java. Engineering-led. Non-US-aligned (GCC). CAVEAT: Careem is Uber-owned (US parent) => partial US influence; downweight on the jurisdiction axis.
+   :APPLIED_ON: 2026-10-13
    :END:
 
 * Archive
 :PROPERTIES:
 :NOTES: no jobs available matching profile so did not apply
 :END:
-** LEAD Enclave — Offshore Development Center      :jobsearch:mid:english:
-   :PROPERTIES:
-   :URL: https://enclave.vn/careers
-   :LOCATION: Da Nang (also Hue)
-   :SIZE: mid
-   :ENGLISH: yes
-   :CONTACT:
-   :CREATED: 2026-09-26
-   :NOTES: ~250 engineers; explicitly collaborates in English. No jobs matching profile
-   :ARCHIVE_TIME: 2026-09-29 Tue 08:34
-   :ARCHIVE_FILE: ~/src/cv/jobs.org
-   :ARCHIVE_OLPATH: Pipeline
-   :ARCHIVE_CATEGORY: jobs
-   :ARCHIVE_TODO: LEAD
-   :ARCHIVE_ITAGS: jobsearch
-   :END:
-
 ** LEAD DataHouse Asia — Software development      :jobsearch:mid:english:
    :PROPERTIES:
    :URL: https://www.linkedin.com/company/datahousevietnam
@@ -669,17 +321,17 @@ CLOSED: [2026-09-30 Wed 20:14]
    - CLOSING NOTE [2026-09-30 Wed 20:14] \\
      They need someone who can speak Vietnamese
 
-** APPLIED KAMORA — Golang / Flutter / Frontend  :jobsearch:small:english:
+** APPLIED Vinova — Java / Mobile / Full-Stack   :jobsearch:small:english:
    :PROPERTIES:
-   :URL: https://kamora.vn/careers
-   :LOCATION: Da Nang, Vietnam (Ngũ Hành Sơn)
+   :URL: https://vinova.sg/jobs/
+   :LOCATION: Da Nang, Vietnam (+ HCMC / Hanoi)
    :SIZE: small
    :ENGLISH: yes
    :CONTACT:
-   :CREATED: 2026-09-26
-   :APPLIED_ON: 2026-09-26
-   :NOTES: 100% product studio since 2019, serving European & US markets.
-   :ARCHIVE_TIME: 2026-10-09 Fri 15:13
+   :CREATED: 2026-09-29
+   :NOTES: "VIbrant inNOVAtors"; recurring Java Software Engineer and Senior Java roles in Da Nang. VERIFY(2026-09-29): ATS=hrpartner.io + vinova.careers-page.com; HR present (posted Employer Branding & Engagement Specialist). Java-stack fit but gated.
+   :APPLIED_ON: 2026-09-30
+   :ARCHIVE_TIME: 2026-10-13 Tue 08:41
    :ARCHIVE_FILE: ~/src/cv/jobs.org
    :ARCHIVE_OLPATH: Archive
    :ARCHIVE_CATEGORY: jobs
@@ -687,71 +339,53 @@ CLOSED: [2026-09-30 Wed 20:14]
    :ARCHIVE_ITAGS: jobsearch
    :END:
 
-** APPLIED Innovaly Services — Full-Stack / Backend / Tech Lead :jobsearch:small:english:
+** APPLIED Axon Active — Dedicated Teams / Agile   :jobsearch:mid:english:
    :PROPERTIES:
-   :URL: https://innovaly.services/careers
-   :LOCATION: Da Nang, Vietnam (hybrid + remote)
-   :SIZE: small
-   :ENGLISH: yes
-   :CONTACT:
-   :CREATED: 2026-09-26
-   :APPLIED_ON: 2026-09-26
-   :NOTES: US startup; up to $1,800/mo for senior backend/full-stack.
-   :ARCHIVE_TIME: 2026-10-09 Fri 15:13
-   :ARCHIVE_FILE: ~/src/cv/jobs.org
-   :ARCHIVE_OLPATH: Archive
-   :ARCHIVE_CATEGORY: jobs
-   :ARCHIVE_TODO: APPLIED
-   :ARCHIVE_ITAGS: jobsearch
-   :END:
-
-** APPLIED Tekmium — Web / Mobile / AI / Cloud   :jobsearch:small:english:
-   :PROPERTIES:
-   :URL: https://tekmium.com/en/careers
-   :LOCATION: Da Nang, Vietnam (on-site / hybrid / remote)
-   :SIZE: small
-   :ENGLISH: yes
-   :CONTACT:
-   :CREATED: 2026-09-26
-   :APPLIED_ON: 2026-09-26
-   :NOTES: Nimble studio, English site.
-   :ARCHIVE_TIME: 2026-10-09 Fri 15:13
-   :ARCHIVE_FILE: ~/src/cv/jobs.org
-   :ARCHIVE_OLPATH: Archive
-   :ARCHIVE_CATEGORY: jobs
-   :ARCHIVE_TODO: APPLIED
-   :ARCHIVE_ITAGS: jobsearch
-   :END:
-
-** APPLIED Xenia Tech — Full-Stack / React Native / QA :jobsearch:small:english:
-   :PROPERTIES:
-   :URL: https://xeniatech.vn/en/jobs
-   :LOCATION: Da Nang, Vietnam (+ HCMC / London)
-   :SIZE: small
-   :ENGLISH: yes
-   :CONTACT:
-   :CREATED: 2026-09-26
-   :APPLIED_ON: 2026-09-26
-   :NOTES: Founded 2017 by a UK entrepreneur; international clients.
-   :ARCHIVE_TIME: 2026-10-09 Fri 15:13
-   :ARCHIVE_FILE: ~/src/cv/jobs.org
-   :ARCHIVE_OLPATH: Archive
-   :ARCHIVE_CATEGORY: jobs
-   :ARCHIVE_TODO: APPLIED
-   :ARCHIVE_ITAGS: jobsearch
-   :END:
-
-** APPLIED Enlab Software — Offshore software development :jobsearch:mid:english:
-   :PROPERTIES:
-   :URL: https://enlabsoftware.com/careers
-   :LOCATION: Da Nang, Vietnam
+   :URL: https://www.careers.axonactive.com/
+   :LOCATION: Da Nang, Vietnam (+ HCMC / Can Tho / Switzerland)
    :SIZE: mid
    :ENGLISH: yes
    :CONTACT:
-   :CREATED: 2026-09-26
-   :APPLIED_ON: 2026-09-26
-   :NOTES: "US-led standards with Vietnam-based costs".
-   :ARCHIVE_TIME: 2026-10-09 Fri 15:13
+   :CREATED: 2026-09-29
+   :NOTES: Swiss-founded 2008; 650+ staff, 80+ teams; Swiss client work in English. VERIFY(2026-09-29): careers on own subdomain (careers.axonactive.com), no named ATS vendor; but 650+ staff => HR exists. Open .Net/C#+ReactJS role.
+   :APPLIED_ON: 2026-09-30
+   :ARCHIVE_TIME: 2026-10-13 Tue 08:41
+   :ARCHIVE_FILE: ~/src/cv/jobs.org
+   :ARCHIVE_OLPATH: Archive
+   :ARCHIVE_CATEGORY: jobs
+   :ARCHIVE_TODO: APPLIED
+   :ARCHIVE_ITAGS: jobsearch
+   :END:
+
+** APPLIED Oivan — Web / Mobile / Cloud / Security :jobsearch:mid:english:
+   :PROPERTIES:
+   :URL: https://oivan.com/careers/
+   :LOCATION: Da Nang, Vietnam (+ HCMC / Finland)
+   :SIZE: mid
+   :ENGLISH: yes
+   :CONTACT:
+   :CREATED: 2026-09-29
+   :NOTES: Finland-based (151-300); Personio board lists Da Nang frontend/engineer roles. VERIFY(2026-09-29): ATS=Personio (personio.com). Live roles: Frontend (Angular) + Ruby on Rails — not Java/Spring; mid-size => HR present.
+   :APPLIED_ON: 2026-09-30
+   :ARCHIVE_TIME: 2026-10-13 Tue 08:41
+   :ARCHIVE_FILE: ~/src/cv/jobs.org
+   :ARCHIVE_OLPATH: Archive
+   :ARCHIVE_CATEGORY: jobs
+   :ARCHIVE_TODO: APPLIED
+   :ARCHIVE_ITAGS: jobsearch
+   :END:
+
+** APPLIED NashTech — Software Engineering Services :jobsearch:large:english:
+   :PROPERTIES:
+   :URL: https://careers.nashtechglobal.com/
+   :LOCATION: Da Nang, Vietnam (+ Hanoi / HCMC)
+   :SIZE: large
+   :ENGLISH: yes
+   :CONTACT:
+   :CREATED: 2026-09-29
+   :NOTES: Large UK/Nash Squared group; recurring Senior Software Engineer Java/.Net/Python roles in Da Nang. VERIFY(2026-09-29): own portal careers.nashtechglobal.com; LinkedIn posts name a TA person ("Diem Ha") => HR-first, large (score ~1/8). Java roles exist.
+   :APPLIED_ON: 2026-09-30
+   :ARCHIVE_TIME: 2026-10-13 Tue 08:41
    :ARCHIVE_FILE: ~/src/cv/jobs.org
    :ARCHIVE_OLPATH: Archive
    :ARCHIVE_CATEGORY: jobs
@@ -769,83 +403,620 @@ CLOSED: [2026-09-30 Wed 20:14]
    :CREATED: 2026-09-29
    :NOTES: 30+ yrs software testing/QA focus; mostly QA roles, some bridge-engineer posts. VERIFY(2026-09-29): own site + VietnamWorks/careerviet listings; QA-heavy, few dev roles. Weak fit for this Java/React profile.
    :APPLIED_ON: 2026-09-30
-   :ARCHIVE_TIME: 2026-10-09 Fri 15:13
+   :ARCHIVE_TIME: 2026-10-13 Tue 08:41
    :ARCHIVE_FILE: ~/src/cv/jobs.org
-   :ARCHIVE_OLPATH: Pipeline
+   :ARCHIVE_OLPATH: Archive
    :ARCHIVE_CATEGORY: jobs
    :ARCHIVE_TODO: APPLIED
    :ARCHIVE_ITAGS: jobsearch
    :END:
 
-** APPLIED NashTech — Software Engineering Services :jobsearch:large:english:
+** APPLIED Enlab Software — Offshore software development :jobsearch:mid:english:
    :PROPERTIES:
-   :URL: https://careers.nashtechglobal.com/
-   :LOCATION: Da Nang, Vietnam (+ Hanoi / HCMC)
-   :SIZE: large
-   :ENGLISH: yes
-   :CONTACT:
-   :CREATED: 2026-09-29
-   :NOTES: Large UK/Nash Squared group; recurring Senior Software Engineer Java/.Net/Python roles in Da Nang. VERIFY(2026-09-29): own portal careers.nashtechglobal.com; LinkedIn posts name a TA person ("Diem Ha") => HR-first, large (score ~1/8). Java roles exist.
-   :APPLIED_ON: 2026-09-30
-   :ARCHIVE_TIME: 2026-10-09 Fri 15:13
-   :ARCHIVE_FILE: ~/src/cv/jobs.org
-   :ARCHIVE_OLPATH: Pipeline
-   :ARCHIVE_CATEGORY: jobs
-   :ARCHIVE_TODO: APPLIED
-   :ARCHIVE_ITAGS: jobsearch
-   :END:
-
-** APPLIED Oivan — Web / Mobile / Cloud / Security :jobsearch:mid:english:
-   :PROPERTIES:
-   :URL: https://oivan.com/careers/
-   :LOCATION: Da Nang, Vietnam (+ HCMC / Finland)
+   :URL: https://enlabsoftware.com/careers
+   :LOCATION: Da Nang, Vietnam
    :SIZE: mid
    :ENGLISH: yes
    :CONTACT:
-   :CREATED: 2026-09-29
-   :NOTES: Finland-based (151-300); Personio board lists Da Nang frontend/engineer roles. VERIFY(2026-09-29): ATS=Personio (personio.com). Live roles: Frontend (Angular) + Ruby on Rails — not Java/Spring; mid-size => HR present.
-   :APPLIED_ON: 2026-09-30
-   :ARCHIVE_TIME: 2026-10-09 Fri 15:13
+   :CREATED: 2026-09-26
+   :APPLIED_ON: 2026-09-26
+   :NOTES: "US-led standards with Vietnam-based costs".
+   :ARCHIVE_TIME: 2026-10-13 Tue 08:41
    :ARCHIVE_FILE: ~/src/cv/jobs.org
-   :ARCHIVE_OLPATH: Pipeline
+   :ARCHIVE_OLPATH: Archive
    :ARCHIVE_CATEGORY: jobs
    :ARCHIVE_TODO: APPLIED
    :ARCHIVE_ITAGS: jobsearch
    :END:
 
-** APPLIED Axon Active — Dedicated Teams / Agile   :jobsearch:mid:english:
+** APPLIED Xenia Tech — Full-Stack / React Native / QA :jobsearch:small:english:
    :PROPERTIES:
-   :URL: https://www.careers.axonactive.com/
-   :LOCATION: Da Nang, Vietnam (+ HCMC / Can Tho / Switzerland)
-   :SIZE: mid
-   :ENGLISH: yes
-   :CONTACT:
-   :CREATED: 2026-09-29
-   :NOTES: Swiss-founded 2008; 650+ staff, 80+ teams; Swiss client work in English. VERIFY(2026-09-29): careers on own subdomain (careers.axonactive.com), no named ATS vendor; but 650+ staff => HR exists. Open .Net/C#+ReactJS role.
-   :APPLIED_ON: 2026-09-30
-   :ARCHIVE_TIME: 2026-10-09 Fri 15:13
-   :ARCHIVE_FILE: ~/src/cv/jobs.org
-   :ARCHIVE_OLPATH: Pipeline
-   :ARCHIVE_CATEGORY: jobs
-   :ARCHIVE_TODO: APPLIED
-   :ARCHIVE_ITAGS: jobsearch
-   :END:
-
-** APPLIED Vinova — Java / Mobile / Full-Stack   :jobsearch:small:english:
-   :PROPERTIES:
-   :URL: https://vinova.sg/jobs/
-   :LOCATION: Da Nang, Vietnam (+ HCMC / Hanoi)
+   :URL: https://xeniatech.vn/en/jobs
+   :LOCATION: Da Nang, Vietnam (+ HCMC / London)
    :SIZE: small
    :ENGLISH: yes
    :CONTACT:
-   :CREATED: 2026-09-29
-   :NOTES: "VIbrant inNOVAtors"; recurring Java Software Engineer and Senior Java roles in Da Nang. VERIFY(2026-09-29): ATS=hrpartner.io + vinova.careers-page.com; HR present (posted Employer Branding & Engagement Specialist). Java-stack fit but gated.
-   :APPLIED_ON: 2026-09-30
-   :ARCHIVE_TIME: 2026-10-09 Fri 15:13
+   :CREATED: 2026-09-26
+   :APPLIED_ON: 2026-09-26
+   :NOTES: Founded 2017 by a UK entrepreneur; international clients.
+   :ARCHIVE_TIME: 2026-10-13 Tue 08:41
+   :ARCHIVE_FILE: ~/src/cv/jobs.org
+   :ARCHIVE_OLPATH: Archive
+   :ARCHIVE_CATEGORY: jobs
+   :ARCHIVE_TODO: APPLIED
+   :ARCHIVE_ITAGS: jobsearch
+   :END:
+
+** APPLIED Tekmium — Web / Mobile / AI / Cloud   :jobsearch:small:english:
+   :PROPERTIES:
+   :URL: https://tekmium.com/en/careers
+   :LOCATION: Da Nang, Vietnam (on-site / hybrid / remote)
+   :SIZE: small
+   :ENGLISH: yes
+   :CONTACT:
+   :CREATED: 2026-09-26
+   :APPLIED_ON: 2026-09-26
+   :NOTES: Nimble studio, English site.
+   :ARCHIVE_TIME: 2026-10-13 Tue 08:41
+   :ARCHIVE_FILE: ~/src/cv/jobs.org
+   :ARCHIVE_OLPATH: Archive
+   :ARCHIVE_CATEGORY: jobs
+   :ARCHIVE_TODO: APPLIED
+   :ARCHIVE_ITAGS: jobsearch
+   :END:
+
+** APPLIED Innovaly Services — Full-Stack / Backend / Tech Lead :jobsearch:small:english:
+   :PROPERTIES:
+   :URL: https://innovaly.services/careers
+   :LOCATION: Da Nang, Vietnam (hybrid + remote)
+   :SIZE: small
+   :ENGLISH: yes
+   :CONTACT:
+   :CREATED: 2026-09-26
+   :APPLIED_ON: 2026-09-26
+   :NOTES: US startup; up to $1,800/mo for senior backend/full-stack.
+   :ARCHIVE_TIME: 2026-10-13 Tue 08:41
+   :ARCHIVE_FILE: ~/src/cv/jobs.org
+   :ARCHIVE_OLPATH: Archive
+   :ARCHIVE_CATEGORY: jobs
+   :ARCHIVE_TODO: APPLIED
+   :ARCHIVE_ITAGS: jobsearch
+   :END:
+
+** APPLIED KAMORA — Golang / Flutter / Frontend  :jobsearch:small:english:
+   :PROPERTIES:
+   :URL: https://kamora.vn/careers
+   :LOCATION: Da Nang, Vietnam (Ngũ Hành Sơn)
+   :SIZE: small
+   :ENGLISH: yes
+   :CONTACT:
+   :CREATED: 2026-09-26
+   :APPLIED_ON: 2026-09-26
+   :NOTES: 100% product studio since 2019, serving European & US markets.
+   :ARCHIVE_TIME: 2026-10-13 Tue 08:41
+   :ARCHIVE_FILE: ~/src/cv/jobs.org
+   :ARCHIVE_OLPATH: Archive
+   :ARCHIVE_CATEGORY: jobs
+   :ARCHIVE_TODO: APPLIED
+   :ARCHIVE_ITAGS: jobsearch
+   :END:
+
+** LEAD Enclave — Offshore Development Center      :jobsearch:mid:english:
+   :PROPERTIES:
+   :URL: https://enclave.vn/careers
+   :LOCATION: Da Nang (also Hue)
+   :SIZE: mid
+   :ENGLISH: yes
+   :CONTACT:
+   :CREATED: 2026-09-26
+   :NOTES: ~250 engineers; explicitly collaborates in English. No jobs matching profile
+   :ARCHIVE_TIME: 2026-10-13 Tue 08:41
+   :ARCHIVE_FILE: ~/src/cv/jobs.org
+   :ARCHIVE_OLPATH: Archive
+   :ARCHIVE_CATEGORY: jobs
+   :ARCHIVE_TODO: LEAD
+   :ARCHIVE_ITAGS: jobsearch
+   :END:
+
+** LEAD KSC Trading — Senior Backend Engineer (Java) :jobsearch:small:english:global:
+   :PROPERTIES:
+   :URL: https://news.ycombinator.com/item?id=46108941
+   :LOCATION: Remote (worldwide) — needs ~4h overlap with US East
+   :NATION: unknown
+   :SIZE: small
+   :ENGLISH: yes
+   :CONTACT: hiring@ksctrading.com
+   :CREATED: 2026-10-02
+   :INTERVIEW: No public reports (boutique prop firm; hires via the founder's direct email). INFERRED: intro call with founder -> live coding / short take-home -> 1-2 deeper technical rounds with the team. Tiny team (2->6), so likely compressed and fast.
+   :NOTES: Prop algorithmic trading (sports & prediction markets), founded 2020; team of 2 growing to ~6. Stack: Java, Google Cloud, Postgres. $200k–$250k total comp. Ad gives a direct email and names no ATS => strong no-HR signal (strategy rubric ~7/8). HN Oct 2026.
+   :ARCHIVE_TIME: 2026-10-13 Tue 08:42
    :ARCHIVE_FILE: ~/src/cv/jobs.org
    :ARCHIVE_OLPATH: Pipeline
    :ARCHIVE_CATEGORY: jobs
-   :ARCHIVE_TODO: APPLIED
+   :ARCHIVE_TODO: LEAD
+   :ARCHIVE_ITAGS: jobsearch
+   :END:
+
+** LEAD Seeq — Backend + Full-Stack (JVM/React) :jobsearch:mid:english:global:
+   :PROPERTIES:
+   :URL: https://apply.workable.com/seeq/
+   :LOCATION: Remote (worldwide; some PST overlap) — pay adjusted by country
+   :NATION: United States
+   :SIZE: mid
+   :ENGLISH: yes
+   :CONTACT:
+   :CREATED: 2026-10-02
+   :INTERVIEW: Glassdoor (~13 reports): ~2-week process; recruiter screen -> hiring-manager call -> technical exercise (take-home or live coding) -> team panel. Difficulty 3.4/5; only ~23% report a positive experience. Exact rounds vary by role.
+   :NOTES: Industrial-process data analytics. Core JVM + Postgres; React front-end. $170k–$205k + bonus + equity (US base; "local adjustments for other countries" => genuinely open to non-US). Roles: Principal Backend (JVM, Postgres) j/CD7BA6EE7B; Senior Full-Stack (React, JVM) j/763AE68666; Staff DevEx (Java/Gradle) j/A966C8897D; Principal AI (Python). ATS=Workable. HN Oct 2026. CONTACT SOURCE: contact page lists an "Employment Inquiries" address but the fetch tool masks it (unreadable) — https://www.seeq.com/contact/
+   :ARCHIVE_TIME: 2026-10-13 Tue 08:42
+   :ARCHIVE_FILE: ~/src/cv/jobs.org
+   :ARCHIVE_OLPATH: Pipeline
+   :ARCHIVE_CATEGORY: jobs
+   :ARCHIVE_TODO: LEAD
+   :ARCHIVE_ITAGS: jobsearch
+   :END:
+
+** REJECTED Canonical — Software Engineer (Ubuntu / open source) :jobsearch:large:english:global:
+CLOSED: [2026-10-13 Tue 08:59]
+   :PROPERTIES:
+   :URL: https://canonical.com/careers
+   :LOCATION: Remote-first — worldwide
+   :NATION: United Kingdom
+   :SIZE: large
+   :ENGLISH: yes
+   :CONTACT:
+   :CREATED: 2026-10-02
+   :INTERVIEW: Documented (canonical.com/careers/hiring-process), ~3 months: application Qs -> written interview (essay, graded by 2 domain experts, anonymised) -> psychometric GIA (5-part, 30-45 min) -> role-specific technical assessment -> 3 early-stage technical interviews -> talent interview (10-min personality profile + comp) -> late-stage interviews (manager, Hiring Lead; CEO for leadership) -> offer. Own words only, no AI aids.
+   :NOTES: Ubuntu / OpenStack publisher. Remote-first, hires across the globe. Reported remote bands modest (~$48k–$70k) but real FTE + benefits and one of the few truly worldwide openings. Large co => HR. Their application page had a bug so did not submit application lol
+   :ARCHIVE_TIME: 2026-10-13 Tue 08:59
+   :ARCHIVE_FILE: ~/src/cv/jobs.org
+   :ARCHIVE_OLPATH: Pipeline
+   :ARCHIVE_CATEGORY: jobs
+   :ARCHIVE_TODO: REJECTED
+   :ARCHIVE_ITAGS: jobsearch
+   :END:
+
+   - CLOSING NOTE [2026-10-13 Tue 08:59] \\
+     page had a bug lol
+
+** LEAD Arc.dev — Vetted Remote Developer Network :jobsearch:mid:english:global:
+   :PROPERTIES:
+   :URL: https://arc.dev/
+   :LOCATION: Remote — worldwide
+   :NATION: United States
+   :SIZE: mid
+   :ENGLISH: yes
+   :CONTACT:
+   :CREATED: 2026-10-02
+   :INTERVIEW: Platform vetting, then client rounds. Funnel: profile screening (~55% pass) -> communication assessment (~14%) -> 1h technical interview / pair-programming (~2% pass) -> final review. Passing = "vetted"; a hiring company then runs its own interviews.
+   :NOTES: Vetted marketplace for freelance + full-time remote dev roles. Global-open, well above VN market. Channel-6 contract lane.
+   :ARCHIVE_TIME: 2026-10-13 Tue 08:59
+   :ARCHIVE_FILE: ~/src/cv/jobs.org
+   :ARCHIVE_OLPATH: Pipeline
+   :ARCHIVE_CATEGORY: jobs
+   :ARCHIVE_TODO: LEAD
+   :ARCHIVE_ITAGS: jobsearch
+   :END:
+
+** LEAD FusionAuth — Principal / Senior Java Engineer :jobsearch:mid:english:
+   :PROPERTIES:
+   :URL: https://fusionauth.io/careers/
+   :LOCATION: Remote (US) — Europe limited to account-exec
+   :NATION: United States
+   :SIZE: mid
+   :ENGLISH: yes
+   :CONTACT:
+   :CREATED: 2026-10-02
+   :INTERVIEW: SE loop documented (GitHub: FusionAuth/se-code-challenge): 7-day take-home code challenge -> 1h technical interview split into code walkthrough + product demo + prospect architecture review, then Q&A. INFERRED for eng roles: People/recruiter screen -> take-home coding challenge -> 1-2 technical rounds (design/code review) -> team fit.
+   :NOTES: Auth/authz product built on modern Java, Postgres, Docker, K8s, OAuth/SAML/OIDC. Principal SWE $225k–$270k. Direct stack hit but engineering is US-gated => likely closed to a VN resident. HN Oct 2026.
+   :ARCHIVE_TIME: 2026-10-13 Tue 09:00
+   :ARCHIVE_FILE: ~/src/cv/jobs.org
+   :ARCHIVE_OLPATH: Pipeline
+   :ARCHIVE_CATEGORY: jobs
+   :ARCHIVE_TODO: LEAD
+   :ARCHIVE_ITAGS: jobsearch
+   :END:
+
+** LEAD Tivly — Principal Software Engineer (Java) :jobsearch:mid:english:
+   :PROPERTIES:
+   :URL: https://tivly.com/careers
+   :LOCATION: Remote (US only — named states)
+   :NATION: United States
+   :SIZE: mid
+   :ENGLISH: yes
+   :CONTACT: amber.sharp@tivly.com
+   :CREATED: 2026-10-02
+   :INTERVIEW: Sparse public data (Glassdoor 5-6 reports; Indeed Q&A). INFERRED: recruiter screen -> hiring-manager interview -> technical/architecture round -> team or leadership interview. Note: role reports directly to the hands-on CTO, so a founder-style technical pass is likely.
+   :NOTES: SMB insurance marketplace. Java 17+, Spring Boot, microservices, AWS, Kafka, Postgres. $170k–$190k + bonus. Direct stack match, but restricted to ~11 US states (AL/FL/GA/MI/MS/MO/NC/OK/TN/TX/VA) => closed to VN resident. HN Oct 2026. CONTACT SOURCE: amber.sharp@tivly.com (named; lead buy/sell desk, NOT a hiring inbox) — https://tivly.com/contact-us ; the same page also lists an "Employment Inquiries" address that the fetch tool masks.
+   :ARCHIVE_TIME: 2026-10-13 Tue 09:00
+   :ARCHIVE_FILE: ~/src/cv/jobs.org
+   :ARCHIVE_OLPATH: Pipeline
+   :ARCHIVE_CATEGORY: jobs
+   :ARCHIVE_TODO: LEAD
+   :ARCHIVE_ITAGS: jobsearch
+   :END:
+
+** LEAD Vistulo — Senior Java / React / Calypso (B2B contract) :jobsearch:small:english:
+   :PROPERTIES:
+   :URL: https://ats.vistulo.com/
+   :LOCATION: Remote (Poland or Romania residents only)
+   :NATION: Poland
+   :SIZE: small
+   :ENGLISH: yes
+   :CONTACT: contact@vistulo.com
+   :CREATED: 2026-10-02
+   :INTERVIEW: Documented on role pages: submit CV -> written questions + short programming exercise (self-paced) -> three-stage process: written screen -> technical screen interview -> three technical interviews with future team members. Led by the client's tech lead (no HR). BA track: CV -> written Qs -> experience interview + panel.
+   :NOTES: Front-office trading systems for a top North American bank; B2B contract. Senior Java trading eng 270–300 PLN/hr (~$68–76/hr); Java backend 220–240 PLN/hr; React frontend 220–250 PLN/hr. Client tech-lead interviews => no HR by construction (strategy channel 6), but geo-gated to PL/RO. HN Oct 2026.
+   :ARCHIVE_TIME: 2026-10-13 Tue 09:00
+   :ARCHIVE_FILE: ~/src/cv/jobs.org
+   :ARCHIVE_OLPATH: Pipeline
+   :ARCHIVE_CATEGORY: jobs
+   :ARCHIVE_TODO: LEAD
+   :ARCHIVE_ITAGS: jobsearch
+   :END:
+
+** LEAD Avision GmbH — Full-Stack Java + Angular/React :jobsearch:small:english:
+   :PROPERTIES:
+   :URL: https://news.ycombinator.com/item?id=46108941
+   :LOCATION: Remote (Germany only) — German B2 required
+   :NATION: Germany
+   :SIZE: small
+   :ENGLISH: yes
+   :CONTACT:
+   :CREATED: 2026-10-02
+   :INTERVIEW: Little public detail (kununu lists 12 interview reports). INFERRED for a German SMB: application -> recruiter/phone screen -> technical interview (+ possibly a short coding task) -> team interview. German B2 is assessed along the way.
+   :NOTES: Modernizing legacy business software. Java, Spring Boot, Angular/React, Kafka, Postgres, Docker, K8s, GitLab CI, Gradle/Maven. Fully remote within Germany; 32 vacation days. Geo + German-language gate => closed to VN resident. HN Oct 2026.
+   :ARCHIVE_TIME: 2026-10-13 Tue 09:00
+   :ARCHIVE_FILE: ~/src/cv/jobs.org
+   :ARCHIVE_OLPATH: Pipeline
+   :ARCHIVE_CATEGORY: jobs
+   :ARCHIVE_TODO: LEAD
+   :ARCHIVE_ITAGS: jobsearch
+   :END:
+
+** IGNORED Sonar (SonarSource) — Software Engineer (Java / Platform) :jobsearch:large:english:global:
+CLOSED: [2026-10-13 Tue 09:05]
+   :PROPERTIES:
+   :URL: https://www.sonarsource.com/company/careers/
+   :LOCATION: Remote / hybrid across 12 offices (Geneva HQ, Switzerland)
+   :NATION: Switzerland
+   :SIZE: large
+   :ENGLISH: yes
+   :CONTACT:
+   :CREATED: 2026-10-11
+   :INTERVIEW: No public eng-loop detail gathered. INFERRED: recruiter screen -> hiring-manager call -> technical interview (Java / code quality) -> team fit. 800+ staff => HR present.
+   :NOTES: SonarQube / SonarCloud code-quality & security platform; 7M+ devs. Java/Kotlin core. 100+ openings, 12 offices. Non-US HQ (Switzerland) => less US-revenue exposure; direct stack hit (the Android app is pure Java). Rubric: large co, ATS-gated (~2/8).
+   :ARCHIVE_TIME: 2026-10-13 Tue 09:05
+   :ARCHIVE_FILE: ~/src/cv/jobs.org
+   :ARCHIVE_OLPATH: Pipeline
+   :ARCHIVE_CATEGORY: jobs
+   :ARCHIVE_TODO: IGNORED
+   :ARCHIVE_ITAGS: jobsearch
+   :END:
+
+   - CLOSING NOTE [2026-10-13 Tue 09:05] \\
+     problem verifying my request when i click submit
+
+** LEAD Elastic — Backend / Distributed Systems Engineer :jobsearch:large:english:global:
+   :PROPERTIES:
+   :URL: https://www.elastic.co/careers
+   :LOCATION: Remote — "distributed by design" (Amsterdam HQ, Netherlands)
+   :NATION: Netherlands
+   :SIZE: large
+   :ENGLISH: yes
+   :CONTACT:
+   :CREATED: 2026-10-11
+   :INTERVIEW: Documented as long/async-friendly: recruiter screen -> technical screen -> multiple loops (coding + systems design). Distributed-interview norms.
+   :NOTES: Elasticsearch / Kibana / Logstash; Java (Lucene). One of the original remote-first companies. Non-US HQ (NL). Large => HR, but async culture is real. Confirm timezone overlap for non-EU.
+   :ARCHIVE_TIME: 2026-10-13 Tue 09:06
+   :ARCHIVE_FILE: ~/src/cv/jobs.org
+   :ARCHIVE_OLPATH: Pipeline
+   :ARCHIVE_CATEGORY: jobs
+   :ARCHIVE_TODO: LEAD
+   :ARCHIVE_ITAGS: jobsearch
+   :END:
+
+** LEAD Camunda — Java / Platform Engineer         :jobsearch:mid:english:
+   :PROPERTIES:
+   :URL: https://camunda.com/careers/
+   :LOCATION: Remote across Europe (Berlin HQ, Germany)
+   :NATION: Germany
+   :SIZE: mid
+   :ENGLISH: yes
+   :CONTACT:
+   :CREATED: 2026-10-11
+   :INTERVIEW: No public eng-loop detail gathered. INFERRED for a German distributed co: recruiter screen -> technical interview (Java/Spring) -> team/fit. Written-first culture.
+   :NOTES: Process orchestration / BPMN; Zeebe engine is Java/Spring. Fully distributed across Europe, documented async/written norms. EU-HQ => native EU exposure. Verify CET overlap requirement.
+   :ARCHIVE_TIME: 2026-10-13 Tue 09:10
+   :ARCHIVE_FILE: ~/src/cv/jobs.org
+   :ARCHIVE_OLPATH: Pipeline
+   :ARCHIVE_CATEGORY: jobs
+   :ARCHIVE_TODO: LEAD
+   :ARCHIVE_ITAGS: jobsearch
+   :END:
+
+** LEAD AUTO1 Group — Senior Java Engineer (Remote) :jobsearch:large:english:
+   :PROPERTIES:
+   :URL: https://www.auto1-group.com/careers/
+   :LOCATION: Remote (Germany HQ Berlin, with Poland tech hubs)
+   :NATION: Germany
+   :SIZE: large
+   :ENGLISH: yes
+   :CONTACT: info@auto1-group.com
+   :CREATED: 2026-10-11
+   :INTERVIEW: No public loop detail. INFERRED: recruiter screen -> technical interview -> team. Large co => ATS.
+   :NOTES: Europe's leading digital used-car platform. Java/Spring Boot backend. Explicit live "Senior Java Engineer — Remote (f/m/x)" postings. ATS=SmartRecruiters. Non-US HQ but large/HR-gated. CONTACT SOURCE: info@auto1-group.com (general company inbox, NOT hiring) — https://www.auto1-group.com/imprint/
+   :ARCHIVE_TIME: 2026-10-13 Tue 09:12
+   :ARCHIVE_FILE: ~/src/cv/jobs.org
+   :ARCHIVE_OLPATH: Pipeline
+   :ARCHIVE_CATEGORY: jobs
+   :ARCHIVE_TODO: LEAD
+   :ARCHIVE_ITAGS: jobsearch
+   :END:
+
+** LEAD commercetools — Backend Engineer (Java)    :jobsearch:mid:english:
+   :PROPERTIES:
+   :URL: https://commercetools.com/careers
+   :LOCATION: Remote-friendly EMEA (Munich HQ, Germany)
+   :NATION: Germany
+   :SIZE: mid
+   :ENGLISH: yes
+   :CONTACT:
+   :CREATED: 2026-10-11
+   :INTERVIEW: No public loop detail. INFERRED: screen -> technical -> team.
+   :NOTES: MACH-architecture commerce APIs. Java, AWS. Non-US HQ (DE). Mid-large => HR present.
+   :ARCHIVE_TIME: 2026-10-13 Tue 09:13
+   :ARCHIVE_FILE: ~/src/cv/jobs.org
+   :ARCHIVE_OLPATH: Pipeline
+   :ARCHIVE_CATEGORY: jobs
+   :ARCHIVE_TODO: LEAD
+   :ARCHIVE_ITAGS: jobsearch
+   :END:
+
+** LEAD Personio — Backend Engineer (Java / Kotlin) :jobsearch:large:english:
+   :PROPERTIES:
+   :URL: https://www.personio.com/careers/
+   :LOCATION: Remote across EMEA (Munich HQ, Germany)
+   :NATION: Germany
+   :SIZE: large
+   :ENGLISH: yes
+   :CONTACT:
+   :CREATED: 2026-10-11
+   :INTERVIEW: No public loop detail. INFERRED: recruiter screen -> technical -> team. ATS=Personio (own product).
+   :NOTES: HR SaaS. Java/Kotlin. Non-US HQ (DE). Large => HR-gated.
+   :ARCHIVE_TIME: 2026-10-13 Tue 09:14
+   :ARCHIVE_FILE: ~/src/cv/jobs.org
+   :ARCHIVE_OLPATH: Pipeline
+   :ARCHIVE_CATEGORY: jobs
+   :ARCHIVE_TODO: LEAD
+   :ARCHIVE_ITAGS: jobsearch
+   :END:
+
+** LEAD Rows — Backend Engineer (Java / Kotlin)  :jobsearch:small:english:
+   :PROPERTIES:
+   :URL: https://rows.com/careers
+   :LOCATION: Remote (Porto HQ, Portugal)
+   :NATION: Portugal
+   :SIZE: small
+   :ENGLISH: yes
+   :CONTACT:
+   :CREATED: 2026-10-11
+   :INTERVIEW: No public loop detail. INFERRED: screen -> technical -> team.
+   :NOTES: Spreadsheet/database hybrid product. Java/Kotlin. Small, remote, non-US (PT).
+   :ARCHIVE_TIME: 2026-10-13 Tue 09:19
+   :ARCHIVE_FILE: ~/src/cv/jobs.org
+   :ARCHIVE_OLPATH: Pipeline
+   :ARCHIVE_CATEGORY: jobs
+   :ARCHIVE_TODO: LEAD
+   :ARCHIVE_ITAGS: jobsearch
+   :END:
+
+** LEAD Venly — Java Engineer (Web3 infra)       :jobsearch:small:english:
+   :PROPERTIES:
+   :URL: https://www.venly.io/careers
+   :LOCATION: Remote (Antwerp HQ, Belgium)
+   :NATION: Belgium
+   :SIZE: small
+   :ENGLISH: yes
+   :CONTACT:
+   :CREATED: 2026-10-11
+   :INTERVIEW: No public loop detail. INFERRED: screen -> technical -> team.
+   :NOTES: Blockchain wallet / API infrastructure. Java (+ C#). Small, remote, non-US (BE).
+   :ARCHIVE_TIME: 2026-10-13 Tue 09:19
+   :ARCHIVE_FILE: ~/src/cv/jobs.org
+   :ARCHIVE_OLPATH: Pipeline
+   :ARCHIVE_CATEGORY: jobs
+   :ARCHIVE_TODO: LEAD
+   :ARCHIVE_ITAGS: jobsearch
+   :END:
+
+** LEAD n8n — Software Engineer                    :jobsearch:mid:english:
+   :PROPERTIES:
+   :URL: https://n8n.io/careers/
+   :LOCATION: Remote across Europe (Berlin HQ, Germany)
+   :NATION: Germany
+   :SIZE: mid
+   :ENGLISH: yes
+   :CONTACT:
+   :CREATED: 2026-10-11
+   :INTERVIEW: No public loop detail. INFERRED: screen -> technical -> team. Low-ego, high-velocity culture.
+   :NOTES: OSS workflow automation / AI orchestration. Node/TS (NOT Java) — adjacent only. Non-US HQ (DE). Explicit low-ego, community-first culture; $1bn ARR with <500 people.
+   :ARCHIVE_TIME: 2026-10-13 Tue 09:27
+   :ARCHIVE_FILE: ~/src/cv/jobs.org
+   :ARCHIVE_OLPATH: Pipeline
+   :ARCHIVE_CATEGORY: jobs
+   :ARCHIVE_TODO: LEAD
+   :ARCHIVE_ITAGS: jobsearch
+   :END:
+
+** LEAD Storyblok — Software Engineer              :jobsearch:mid:english:
+   :PROPERTIES:
+   :URL: https://www.storyblok.com/jobs
+   :LOCATION: Fully remote across Europe (Linz HQ, Austria)
+   :NATION: Austria
+   :SIZE: mid
+   :ENGLISH: yes
+   :CONTACT: legal@storyblok.com
+   :CREATED: 2026-10-11
+   :INTERVIEW: No public loop detail. INFERRED: screen -> technical -> team.
+   :NOTES: Headless CMS. Node/TS (NOT Java). Fully remote, non-US HQ (AT). CONTACT SOURCE: legal@storyblok.com (legal / media-owner contact, NOT hiring) — https://www.storyblok.com/legal/legal-notice
+   :ARCHIVE_TIME: 2026-10-13 Tue 09:29
+   :ARCHIVE_FILE: ~/src/cv/jobs.org
+   :ARCHIVE_OLPATH: Pipeline
+   :ARCHIVE_CATEGORY: jobs
+   :ARCHIVE_TODO: LEAD
+   :ARCHIVE_ITAGS: jobsearch
+   :END:
+
+** LEAD Prezi — Software Engineer (Java / Scala)   :jobsearch:mid:english:
+   :PROPERTIES:
+   :URL: https://prezi.com/jobs/
+   :LOCATION: Remote / distributed (Budapest HQ, Hungary)
+   :NATION: Hungary
+   :SIZE: mid
+   :ENGLISH: yes
+   :CONTACT: privacy@prezi.com
+   :CREATED: 2026-10-11
+   :INTERVIEW: No public loop detail. INFERRED: screen -> technical -> team.
+   :NOTES: Presentation SaaS. Java/Scala. Distributed, non-US HQ (HU). CONTACT SOURCE: privacy@prezi.com (privacy / data-subject contact, NOT hiring) — https://prezi.com/contact/
+   :ARCHIVE_TIME: 2026-10-13 Tue 09:29
+   :ARCHIVE_FILE: ~/src/cv/jobs.org
+   :ARCHIVE_OLPATH: Pipeline
+   :ARCHIVE_CATEGORY: jobs
+   :ARCHIVE_TODO: LEAD
+   :ARCHIVE_ITAGS: jobsearch
+   :END:
+
+** LEAD Toggl — Backend Engineer          :jobsearch:small:english:global:
+   :PROPERTIES:
+   :URL: https://toggl.com/jobs
+   :LOCATION: Fully remote since 2014 (Tallinn HQ, Estonia)
+   :NATION: Estonia
+   :SIZE: small
+   :ENGLISH: yes
+   :CONTACT:
+   :CREATED: 2026-10-11
+   :INTERVIEW: No formal loop documented publicly. INFERRED: async take-home + interviews. Culture = RAFT (Results and Accountability First).
+   :NOTES: Time-tracking / capacity planning tools. Go/Ruby/JS (NOT Java) — adjacent. Fully remote since 2014, colleagues worldwide, twice-yearly covered meetups. Small, high-trust => low-HR signal.
+   :ARCHIVE_TIME: 2026-10-13 Tue 09:30
+   :ARCHIVE_FILE: ~/src/cv/jobs.org
+   :ARCHIVE_OLPATH: Pipeline
+   :ARCHIVE_CATEGORY: jobs
+   :ARCHIVE_TODO: LEAD
+   :ARCHIVE_ITAGS: jobsearch
+   :END:
+
+** LEAD Doist — Engineer (Backend / Product) :jobsearch:small:english:global:
+   :PROPERTIES:
+   :URL: https://doist.com/careers
+   :LOCATION: Work from anywhere — "no location restrictions" (fully distributed)
+   :NATION: none (fully distributed)
+   :SIZE: small
+   :ENGLISH: yes
+   :CONTACT:
+   :CREATED: 2026-10-11
+   :INTERVIEW: Documented: application + form questions -> interview(s) over Google Meet (salary range shared early) -> task assignment -> reference/background check -> offer. Onboarding incl. an in-person co-working week with a mentor.
+   :NOTES: Todoist / Twist. Explicit: "Todoisters can work from anywhere in the world. We never place restrictions on locations." Formula-based geo-adjusted comp; 8 weeks PTO. Python/Go/React (NOT Java) — lateral. Strongest "no asterisks" remote policy in this set.
+   :ARCHIVE_TIME: 2026-10-13 Tue 09:32
+   :ARCHIVE_FILE: ~/src/cv/jobs.org
+   :ARCHIVE_OLPATH: Pipeline
+   :ARCHIVE_CATEGORY: jobs
+   :ARCHIVE_TODO: LEAD
+   :ARCHIVE_ITAGS: jobsearch
+   :END:
+
+** LEAD Rakuten — Software Engineer (Java)       :jobsearch:large:english:
+   :PROPERTIES:
+   :URL: https://japan-job-en.rakuten.careers/
+   :LOCATION: Tokyo, Japan
+   :NATION: Japan
+   :SIZE: large
+   :ENGLISH: yes
+   :CONTACT:
+   :CREATED: 2026-10-11
+   :INTERVIEW: Large-co process. INFERRED: recruiter -> technical -> team.
+   :NOTES: Java-heavy. English job postings exist. Non-US HQ (JP) but large/HR-heavy.
+   :ARCHIVE_TIME: 2026-10-13 Tue 09:45
+   :ARCHIVE_FILE: ~/src/cv/jobs.org
+   :ARCHIVE_OLPATH: Pipeline
+   :ARCHIVE_CATEGORY: jobs
+   :ARCHIVE_TODO: LEAD
+   :ARCHIVE_ITAGS: jobsearch
+   :END:
+
+** LEAD Airwallex — Backend Engineer (Java)      :jobsearch:large:english:
+   :PROPERTIES:
+   :URL: https://careers.airwallex.com/
+   :LOCATION: Remote-friendly APAC (Melbourne HQ, Australia)
+   :NATION: Australia
+   :SIZE: large
+   :ENGLISH: yes
+   :CONTACT:
+   :CREATED: 2026-10-11
+   :INTERVIEW: No public loop detail. INFERRED: screen -> technical -> team. Large => ATS.
+   :NOTES: Fintech payments. Java. Non-US HQ (AU). Large => HR-gated.
+   :ARCHIVE_TIME: 2026-10-13 Tue 09:47
+   :ARCHIVE_FILE: ~/src/cv/jobs.org
+   :ARCHIVE_OLPATH: Pipeline
+   :ARCHIVE_CATEGORY: jobs
+   :ARCHIVE_TODO: LEAD
+   :ARCHIVE_ITAGS: jobsearch
+   :END:
+
+** LEAD Kitopi — Backend Engineer (Java)    :jobsearch:mid:english:global:
+   :PROPERTIES:
+   :URL: https://europeanremote.com/teams/kitopi
+   :LOCATION: Dubai, UAE (GCC)
+   :NATION: UAE
+   :SIZE: mid
+   :ENGLISH: yes
+   :CONTACT:
+   :CREATED: 2026-10-11
+   :INTERVIEW: No public loop detail. INFERRED: screen -> technical -> team.
+   :NOTES: Cloud-kitchen platform. Java, AWS. English working language. Non-US-aligned; GCC pays well and is short of senior JVM engineers.
+   :ARCHIVE_TIME: 2026-10-13 Tue 09:53
+   :ARCHIVE_FILE: ~/src/cv/jobs.org
+   :ARCHIVE_OLPATH: Pipeline
+   :ARCHIVE_CATEGORY: jobs
+   :ARCHIVE_TODO: LEAD
+   :ARCHIVE_ITAGS: jobsearch
+   :END:
+
+** LEAD Noon — Backend Engineer (Java)           :jobsearch:large:english:
+   :PROPERTIES:
+   :URL: https://www.noon.com/careers
+   :LOCATION: Dubai / Riyadh (GCC)
+   :NATION: UAE
+   :SIZE: large
+   :ENGLISH: yes
+   :CONTACT:
+   :CREATED: 2026-10-11
+   :INTERVIEW: No public loop detail. INFERRED: recruiter -> technical -> team. Large => ATS.
+   :NOTES: Amazon-competitor marketplace. Java. Non-US-aligned (GCC). Large => HR-gated.
+   :ARCHIVE_TIME: 2026-10-13 Tue 09:53
+   :ARCHIVE_FILE: ~/src/cv/jobs.org
+   :ARCHIVE_OLPATH: Pipeline
+   :ARCHIVE_CATEGORY: jobs
+   :ARCHIVE_TODO: LEAD
+   :ARCHIVE_ITAGS: jobsearch
+   :END:
+
+** LEAD Careem — Backend Engineer                :jobsearch:large:english:
+   :PROPERTIES:
+   :URL: https://www.careem.com/careers
+   :LOCATION: Dubai, UAE (GCC)
+   :NATION: UAE
+   :SIZE: large
+   :ENGLISH: yes
+   :CONTACT:
+   :CREATED: 2026-10-11
+   :INTERVIEW: No public loop detail. INFERRED: recruiter -> technical -> team. Large => ATS.
+   :NOTES: Super-app. Java. Engineering-led. Non-US-aligned (GCC). CAVEAT: Careem is Uber-owned (US parent) => partial US influence; downweight on the jurisdiction axis.
+   :ARCHIVE_TIME: 2026-10-13 Tue 09:53
+   :ARCHIVE_FILE: ~/src/cv/jobs.org
+   :ARCHIVE_OLPATH: Pipeline
+   :ARCHIVE_CATEGORY: jobs
+   :ARCHIVE_TODO: LEAD
    :ARCHIVE_ITAGS: jobsearch
    :END:
 
