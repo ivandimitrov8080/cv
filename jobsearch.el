@@ -265,5 +265,122 @@ You are immune to job market propaganda and know exactly how to find the perfect
   :context '("~/src/cv/jobs.org" "~/src/cv/cv.typ")
   :tools '("mcp-websearch" "mcp-fetch"))
 
+;;; Applying to leads (Playwright MCP)
+
+;; The `jobsearch-apply' preset turns the browser into the applicant: it fetches
+;; the next LEAD with the `cv_jobs_next_lead' tool, then drives a real browser
+;; through the Playwright MCP server to fill in, and submit, the application.
+;; The `playwright-mcp' binary comes from the project dev shell (see
+;; flake.nix), so Emacs has to inherit the dev-shell environment (e.g. be
+;; started from `~/src/cv' under direnv) for it to be on PATH.
+
+(defconst cv-jobs-playwright-server "playwright"
+  "Name of the Playwright MCP server used by `jobsearch-apply'.")
+
+(require 'mcp)
+(require 'gptel-integrations)
+
+;; Register the server with the MCP hub but do not start it here; the preset's
+;; :pre hook starts it on demand.
+(unless (assoc cv-jobs-playwright-server mcp-hub-servers)
+  (add-to-list 'mcp-hub-servers
+               (cons cv-jobs-playwright-server '(:command "playwright-mcp"))))
+
+(defvar cv-jobs--next-lead-marker nil
+  "Marker to the lead last returned by `cv_jobs_next_lead'.
+
+Lets `cv_jobs_mark_applied' find the entry to update without the agent
+having to pass a buffer position around.")
+
+(defconst cv-jobs-lead-properties '("URL" "LOCATION" "SIZE" "ENGLISH" "CONTACT")
+  "Entry properties reported for a lead by `cv_jobs_next_lead'.")
+
+(defun cv-jobs--describe-lead ()
+  "Return a description of the lead at point, for the LLM."
+  (concat
+   "Next lead in the pipeline:\n"
+   "Heading: " (org-get-heading t t t t) "\n"
+   (mapconcat (lambda (prop)
+                (format "%s: %s" prop (or (org-entry-get nil prop) "-")))
+              cv-jobs-lead-properties "\n")))
+
+(defun cv-jobs-next-lead ()
+  "Return the next LEAD in the pipeline and remember where it is.
+
+Leads are searched in file order under the \"Pipeline\" tree of
+`cv-jobs-file'; archived entries are ignored.  Returns an explanatory
+string instead when the pipeline has run dry.  Intended as a gptel tool
+for the `jobsearch-apply' preset."
+  (with-current-buffer (find-file-noselect cv-jobs-file)
+    (save-excursion
+      (save-restriction
+        (widen)
+        (goto-char (point-min))
+        (setq cv-jobs--next-lead-marker
+              (when (re-search-forward "^\\*+ +Pipeline\\b" nil t)
+                (org-back-to-heading t)
+                (catch 'found
+                  (org-map-entries
+                   (lambda ()
+                     (when (equal (org-get-todo-state) "LEAD")
+                       (throw 'found (point-marker))))
+                   "+TODO=\"LEAD\""
+                   'tree))))
+        (if cv-jobs--next-lead-marker
+            (save-excursion
+              (goto-char cv-jobs--next-lead-marker)
+              (org-back-to-heading t)
+              (cv-jobs--describe-lead))
+          "No LEAD entries left in the pipeline.")))))
+
+(defun cv-jobs-mark-applied ()
+  "Mark the lead from the last `cv-jobs-next-lead' call as APPLIED.
+
+Reuses `cv-jobs-apply', so the follow-up is scheduled and the
+:APPLIED_ON: property stamped exactly as for a manual application.
+Intended as a gptel tool to call once the browser has submitted the
+application."
+  (if (not (and cv-jobs--next-lead-marker
+                (marker-buffer cv-jobs--next-lead-marker)))
+      "No lead is selected; call cv_jobs_next_lead first."
+    (with-current-buffer (marker-buffer cv-jobs--next-lead-marker)
+      (save-excursion
+        (goto-char cv-jobs--next-lead-marker)
+        (org-back-to-heading t)
+        (let ((heading (org-get-heading t t t t)))
+          (cv-jobs-apply)
+          (setq cv-jobs--next-lead-marker nil)
+          (format "Marked %s as APPLIED and scheduled a follow-up." heading))))))
+
+(gptel-make-tool
+ :name "cv_jobs_next_lead"
+ :function #'cv-jobs-next-lead
+ :description "Return the next LEAD from the job-search pipeline in jobs.org, with its URL, location, size, English requirement and contact. Call this first to choose which company to apply to."
+ :args nil
+ :category "jobsearch")
+
+(gptel-make-tool
+ :name "cv_jobs_mark_applied"
+ :function #'cv-jobs-mark-applied
+ :description "Move the lead most recently returned by cv_jobs_next_lead from LEAD to APPLIED and schedule the follow-up. Call this once the application has been submitted."
+ :args nil
+ :category "jobsearch")
+
+(gptel-make-preset 'jobsearch-apply
+  :description "Apply to the next LEAD in the pipeline in a real browser."
+  :parents 'jobsearch
+  :pre (lambda ()
+         (gptel-mcp-connect (list cv-jobs-playwright-server) 'sync))
+  :system "You apply for software jobs on behalf of the user by driving a web
+browser. The CV (cv.typ) and the pipeline (jobs.org) are provided as context.
+First call the cv_jobs_next_lead tool to get the next lead and its URL, then use
+the Playwright browser tools to open that URL, read the posting, and fill in the
+application form. Treat the CV as the single source of truth: never invent or
+exaggerate experience, education or contact details. If the form asks for
+information the CV does not provide, stop and tell the user what is missing. Do
+not submit an application to the wrong role or company. Once the application is
+submitted, call cv_jobs_mark_applied. Reply in Org Mode, never Markdown."
+  :tools '("mcp-playwright" "cv_jobs_next_lead" "cv_jobs_mark_applied"))
+
 (provide 'jobsearch)
 ;;; jobsearch.el ends here

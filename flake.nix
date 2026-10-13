@@ -73,6 +73,7 @@
                 packages = with pkgs; [
                   typst
                   pdfminer
+                  playwright-mcp
                 ];
               }
             ];
