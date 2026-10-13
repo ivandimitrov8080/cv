@@ -126,6 +126,162 @@
    :APPLIED_ON: 2026-10-13
    :END:
 
+** LEAD Reef Technologies — Senior Python Backend Engineer (B2B) :small:english:
+   :PROPERTIES:
+   :URL: https://careers.reef.pl/?utm_source=hackernews
+   :LOCATION: Remote (EMEA / APAC) — fully remote
+   :NATION: Poland
+   :SIZE: small
+   :ENGLISH: yes
+   :CONTACT:
+   :CREATED: 2026-10-13
+   :INTERVIEW: "You don't even need a CV" — apply by running a few commands at careers.reef.pl. INFERRED: short automated exercise -> technical conversation -> offer. Public handbook (github.com/reef-technologies/handbook).
+   :NOTES: Python backend on a trustless GPU/Docker supercluster. B2B contract, 45-70 USD/hr (180-280 PLN/hr), inflation-adjusted twice a year, min 30h/week, self-scheduled hours. Sociocracy 3.0 governance. 5+ yrs programming, 1+ Python. Developer-run => strong no-HR signal. STACK STRETCH: Python, not Java. HN Oct 2026.
+   :END:
+
+** LEAD Revieve Oy — Senior Product Engineer :small:english:
+   :PROPERTIES:
+   :URL: https://revieve.factorialhr.com/job_posting/senior-product-engineer-299899
+   :LOCATION: Remote (Europe, GMT+2)
+   :NATION: Finland
+   :SIZE: small
+   :ENGLISH: yes
+   :CONTACT:
+   :CREATED: 2026-10-13
+   :INTERVIEW: Documented: intro call -> PAID build session on a real problem (hire decision made here) -> short team presentation -> offer.
+   :NOTES: AI/AR/computer-vision personalisation for beauty retail (120+ brands, 40+ countries). ~30 people, ~12 engineers across 8 timezones. Contract full-time. Async, ~1-2h meetings/week, no PM/designer in the loop. Wants public proof of building + agentic coding (Claude Code, MCP) + React/TS up front. Stack: TS/React + backend (NOT Java) — lateral. Founder-adjacent => low HR. HN Oct 2026.
+   :END:
+
+** LEAD OpenSanctions — Product Engineer :small:english:
+   :PROPERTIES:
+   :URL: https://www.opensanctions.org/docs/company/jobs/
+   :LOCATION: Berlin / Remote (CET +/-3 preferred)
+   :NATION: Germany
+   :SIZE: small
+   :ENGLISH: yes
+   :CONTACT:
+   :CREATED: 2026-10-13
+   :INTERVIEW: No cover letter; "share some basic facts" via the form. Rolling review. INFERRED: form -> 1-2 conversations -> paid trial / freelance start.
+   :NOTES: Bootstrapped, open-source sanctions/PEP database; journalists + compliance customers. Remote-first (desk in Berlin optional). Freelance with option to employment. Stack: Python, SQL, React/Next.js (NOT Java) — lateral. "Not considering agencies" => no-HR signal. HN Oct 2026.
+   :END:
+
+** LEAD NetBird — Senior/Staff Backend Engineer (Go) :small:english:
+   :PROPERTIES:
+   :URL: https://netbird.io/careers
+   :LOCATION: Remote (CET/CEST overlap) — Berlin office optional
+   :NATION: Germany
+   :SIZE: small
+   :ENGLISH: yes
+   :CONTACT:
+   :CREATED: 2026-10-13
+   :INTERVIEW: No loop detail. INFERRED: technical chat -> code/design review -> team. Small team hires directly.
+   :NOTES: Open-source WireGuard overlay networking / zero-config P2P; post-Series A, scaling. Backend (Go) = control plane: peer coordination, policy, multi-tenancy at 100k+ peers. STACK STRETCH: Go. HN Oct 2026.
+   :END:
+
+** LEAD Modash — Senior Product Engineer :mid:english:
+   :PROPERTIES:
+   :URL: https://apply.workable.com/modash/j/C1507B65C3
+   :LOCATION: Remote (Europe) — engineering fully remote
+   :NATION: Estonia
+   :SIZE: mid
+   :ENGLISH: yes
+   :CONTACT:
+   :CREATED: 2026-10-13
+   :INTERVIEW: No loop detail. INFERRED: screen -> technical -> team. "No ticket factory, no seven layers of approval."
+   :NOTES: Influencer-marketing data platform; indexes 380M+ creator profiles; 1,700+ brands; 85 people, EUR 11M Series A, ARR doubling. Stack not stated (JS/TS likely) — lateral. Engineering blog public. Mid => some HR. HN Oct 2026.
+   :END:
+
+** LEAD Trackerbot — Full-Stack Developer (Node.js) :small:english:
+   :PROPERTIES:
+   :URL: https://trackerbot.me
+   :LOCATION: Fully remote (Sofia office optional)
+   :NATION: Bulgaria
+   :SIZE: small
+   :ENGLISH: yes
+   :CONTACT: dobrev.d10@gmail.com
+   :CREATED: 2026-10-13
+   :INTERVIEW: Documented: short intro call -> small take-home -> discuss solution -> offer. Explicitly "No LeetCode and no six-round interview process."
+   :NOTES: Profitable SaaS for e-commerce order tracking (eBay/Amazon). Team of 3 incl. CTO/co-owner. Stack: Node.js/JS, Postgres, Heroku, AWS/S3, Chrome extensions (NOT Java) — lateral. DIRECT email to the CTO => strong no-HR signal. EUR 35-45k/yr (low band; weigh vs VN market). HN Oct 2026.
+   :END:
+
+** LEAD Matcha.fm — Founding Software Engineer :small:english:global:
+   :PROPERTIES:
+   :URL: https://matcha.fm/apply/fse
+   :LOCATION: Remote — worldwide (US / Canada / Europe / UK / LATAM); some US/EU overlap
+   :NATION: Canada
+   :SIZE: small
+   :ENGLISH: yes
+   :CONTACT:
+   :CREATED: 2026-10-13
+   :INTERVIEW: No detail. INFERRED: founder chat -> technical / paid work-sample -> offer. Canadian repeat founder.
+   :NOTES: "Agents that cut the noise in large dataset search." Explicitly: fully remote anywhere, SAME salary regardless of location, no micromanagement, no unnecessary calls. Founding role. HN Oct 2026.
+   :END:
+
+** LEAD Tether — Backend Developer (Wallets) :large:english:global:
+   :PROPERTIES:
+   :URL: https://careers.tether.io/o/backend-engineer-wallets-100-remote-31
+   :LOCATION: Remote — worldwide ("100% remote")
+   :NATION: unknown
+   :SIZE: large
+   :ENGLISH: yes
+   :CONTACT:
+   :CREATED: 2026-10-13
+   :INTERVIEW: No loop detail. INFERRED: recruiter/screen -> technical -> team. Large org but fully distributed.
+   :NOTES: Stablecoin issuer (USDt). All roles posted "fully remote, worldwide" (wallets backend, AI inference, DevOps, research). Backend stack for wallets unconfirmed — verify. HQ-less / large. HN Oct 2026.
+   :END:
+
+** LEAD Cardog — Product / Data Engineer :small:english:
+   :PROPERTIES:
+   :URL: https://cardog.app/careers
+   :LOCATION: Toronto / Remote (role-dependent)
+   :NATION: Canada
+   :SIZE: small
+   :ENGLISH: yes
+   :CONTACT: careers@cardog.app
+   :CREATED: 2026-10-13
+   :INTERVIEW: No loop detail. INFERRED: small team, direct interviews, likely a paid practical task. Every engineer owns a whole area.
+   :NOTES: Vehicle-data platform (VIN decode, recalls, pricing). Remote roles: Data Platform Eng, VIN Decode Eng, Design Eng (React/Next/Tailwind), Founding Eng (Postgres, multi-tenant). Stack: TS/Postgres/React (NOT Java) — lateral. Small => low HR. HN Oct 2026.
+   :END:
+
+** LEAD Albert — Principal / Distinguished Software Engineer :mid:english:global:
+   :PROPERTIES:
+   :URL: https://www.albert.com/careers
+   :LOCATION: Remote — "almost anywhere in the world" (some overlap)
+   :NATION: United States
+   :SIZE: mid
+   :ENGLISH: yes
+   :CONTACT: recruiting@albert.com
+   :CREATED: 2026-10-13
+   :INTERVIEW: "We review every application… reach out within a few business days." INFERRED: screen -> technical -> team; senior track is founder-led.
+   :NOTES: Consumer fintech (budget/save/invest/bank), 20M+ users, profitable 4+ yrs, unicorn. Hiring principal/distinguished engineers for net-new 0->1 products; up to ~$750k. Stack: Python, Postgres, React/React Native (NOT Java) — lateral. US-HQ, but explicit global remote + premium comp. HN Oct 2026.
+   :END:
+
+** LEAD Descartes – Finale Inventory — Senior Software Engineer :mid:english:
+   :PROPERTIES:
+   :URL: https://www.descartes.com/
+   :LOCATION: Remote-first (team across NA / South America / Western Europe)
+   :NATION: United States
+   :SIZE: mid
+   :ENGLISH: yes
+   :CONTACT: jforbes@descartes.com
+   :CREATED: 2026-10-13
+   :INTERVIEW: No loop detail. INFERRED: direct to hiring director (email) -> technical interview -> team.
+   :NOTES: SaaS inventory/ops for e-commerce sellers; integrates Amazon/eBay/Shopify/QuickBooks. 15 engineers; continuous deployment, strong TDD. Stack: Node.js/React + some C++ (NOT Java) — lateral. DIRECT email to Director of Software Development => low-HR signal. HN Oct 2026.
+   :END:
+
+** LEAD Coder — Software Engineer (Enterprise Experience, Backend) :mid:english:
+   :PROPERTIES:
+   :URL: https://coder.com/careers
+   :LOCATION: Fully remote (Europe; also UK / Ireland / Poland)
+   :NATION: United States
+   :SIZE: mid
+   :ENGLISH: yes
+   :CONTACT:
+   :CREATED: 2026-10-13
+   :INTERVIEW: No loop detail. INFERRED: screen -> technical -> team. 100k+ star OSS (github.com/coder).
+   :NOTES: Agentic development environment (self-hosted ADE) for enterprises; open-core. Fully remote in the countries listed. Backend (Go) — STACK STRETCH. US-HQ (SF) but hiring across Europe. HN Oct 2026.
+   :END:
+
 * Archive
 :PROPERTIES:
 :NOTES: no jobs available matching profile so did not apply
