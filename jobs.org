@@ -140,19 +140,6 @@
    :APPLIED_ON: 2026-10-14
    :END:
 
-** LEAD OpenSanctions — Product Engineer :small:english:
-   :PROPERTIES:
-   :URL: https://www.opensanctions.org/docs/company/jobs/
-   :LOCATION: Berlin / Remote (CET +/-3 preferred)
-   :NATION: Germany
-   :SIZE: small
-   :ENGLISH: yes
-   :CONTACT:
-   :CREATED: 2026-10-13
-   :INTERVIEW: No cover letter; "share some basic facts" via the form. Rolling review. INFERRED: form -> 1-2 conversations -> paid trial / freelance start.
-   :NOTES: Bootstrapped, open-source sanctions/PEP database; journalists + compliance customers. Remote-first (desk in Berlin optional). Freelance with option to employment. Stack: Python, SQL, React/Next.js (NOT Java) — lateral. "Not considering agencies" => no-HR signal. HN Oct 2026.
-   :END:
-
 ** LEAD NetBird — Senior/Staff Backend Engineer (Go) :small:english:
    :PROPERTIES:
    :URL: https://netbird.io/careers
@@ -1176,6 +1163,25 @@ CLOSED: [2026-10-13 Tue 09:05]
    :INTERVIEW: "You don't even need a CV" — apply by running a few commands at careers.reef.pl. INFERRED: short automated exercise -> technical conversation -> offer. Public handbook (github.com/reef-technologies/handbook).
    :NOTES: Python backend on a trustless GPU/Docker supercluster. B2B contract, 45-70 USD/hr (180-280 PLN/hr), inflation-adjusted twice a year, min 30h/week, self-scheduled hours. Sociocracy 3.0 governance. 5+ yrs programming, 1+ Python. Developer-run => strong no-HR signal. STACK STRETCH: Python, not Java. HN Oct 2026.
    :ARCHIVE_TIME: 2026-10-14 Wed 08:36
+   :ARCHIVE_FILE: ~/src/cv/jobs.org
+   :ARCHIVE_OLPATH: Pipeline
+   :ARCHIVE_CATEGORY: jobs
+   :ARCHIVE_TODO: LEAD
+   :ARCHIVE_ITAGS: jobsearch
+   :END:
+
+** LEAD OpenSanctions — Product Engineer         :jobsearch:small:english:
+   :PROPERTIES:
+   :URL: https://www.opensanctions.org/docs/company/jobs/
+   :LOCATION: Berlin / Remote (CET +/-3 preferred)
+   :NATION: Germany
+   :SIZE: small
+   :ENGLISH: yes
+   :CONTACT:
+   :CREATED: 2026-10-13
+   :INTERVIEW: No cover letter; "share some basic facts" via the form. Rolling review. INFERRED: form -> 1-2 conversations -> paid trial / freelance start.
+   :NOTES: Bootstrapped, open-source sanctions/PEP database; journalists + compliance customers. Remote-first (desk in Berlin optional). Freelance with option to employment. Stack: Python, SQL, React/Next.js (NOT Java) — lateral. "Not considering agencies" => no-HR signal. HN Oct 2026.
+   :ARCHIVE_TIME: 2026-10-14 Wed 12:32
    :ARCHIVE_FILE: ~/src/cv/jobs.org
    :ARCHIVE_OLPATH: Pipeline
    :ARCHIVE_CATEGORY: jobs
