@@ -394,11 +394,49 @@ application."
  :args nil
  :category "jobsearch")
 
+(defun cv-jobs-archive-lead (reason)
+  "Archive the lead selected by the last `cv-jobs-next-lead' call.
+
+Records REASON as a note on the entry, then files the subtree under the
+file's "* Archive" tree, exactly as `cv-jobs-archive' does for the entry
+at point.  Intended as a gptel tool so the agent can close out a lead it
+cannot apply to -- e.g. a required field whose answer is not in the CV
+and must not be fabricated -- without having to edit jobs.org by hand.
+The lead is left in its current TODO state (LEAD); only the archive
+move and the note are performed."
+  (if (not (and cv-jobs--next-lead-marker
+                (marker-buffer cv-jobs--next-lead-marker)))
+      "No lead is selected; call cv_jobs_next_lead first."
+    (with-current-buffer (marker-buffer cv-jobs--next-lead-marker)
+      (save-excursion
+        (goto-char cv-jobs--next-lead-marker)
+        (org-back-to-heading t)
+        (let ((heading (org-get-heading t t t t)))
+          ;; The note is bookkeeping; a failure here must not cost us the
+          ;; archive move, so report and carry on.
+          (condition-case err
+              (cv-jobs--add-note
+               (format "Archived without applying: %s" reason))
+            (error (message "Could not log archive note: %S" err)))
+          (let ((org-archive-location (concat cv-jobs-file "::* Archive")))
+            (org-archive-subtree))
+          (setq cv-jobs--next-lead-marker nil)
+          (format "Archived %s without applying: %s" heading reason))))))
+
 (gptel-make-tool
  :name "cv_jobs_mark_applied"
  :function #'cv-jobs-mark-applied
  :description "Move the lead most recently returned by cv_jobs_next_lead from LEAD to APPLIED and schedule the follow-up. Call this once the application has been submitted."
  :args nil
+ :category "jobsearch")
+
+(gptel-make-tool
+ :name "cv_jobs_archive_lead"
+ :function #'cv-jobs-archive-lead
+ :description "Archive the lead most recently returned by cv_jobs_next_lead after abandoning it, recording the reason as a note on the entry. Use this when the application cannot be completed -- for example a required field whose answer is not in the CV and must not be fabricated, or a broken/dead application form. Call this instead of marking the lead APPLIED."
+ :args '((:name "reason"
+          :type string
+          :description "Why the application could not be completed and the lead is being archived."))
  :category "jobsearch")
 
 (gptel-make-preset 'jobsearch-apply
@@ -425,8 +463,9 @@ Right to work in EU and B2B remote.
 Business is registered in Bulgaria.
 .
 VERY IMPORTANT:
-Do not fabricate information. Inferring information from the CV is allowed. Do not fill out form fields that are not absolutely required. Avoid free text fields that want an open answer. If the field is required but the information is not present in the CV then stop applying."
-  :tools '("mcp-playwright" "cv_jobs_next_lead" "cv_jobs_mark_applied"))
+Do not fabricate information. Inferring information from the CV is allowed. Do not fill out form fields that are not absolutely required. Avoid free text fields that want an open answer. If the field is required but the information is not present in the CV then stop applying. If you stop applying, or otherwise cannot complete the application, do not leave the lead in the pipeline: call the cv_jobs_archive_lead tool with a short reason explaining why, so the lead is archived with a note instead."
+  :tools '("mcp-playwright" "cv_jobs_next_lead" "cv_jobs_mark_applied"
+           "cv_jobs_archive_lead"))
 
 (provide 'jobsearch)
 ;;; jobsearch.el ends here
