@@ -1189,4 +1189,3 @@ CLOSED: [2026-10-13 Tue 09:05]
    :ARCHIVE_TODO: LEAD
    :ARCHIVE_ITAGS: jobsearch
    :END:
-

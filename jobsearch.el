@@ -150,6 +150,46 @@ nothing foreign is ever removed."
   (interactive)
   (org-agenda nil "j"))
 
+(defun cv-jobs--add-note (note)
+  "Log NOTE on the entry at point, creating the LOGBOOK drawer if needed.
+
+This replaces the previous `(org-add-note \"...\")' call, which could never
+work: `org-add-note' is an interactive command that takes *no* arguments and
+prompts for the note, so handing it text raised
+`wrong-number-of-arguments: org-add-note 1'.  Inserting the \"Note taken
+on ...\" entry directly keeps the call non-interactive and version-warning
+free.  The drawer is written at column 0, in the canonical position after the
+planning line and the PROPERTIES drawer, which Org parses the same way as the
+indented drawers produced by `org-add-note' itself."
+  (save-excursion
+    (org-back-to-heading t)
+    ;; Org marks a note that has a body with a trailing double backslash on
+    ;; the "Note taken on ..." line; built with `make-string' so the
+    ;; backslashes need no double escaping in this source file.
+    (let* ((mark (make-string 2 ?\\))
+           (entry (format "Note taken on %s %s\n  %s\n"
+                          (format-time-string "%Y-%m-%d %a %H:%M")
+                          mark
+                          note)))
+      (forward-line)
+      ;; Step over the planning line and the property drawer, so the LOGBOOK
+      ;; drawer lands where Org expects it rather than above them.
+      (when (looking-at-p "[ \t]*\\(CLOSED\\|SCHEDULED\\|DEADLINE\\):")
+        (forward-line))
+      (when (looking-at-p "[ \t]*:PROPERTIES:")
+        (when (re-search-forward "^[ \t]*:END:[ \t]*$"
+                                 (save-excursion (org-end-of-subtree t t)) t)
+          (forward-line)))
+      (if (re-search-forward "^[ \t]*:LOGBOOK:[ \t]*$"
+                             (save-excursion (org-end-of-subtree t t)) t)
+          (progn
+            (forward-line)
+            (if (re-search-forward "^[ \t]*:END:[ \t]*$"
+                                   (save-excursion (org-end-of-subtree t t)) t)
+                (progn (beginning-of-line) (insert entry))
+              (insert entry)))
+        (insert ":LOGBOOK:\n" entry ":END:\n")))))
+
 (defun cv-jobs-apply ()
   "Move the company at point to APPLIED and schedule a follow-up.
 
@@ -160,7 +200,11 @@ changes state, so company details are never repeated."
   (org-back-to-heading t)
   (when (equal (org-get-todo-state) "LEAD")
     (org-todo "APPLIED"))
-  (org-add-note "Application sent.")
+  ;; Logging the note is bookkeeping: a failure here must not cost us the
+  ;; APPLIED transition or the follow-up, so report and carry on.
+  (condition-case err
+      (cv-jobs--add-note "Application sent.")
+    (error (message "Could not log application note: %S" err)))
   (org-schedule nil (format-time-string
                      "%Y-%m-%d"
                      (time-add (current-time)
@@ -375,9 +419,13 @@ Do not apply to more than one job per lead. The relevant files are
 ~/src/cv/result/Ivan_Dimitrov_Resume_Software_Developer_ATS.pdf
 ~/src/cv/cv.typ
 ~/src/cv/cv-ats.typ
+Other relevant information:
+Phone number +84898532337
+Right to work in EU and B2B remote.
+Business is registered in Bulgaria.
 .
 VERY IMPORTANT:
-Do not fabricate information. Do not fill out form fields that are not absolutely required. Avoid free text fields that want an open answer. If the field is required but the information is not present in the CV then stop applying."
+Do not fabricate information. Inferring information from the CV is allowed. Do not fill out form fields that are not absolutely required. Avoid free text fields that want an open answer. If the field is required but the information is not present in the CV then stop applying."
   :tools '("mcp-playwright" "cv_jobs_next_lead" "cv_jobs_mark_applied"))
 
 (provide 'jobsearch)
