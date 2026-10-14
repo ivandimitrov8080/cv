@@ -6,3 +6,4 @@ out/**
 bin/**
 cv.pdf
 *.html
+.playwright-mcp

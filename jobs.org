@@ -126,20 +126,7 @@
    :APPLIED_ON: 2026-10-13
    :END:
 
-** LEAD Reef Technologies — Senior Python Backend Engineer (B2B) :small:english:
-   :PROPERTIES:
-   :URL: https://careers.reef.pl/?utm_source=hackernews
-   :LOCATION: Remote (EMEA / APAC) — fully remote
-   :NATION: Poland
-   :SIZE: small
-   :ENGLISH: yes
-   :CONTACT:
-   :CREATED: 2026-10-13
-   :INTERVIEW: "You don't even need a CV" — apply by running a few commands at careers.reef.pl. INFERRED: short automated exercise -> technical conversation -> offer. Public handbook (github.com/reef-technologies/handbook).
-   :NOTES: Python backend on a trustless GPU/Docker supercluster. B2B contract, 45-70 USD/hr (180-280 PLN/hr), inflation-adjusted twice a year, min 30h/week, self-scheduled hours. Sociocracy 3.0 governance. 5+ yrs programming, 1+ Python. Developer-run => strong no-HR signal. STACK STRETCH: Python, not Java. HN Oct 2026.
-   :END:
-
-** LEAD Revieve Oy — Senior Product Engineer :small:english:
+** APPLIED Revieve Oy — Senior Product Engineer              :small:english:
    :PROPERTIES:
    :URL: https://revieve.factorialhr.com/job_posting/senior-product-engineer-299899
    :LOCATION: Remote (Europe, GMT+2)
@@ -150,6 +137,7 @@
    :CREATED: 2026-10-13
    :INTERVIEW: Documented: intro call -> PAID build session on a real problem (hire decision made here) -> short team presentation -> offer.
    :NOTES: AI/AR/computer-vision personalisation for beauty retail (120+ brands, 40+ countries). ~30 people, ~12 engineers across 8 timezones. Contract full-time. Async, ~1-2h meetings/week, no PM/designer in the loop. Wants public proof of building + agentic coding (Claude Code, MCP) + React/TS up front. Stack: TS/React + backend (NOT Java) — lateral. Founder-adjacent => low HR. HN Oct 2026.
+   :APPLIED_ON: 2026-10-14
    :END:
 
 ** LEAD OpenSanctions — Product Engineer :small:english:
@@ -1169,6 +1157,25 @@ CLOSED: [2026-10-13 Tue 09:05]
    :INTERVIEW: No public loop detail. INFERRED: recruiter -> technical -> team. Large => ATS.
    :NOTES: Super-app. Java. Engineering-led. Non-US-aligned (GCC). CAVEAT: Careem is Uber-owned (US parent) => partial US influence; downweight on the jurisdiction axis.
    :ARCHIVE_TIME: 2026-10-13 Tue 09:53
+   :ARCHIVE_FILE: ~/src/cv/jobs.org
+   :ARCHIVE_OLPATH: Pipeline
+   :ARCHIVE_CATEGORY: jobs
+   :ARCHIVE_TODO: LEAD
+   :ARCHIVE_ITAGS: jobsearch
+   :END:
+
+** LEAD Reef Technologies — Senior Python Backend Engineer (B2B) :jobsearch:small:english:
+   :PROPERTIES:
+   :URL: https://careers.reef.pl/?utm_source=hackernews
+   :LOCATION: Remote (EMEA / APAC) — fully remote
+   :NATION: Poland
+   :SIZE: small
+   :ENGLISH: yes
+   :CONTACT:
+   :CREATED: 2026-10-13
+   :INTERVIEW: "You don't even need a CV" — apply by running a few commands at careers.reef.pl. INFERRED: short automated exercise -> technical conversation -> offer. Public handbook (github.com/reef-technologies/handbook).
+   :NOTES: Python backend on a trustless GPU/Docker supercluster. B2B contract, 45-70 USD/hr (180-280 PLN/hr), inflation-adjusted twice a year, min 30h/week, self-scheduled hours. Sociocracy 3.0 governance. 5+ yrs programming, 1+ Python. Developer-run => strong no-HR signal. STACK STRETCH: Python, not Java. HN Oct 2026.
+   :ARCHIVE_TIME: 2026-10-14 Wed 08:36
    :ARCHIVE_FILE: ~/src/cv/jobs.org
    :ARCHIVE_OLPATH: Pipeline
    :ARCHIVE_CATEGORY: jobs

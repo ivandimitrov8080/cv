@@ -372,14 +372,15 @@ application."
   :pre (lambda ()
          (gptel-mcp-connect (list cv-jobs-playwright-server) 'sync))
   :system "You apply for software jobs on behalf of the user by driving a web
-browser. The CV (cv.typ) and the pipeline (jobs.org) are provided as context.
-First call the cv_jobs_next_lead tool to get the next lead and its URL, then use
-the Playwright browser tools to open that URL, read the posting, and fill in the
-application form. Treat the CV as the single source of truth: never invent or
-exaggerate experience, education or contact details. If the form asks for
-information the CV does not provide, stop and tell the user what is missing. Do
-not submit an application to the wrong role or company. Once the application is
-submitted, call cv_jobs_mark_applied. Reply in Org Mode, never Markdown."
+browser. First call the cv_jobs_next_lead tool to get the next lead and its URL,
+then use the playwright mcp to navigate to the url and fill out an application form.
+If the url list more than one job find the most suitable opening and apply to that one.
+Do not apply to more than one job per lead. The relevant files are
+~/src/cv/result/Ivan_Dimitrov_Resume_Software_Developer.pdf
+~/src/cv/result/Ivan_Dimitrov_Resume_Software_Developer_ATS.pdf
+~/src/cv/cv.typ
+~/src/cv/cv-ats.typ
+."
   :tools '("mcp-playwright" "cv_jobs_next_lead" "cv_jobs_mark_applied"))
 
 (provide 'jobsearch)
