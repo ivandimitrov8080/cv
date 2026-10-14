@@ -284,7 +284,11 @@ You are immune to job market propaganda and know exactly how to find the perfect
 ;; :pre hook starts it on demand.
 (unless (assoc cv-jobs-playwright-server mcp-hub-servers)
   (add-to-list 'mcp-hub-servers
-               (cons cv-jobs-playwright-server '(:command "playwright-mcp"))))
+               (cons cv-jobs-playwright-server
+                     `(:command "playwright-mcp"
+                                :args ("--executable-path"
+                                       "chromium-sandboxed")
+                                :roots (,(expand-file-name "result" cv-jobs-directory))))))
 
 (defvar cv-jobs--next-lead-marker nil
   "Marker to the lead last returned by `cv_jobs_next_lead'.
