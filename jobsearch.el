@@ -145,6 +145,16 @@ nothing foreign is ever removed."
   (interactive)
   (find-file cv-jobs-file))
 
+(defun cv-jobs-reload ()
+  "Reload jobsearch.el so edits take effect without restarting Emacs.
+
+`.dir-locals.el' only loads this file when a project buffer is set up, so
+a long-running Emacs can be stuck with stale definitions -- including
+stale gptel tools.  Run this after editing to refresh everything."
+  (interactive)
+  (load (expand-file-name "jobsearch.el" cv-jobs-directory) nil nil)
+  (message "Reloaded jobsearch.el; gptel tools re-registered."))
+
 (defun cv-jobs-agenda ()
   "Open the job-search agenda pipeline."
   (interactive)
@@ -394,34 +404,57 @@ application."
  :args nil
  :category "jobsearch")
 
+(defun cv-jobs--backtrace ()
+  "Return the backtrace of the error currently being handled, as a string."
+  (with-temp-buffer
+    (let ((standard-output (current-buffer)))
+      (backtrace))
+    (buffer-string)))
+
 (defun cv-jobs-archive-lead (reason)
   "Archive the lead selected by the last `cv-jobs-next-lead' call.
 
 Records REASON as a note on the entry, then files the subtree under the
-file's "* Archive" tree, exactly as `cv-jobs-archive' does for the entry
-at point.  Intended as a gptel tool so the agent can close out a lead it
-cannot apply to -- e.g. a required field whose answer is not in the CV
-and must not be fabricated -- without having to edit jobs.org by hand.
-The lead is left in its current TODO state (LEAD); only the archive
-move and the note are performed."
+file's "* Archive" tree.  Intended as a gptel tool so the agent can
+close out a lead it cannot apply to -- e.g. a required field whose answer
+is not in the CV and must not be fabricated -- without having to edit
+jobs.org by hand.  The lead is left in its current TODO state (LEAD).
+
+The archive move is delegated to `cv-jobs-archive', the exact command
+bound to `C-c j x', so the tool cannot drift from the proven code path.
+Every step is wrapped so that a failure is reported back to the model as
+a plain string -- carrying a backtrace -- instead of escaping the tool
+boundary as a raw error such as `void-variable'."
   (if (not (and cv-jobs--next-lead-marker
                 (marker-buffer cv-jobs--next-lead-marker)))
       "No lead is selected; call cv_jobs_next_lead first."
     (with-current-buffer (marker-buffer cv-jobs--next-lead-marker)
-      (save-excursion
-        (goto-char cv-jobs--next-lead-marker)
-        (org-back-to-heading t)
-        (let ((heading (org-get-heading t t t t)))
-          ;; The note is bookkeeping; a failure here must not cost us the
-          ;; archive move, so report and carry on.
-          (condition-case err
-              (cv-jobs--add-note
-               (format "Archived without applying: %s" reason))
-            (error (message "Could not log archive note: %S" err)))
-          (let ((org-archive-location (concat cv-jobs-file "::* Archive")))
-            (org-archive-subtree))
-          (setq cv-jobs--next-lead-marker nil)
-          (format "Archived %s without applying: %s" heading reason))))))
+      (goto-char cv-jobs--next-lead-marker)
+      (org-back-to-heading t)
+      (let* ((heading (replace-regexp-in-string
+                       "\\`\\*+ +" ""
+                       (buffer-substring-no-properties
+                        (line-beginning-position) (line-end-position))))
+             (note-error nil)
+             (archive-error nil))
+        ;; The note is bookkeeping; its failure must not cost us the archive.
+        (condition-case err
+            (cv-jobs--add-note
+             (format "Archived without applying: %s" reason))
+          (error (setq note-error err)))
+        (condition-case err
+            (cv-jobs-archive)
+          (error (setq archive-error err)))
+        (if archive-error
+            (format "FAILED to archive %s: %S\nBacktrace:\n%s"
+                    heading archive-error (cv-jobs--backtrace))
+          (progn
+            (setq cv-jobs--next-lead-marker nil)
+            (format "Archived %s without applying: %s%s"
+                    heading reason
+                    (if note-error
+                        (format " (note failed: %S)" note-error)
+                      ""))))))))
 
 (gptel-make-tool
  :name "cv_jobs_mark_applied"
