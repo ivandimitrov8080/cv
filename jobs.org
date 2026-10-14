@@ -140,7 +140,7 @@
    :APPLIED_ON: 2026-10-14
    :END:
 
-** LEAD NetBird — Senior/Staff Backend Engineer (Go) :small:english:
+** APPLIED NetBird — Senior/Staff Backend Engineer (Go)      :small:english:
    :PROPERTIES:
    :URL: https://netbird.io/careers
    :LOCATION: Remote (CET/CEST overlap) — Berlin office optional
@@ -151,6 +151,7 @@
    :CREATED: 2026-10-13
    :INTERVIEW: No loop detail. INFERRED: technical chat -> code/design review -> team. Small team hires directly.
    :NOTES: Open-source WireGuard overlay networking / zero-config P2P; post-Series A, scaling. Backend (Go) = control plane: peer coordination, policy, multi-tenancy at 100k+ peers. STACK STRETCH: Go. HN Oct 2026.
+   :APPLIED_ON: 2026-10-14
    :END:
 
 ** LEAD Modash — Senior Product Engineer :mid:english:
