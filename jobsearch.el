@@ -274,21 +274,8 @@ You are immune to job market propaganda and know exactly how to find the perfect
 ;; flake.nix), so Emacs has to inherit the dev-shell environment (e.g. be
 ;; started from `~/src/cv' under direnv) for it to be on PATH.
 
-(defconst cv-jobs-playwright-server "playwright"
-  "Name of the Playwright MCP server used by `jobsearch-apply'.")
-
 (require 'mcp)
 (require 'gptel-integrations)
-
-;; Register the server with the MCP hub but do not start it here; the preset's
-;; :pre hook starts it on demand.
-(unless (assoc cv-jobs-playwright-server mcp-hub-servers)
-  (add-to-list 'mcp-hub-servers
-               (cons cv-jobs-playwright-server
-                     `(:command "playwright-mcp"
-                                :args ("--executable-path"
-                                       "chromium-sandboxed")
-                                :roots (,(expand-file-name "result" cv-jobs-directory))))))
 
 (defvar cv-jobs--next-lead-marker nil
   "Marker to the lead last returned by `cv_jobs_next_lead'.
@@ -374,7 +361,11 @@ application."
   :description "Apply to the next LEAD in the pipeline in a real browser."
   :parents 'jobsearch
   :pre (lambda ()
-         (gptel-mcp-connect (list cv-jobs-playwright-server) 'sync))
+         (add-to-list 'mcp-hub-servers
+                      '("playwright" . (
+                                        :command "playwright-mcp"
+                                        :args ("--executable-path" "./.devenv/profile/bin/chromium-sandboxed"))))
+         (gptel-mcp-connect '("playwright") t))
   :system "You apply for software jobs on behalf of the user by driving a web
 browser. First call the cv_jobs_next_lead tool to get the next lead and its URL,
 then use the playwright mcp to navigate to the url and fill out an application form.
