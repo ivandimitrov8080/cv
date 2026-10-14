@@ -375,7 +375,9 @@ Do not apply to more than one job per lead. The relevant files are
 ~/src/cv/result/Ivan_Dimitrov_Resume_Software_Developer_ATS.pdf
 ~/src/cv/cv.typ
 ~/src/cv/cv-ats.typ
-."
+.
+VERY IMPORTANT:
+Do not fabricate information. Do not fill out form fields that are not absolutely required. Avoid free text fields that want an open answer. If the field is required but the information is not present in the CV then stop applying."
   :tools '("mcp-playwright" "cv_jobs_next_lead" "cv_jobs_mark_applied"))
 
 (provide 'jobsearch)
