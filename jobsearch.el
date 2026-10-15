@@ -468,10 +468,16 @@ Do not apply to more than one job per lead. The relevant files are
 ~/src/cv/cv.typ
 ~/src/cv/cv-ats.typ
 Other relevant information:
+Name: Ivan Dimitrov
+Email: ivan@idimitrov.dev
 Phone number +84898532337
+Upwork url: https://www.upwork.com/freelancers/idimitrov
+LinkedIn url: https://www.linkedin.com/in/devidimitrov
+GitHub url: https://github.com/ivandimitrov8080
+GitLab url: https://gitlab.com/ivandimitrov8080
+Resume url: https://idimitrov.dev
 Right to work in EU and B2B remote.
 Business is registered in Bulgaria.
-.
 VERY IMPORTANT:
 Do not fabricate information. Inferring information from the CV is allowed. Do not fill out form fields that are not absolutely required. Avoid free text fields that want an open answer. If the field is required but the information is not present in the CV then stop applying. If you stop applying, or otherwise cannot complete the application, do not leave the lead in the pipeline: call the cv_jobs_archive_lead tool with a short reason explaining why, so the lead is archived with a note instead."
   :tools '("mcp-playwright" "cv_jobs_next_lead" "cv_jobs_mark_applied"

@@ -154,19 +154,6 @@
    :APPLIED_ON: 2026-10-14
    :END:
 
-** LEAD Trackerbot — Full-Stack Developer (Node.js) :small:english:
-   :PROPERTIES:
-   :URL: https://trackerbot.me
-   :LOCATION: Fully remote (Sofia office optional)
-   :NATION: Bulgaria
-   :SIZE: small
-   :ENGLISH: yes
-   :CONTACT: dobrev.d10@gmail.com
-   :CREATED: 2026-10-13
-   :INTERVIEW: Documented: short intro call -> small take-home -> discuss solution -> offer. Explicitly "No LeetCode and no six-round interview process."
-   :NOTES: Profitable SaaS for e-commerce order tracking (eBay/Amazon). Team of 3 incl. CTO/co-owner. Stack: Node.js/JS, Postgres, Heroku, AWS/S3, Chrome extensions (NOT Java) — lateral. DIRECT email to the CTO => strong no-HR signal. EUR 35-45k/yr (low band; weigh vs VN market). HN Oct 2026.
-   :END:
-
 ** LEAD Matcha.fm — Founding Software Engineer :small:english:global:
    :PROPERTIES:
    :URL: https://matcha.fm/apply/fse
@@ -1198,5 +1185,28 @@ CLOSED: [2026-10-13 Tue 09:05]
 :LOGBOOK:
 Note taken on 2026-10-15 Thu 11:52 \\
   Archived on request without applying (no application attempt made).
+:END:
+
+** LEAD Trackerbot — Full-Stack Developer (Node.js) :jobsearch:small:english:
+   :PROPERTIES:
+   :URL: https://trackerbot.me
+   :LOCATION: Fully remote (Sofia office optional)
+   :NATION: Bulgaria
+   :SIZE: small
+   :ENGLISH: yes
+   :CONTACT: dobrev.d10@gmail.com
+   :CREATED: 2026-10-13
+   :INTERVIEW: Documented: short intro call -> small take-home -> discuss solution -> offer. Explicitly "No LeetCode and no six-round interview process."
+   :NOTES: Profitable SaaS for e-commerce order tracking (eBay/Amazon). Team of 3 incl. CTO/co-owner. Stack: Node.js/JS, Postgres, Heroku, AWS/S3, Chrome extensions (NOT Java) — lateral. DIRECT email to the CTO => strong no-HR signal. EUR 35-45k/yr (low band; weigh vs VN market). HN Oct 2026.
+   :ARCHIVE_TIME: 2026-10-15 Thu 13:16
+   :ARCHIVE_FILE: ~/src/cv/jobs.org
+   :ARCHIVE_OLPATH: Pipeline
+   :ARCHIVE_CATEGORY: jobs
+   :ARCHIVE_TODO: LEAD
+   :ARCHIVE_ITAGS: jobsearch
+   :END:
+:LOGBOOK:
+Note taken on 2026-10-15 Thu 13:16 \\
+  No application form to complete: Trackerbot has no careers/application page (https://www.trackerbot.me/careers, /jobs, /contact, /about all 404; site is a Wix marketing page whose only form is a course signup). The HN Oct 2026 posting specifies an email-only application ("email me at dobrev.d10@gmail.com with your LinkedIn, GitHub, CV"), which cannot be submitted by driving a browser.
 :END:
 
