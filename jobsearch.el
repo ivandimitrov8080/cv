@@ -14,7 +14,16 @@
 ;; companies out of the way.  Capture only ever creates a new LEAD; "applying"
 ;; is just a state change (`cv-jobs-apply' / C-c C-t).
 ;;
-;; Nothing here modifies the global `jobsearch' preset.
+;; Two gptel *agents* drive the search:
+;;
+;;   job-search  -- searches the web for leads and records them in the
+;;                  pipeline with the `cv_jobs_add_lead' tool.
+;;   job-apply   -- takes the next lead and applies to it in a real browser
+;;                  (Playwright MCP), marking or archiving the entry.
+;;
+;; `cv-jobs-orchestrate' runs both as asynchronous subagents: apply keeps
+;; applying while there are leads, and when the pipeline runs dry the search
+;; agent is asked for more.  See the "Orchestrator" section at the end.
 
 ;;; Code:
 
@@ -23,6 +32,7 @@
 (require 'org-agenda)
 (require 'subr-x)
 (require 'seq)
+(require 'cl-lib)
 (require 'gptel)
 
 (defvar cv-jobs--loaded nil
@@ -137,6 +147,8 @@ nothing foreign is ever removed."
     (local-set-key (kbd "C-c j A") #'cv-jobs-apply)
     (local-set-key (kbd "C-c j x") #'cv-jobs-archive)
     (local-set-key (kbd "C-c j X") #'cv-jobs-archive-stale-applied)
+    (local-set-key (kbd "C-c j o") #'cv-jobs-orchestrate)
+    (local-set-key (kbd "C-c j O") #'cv-jobs-orchestrate-stop)
     ;; Closed companies go to the Archive tree in the same file.
     (setq-local org-archive-location (concat cv-jobs-file "::* Archive"))))
 
@@ -309,20 +321,26 @@ in place and the hooks and agenda entries are idempotent."
 
 (setq org-export-with-properties t)
 
-(gptel-make-preset 'jobsearch
-  :description "Search the web for remote software dev jobs."
+;;; Agents (gptel presets)
+
+;; `job-search' finds leads and records them; `job-apply' applies to them.  The
+;; orchestrator at the end of this file runs both as asynchronous subagents.
+
+(gptel-make-preset 'job-search
+  :description "Search the web for remote software dev jobs and record leads."
   :backend "Deepseek"
   :model 'deepseek-v4-flash
   :system "You find remote software development jobs given a CV and previous application statuses as context.
 Focus less on job boards/agencies and more on finding individual software development companies that are hiring.
-You are immune to job market propaganda and know exactly how to find the perfect remote job for the provided CV."
-  :context '("~/src/cv/jobs.org" "~/src/cv/cv.typ")
-  :tools '("mcp-websearch" "mcp-fetch"))
+You are immune to job market propaganda and know exactly how to find the perfect remote job for the provided CV.
+Record every promising new lead you find with the cv_jobs_add_lead tool so it lands in the pipeline; skip companies that are already tracked."
+  :context (list cv-jobs-file cv-jobs-cv-file)
+  :tools '("mcp-websearch" "mcp-fetch" "cv_jobs_add_lead"))
 
 ;;; Applying to leads (Playwright MCP)
 
-;; The `jobsearch-apply' preset turns the browser into the applicant: it fetches
-;; the next LEAD with the `cv_jobs_next_lead' tool, then drives a real browser
+;; The `job-apply' preset turns the browser into the applicant: it fetches the
+;; next LEAD with the `cv_jobs_next_lead' tool, then drives a real browser
 ;; through the Playwright MCP server to fill in, and submit, the application.
 ;; The `playwright-mcp' binary comes from the project dev shell (see
 ;; flake.nix), so Emacs has to inherit the dev-shell environment (e.g. be
@@ -355,7 +373,7 @@ having to pass a buffer position around.")
 Leads are searched in file order under the \"Pipeline\" tree of
 `cv-jobs-file'; archived entries are ignored.  Returns an explanatory
 string instead when the pipeline has run dry.  Intended as a gptel tool
-for the `jobsearch-apply' preset."
+for the `job-apply' preset."
   (with-current-buffer (find-file-noselect cv-jobs-file)
     (save-excursion
       (save-restriction
@@ -432,6 +450,80 @@ never blocks the archive."
           (error
            (format "Failed to archive %s: %S" heading err)))))))
 
+(defun cv-jobs--lead-url-p (url)
+  "Return non-nil if a lead with URL is already tracked in jobs.org."
+  (with-current-buffer (find-file-noselect cv-jobs-file)
+    (org-with-wide-buffer
+     (goto-char (point-min))
+     (re-search-forward
+      (concat "^[ \t]*:URL:[ \t]*" (regexp-quote url) "[ \t]*$") nil t))))
+
+(defun cv-jobs--pipeline-insertion-point ()
+  "Return the position where a new entry under \"Pipeline\" belongs.
+
+This is the buffer position of the next top-level heading after the
+\"Pipeline\" tree (e.g. \"* Archive\"), or the end of the buffer when the
+\"Pipeline\" tree is the last one."
+  (save-excursion
+    (goto-char (point-min))
+    (if (re-search-forward "^\\*+ +Pipeline\\b" nil t)
+        (let ((level (or (org-current-level) 1)))
+          (forward-line 1)
+          (if (re-search-forward (format "^\\*\\{1,%d\\} " level) nil t)
+              (match-beginning 0)
+            (point-max)))
+      (point-max))))
+
+(defun cv-jobs--format-properties (url location size english contact notes)
+  "Return the Org property drawer body for the given lead values.
+
+Values that are nil or blank are omitted."
+  (cl-loop for pair in (list (cons "URL" url) (cons "LOCATION" location)
+                             (cons "SIZE" size) (cons "ENGLISH" english)
+                             (cons "CONTACT" contact) (cons "NOTES" notes))
+           for key = (car pair)
+           for value = (cdr pair)
+           when (and value (not (string-blank-p (string-trim value))))
+           concat (format "   :%s: %s\n" key (string-trim value))))
+
+(defun cv-jobs--insert-lead-entry (company role url location size english contact notes)
+  "Insert a new LEAD entry for COMPANY/ROLE into jobs.org and save the file."
+  (with-current-buffer (find-file-noselect cv-jobs-file)
+    (org-with-wide-buffer
+     (let* ((end (cv-jobs--pipeline-insertion-point))
+            (props (cv-jobs--format-properties url location size english contact notes))
+            (entry (concat
+                    (format "** LEAD %s — %s\n" company role)
+                    "   :PROPERTIES:\n"
+                    props
+                    (format "   :CREATED: %s\n" (format-time-string "%Y-%m-%d"))
+                    "   :END:\n")))
+       (goto-char end)
+       (skip-chars-backward " \t\n")
+       (let ((ins (point)))
+         (delete-region ins end)
+         (goto-char ins)
+         (insert "\n\n" entry))
+       (save-buffer)))))
+
+(defun cv-jobs-add-lead (company role &optional url location size english contact notes)
+  "Add a new LEAD for COMPANY/ROLE to the job-search pipeline.
+
+URL, LOCATION, SIZE, ENGLISH, CONTACT and NOTES are optional strings.  If a
+lead with the same URL is already tracked nothing is added, so the tool can
+be called repeatedly without creating duplicates.  Returns a short status
+string.  Intended as a gptel tool for the `job-search' agent."
+  (let ((company (string-trim (or company "")))
+        (role (string-trim (or role ""))))
+    (cond
+     ((string-blank-p company)
+      "Error: company is required.")
+     ((and url (not (string-blank-p url)) (cv-jobs--lead-url-p url))
+      (format "Skipped %s: a lead with that URL already exists." company))
+     (t
+      (cv-jobs--insert-lead-entry company role url location size english contact notes)
+      (format "Added %s — %s" company role)))))
+
 (gptel-make-tool
  :name "cv_jobs_mark_applied"
  :function #'cv-jobs-mark-applied
@@ -449,9 +541,23 @@ never blocks the archive."
           :description "Why the application could not be completed and the lead is being archived."))
  :category "jobsearch")
 
-(gptel-make-preset 'jobsearch-apply
+(gptel-make-tool
+ :name "cv_jobs_add_lead"
+ :function #'cv-jobs-add-lead
+ :description "Add a new LEAD entry to the job-search pipeline in jobs.org. Use this to record each promising new company/role you find. Provide the company and role; url, location, size, english, contact and notes are optional. Leads whose URL is already in the file are skipped, so it is safe to call repeatedly."
+ :args '((:name "company" :type string :description "Company name.")
+         (:name "role" :type string :description "Role or job title.")
+         (:name "url" :type string :optional t :description "URL of the job posting or careers page.")
+         (:name "location" :type string :optional t :description "Where the role is based, e.g. Remote.")
+         (:name "size" :type string :enum ["small" "mid" "large"] :optional t :description "Company size.")
+         (:name "english" :type string :enum ["yes" "unknown" "no"] :optional t :description "Whether the role uses English.")
+         (:name "contact" :type string :optional t :description "Contact email, if known.")
+         (:name "notes" :type string :optional t :description "Short notes about the role."))
+ :category "jobsearch")
+
+(gptel-make-preset 'job-apply
   :description "Apply to the next LEAD in the pipeline in a real browser."
-  :parents 'jobsearch
+  :parents 'job-search
   :pre (lambda ()
          (add-to-list 'mcp-hub-servers
                       '("playwright" . (
@@ -482,6 +588,312 @@ VERY IMPORTANT:
 Do not fabricate information. Inferring information from the CV is allowed. Do not fill out form fields that are not absolutely required. Avoid free text fields that want an open answer. If the field is required but the information is not present in the CV then stop applying. If you stop applying, or otherwise cannot complete the application, do not leave the lead in the pipeline: call the cv_jobs_archive_lead tool with a short reason explaining why, so the lead is archived with a note instead."
   :tools '("mcp-playwright" "cv_jobs_next_lead" "cv_jobs_mark_applied"
            "cv_jobs_archive_lead"))
+
+;;; Orchestrator: run the search and apply agents as asynchronous subagents
+
+;; The orchestrator drives the two presets above as *subagents*.  It launches
+;; one agent at a time with `gptel-request' and resumes from the request's
+;; terminal state (DONE / ERRS / ABRT), so Emacs is never blocked: the agents
+;; run through gptel's asynchronous request machinery.
+;;
+;;   job-apply   -- keeps applying while there are still leads in the pipeline,
+;;                  until `cv_jobs_next_lead' reports it is dry.
+;;   job-search  -- searches for jobs and records new leads, refilling the
+;;                  pipeline.
+;;
+;; The loop is: apply until the pipeline is dry, then search; if the search
+;; adds leads, apply again; stop once a search round adds nothing new (or a
+;; safety cap is hit).  Start it with `cv-jobs-orchestrate' (C-c j o in
+;; jobs.org) and stop it with `cv-jobs-orchestrate-stop' (C-c j O).
+
+(defcustom cv-jobs-orchestrator-max-search-rounds 1
+  "Fruitless search rounds to tolerate before the orchestrator stops.
+
+The orchestrator stops once this many consecutive search rounds have added
+no new leads to the pipeline.  The default, 1, stops as soon as a search
+round finds nothing new."
+  :type 'integer
+  :group 'org)
+
+(defcustom cv-jobs-orchestrator-max-apply-rounds 25
+  "Safety cap on the number of consecutive apply rounds.
+
+Each round drains the pipeline with the apply agent.  If the pipeline is
+still not empty after this many rounds the orchestrator stops, to avoid
+repeating applications forever."
+  :type 'integer
+  :group 'org)
+
+(defcustom cv-jobs-orchestrator-max-errors 3
+  "Consecutive failed agent runs to tolerate before the orchestrator stops."
+  :type 'integer
+  :group 'org)
+
+(defconst cv-jobs-search-prompt
+  (concat "Find new remote software-development job leads that fit the CV and "
+          "add them to the pipeline. Focus on individual companies that are "
+          "hiring rather than job boards. For every promising lead call the "
+          "cv_jobs_add_lead tool to record it; skip companies that are "
+          "already tracked. Stop once you have added the leads you found.")
+  "Prompt used to launch the `job-search' agent.")
+
+(defconst cv-jobs-apply-prompt
+  (concat "Apply to the leads in the pipeline. Repeatedly call "
+          "cv_jobs_next_lead to get the next lead, apply to it in the browser, "
+          "then call cv_jobs_mark_applied (on success) or cv_jobs_archive_lead "
+          "(if it cannot be completed). Keep going until cv_jobs_next_lead "
+          "reports that no leads are left.")
+  "Prompt used to launch the `job-apply' agent.")
+
+(defvar cv-jobs-orchestrator--running nil
+  "Non-nil while the job-search orchestrator is active.")
+
+(defvar cv-jobs-orchestrator--buffer nil
+  "Work buffer of the agent the orchestrator is currently running.")
+
+(defvar cv-jobs-orchestrator--phase nil
+  "Preset name of the agent the orchestrator is currently running.")
+
+(defvar cv-jobs-orchestrator--fruitless-searches 0
+  "Number of consecutive search rounds that added no leads.")
+
+(defvar cv-jobs-orchestrator--apply-rounds 0
+  "Number of consecutive apply rounds run so far.")
+
+(defvar cv-jobs-orchestrator--errors 0
+  "Number of consecutive failed agent runs.")
+
+(defvar cv-jobs-orchestrator--search-before 0
+  "Lead count recorded just before the current search round started.")
+
+(defvar cv-jobs--transforms
+  (progn
+    (require 'gptel-context nil t)
+    (and (fboundp 'gptel-context--wrap)
+         '(gptel--transform-add-context)))
+  "Prompt transforms used when running the agents.
+
+Includes gptel's context transform so the preset's `:context' files (the CV
+and jobs.org) are sent with each request.  Nil when gptel's context support
+is unavailable.")
+
+(defun cv-jobs-count-leads ()
+  "Return the number of LEAD entries in the pipeline.
+
+Only entries under the \"Pipeline\" tree are counted, so archived leads
+(which keep their LEAD state) are not counted."
+  (let ((n 0))
+    (with-current-buffer (find-file-noselect cv-jobs-file)
+      (org-with-wide-buffer
+       (goto-char (point-min))
+       (when (re-search-forward "^\\*+ +Pipeline\\b" nil t)
+         (org-back-to-heading t)
+         (org-map-entries (lambda () (cl-incf n)) "+TODO=\"LEAD\"" 'tree))))
+    n))
+
+(defun cv-jobs--agent-buffer (preset)
+  "Return the persistent work buffer used to run the PRESET agent."
+  (get-buffer-create (format "*cv-jobs:%s*" preset)))
+
+(defun cv-jobs--configure-agent-buffer (preset)
+  "Set up the current buffer to run the PRESET agent.
+
+The gptel preset is applied buffer-locally, so the agent's backend, model,
+system message, tools and context are used without touching any other
+buffer.  Tool-call confirmation is disabled so the agent never blocks on a
+prompt, and tool results are not inserted, so the buffer stays small."
+  (unless (eq major-mode 'fundamental-mode)
+    (fundamental-mode))
+  ;; Ensure `gptel-tools' has a buffer-local binding before the preset is
+  ;; applied: the `:pre' hook of `job-apply' registers MCP tools with
+  ;; `cl-pushnew', and without a local binding that would leak them into the
+  ;; user's global `gptel-tools'.
+  (set (make-local-variable 'gptel-tools) nil)
+  (setq-local gptel-confirm-tool-calls nil)
+  (setq-local gptel-include-tool-results nil)
+  (gptel--apply-preset
+   preset
+   (lambda (sym val) (set (make-local-variable sym) val))))
+
+(defun cv-jobs--agent-fsm-handlers (after)
+  "Return request FSM handlers that call AFTER with the terminal state.
+
+The result is a copy of `gptel-request--handlers' with AFTER appended to the
+handler list of the terminal states DONE, ERRS and ABRT, so AFTER runs once
+when the request finishes (successfully or not)."
+  (let* ((handlers (copy-tree gptel-request--handlers))
+         (make-handler (lambda (state) (lambda (_fsm) (funcall after state)))))
+    (dolist (state '(DONE ERRS ABRT))
+      (let ((cell (assq state handlers)))
+        (when cell
+          (setcdr cell (append (cdr cell) (list (funcall make-handler state)))))))
+    handlers))
+
+(defun cv-jobs--run-agent (preset prompt after)
+  "Run the PRESET agent with PROMPT asynchronously; call AFTER when done.
+
+AFTER is called with the request's terminal state symbol (`DONE', `ERRS' or
+`ABRT').  Returns the agent's work buffer, or nil if the agent could not be
+started."
+  (let ((buf (cv-jobs--agent-buffer preset)))
+    (with-current-buffer buf
+      (condition-case err
+          (cv-jobs--configure-agent-buffer preset)
+        (error
+         (message "cv-jobs: could not start %s agent: %S" preset err)
+         (setq buf nil))))
+    (when (and buf (buffer-live-p buf))
+      (with-current-buffer buf
+        (goto-char (point-max))
+        (insert (format "\n\n===== %s [%s] =====\n%s\n\n"
+                        (format-time-string "%F %T") preset prompt))
+        (gptel-request prompt
+                       :stream nil
+                       :transforms cv-jobs--transforms
+                       :fsm (gptel-make-fsm
+                             :table gptel-request--transitions
+                             :handlers (cv-jobs--agent-fsm-handlers after))))
+      (setq cv-jobs-orchestrator--buffer buf
+            cv-jobs-orchestrator--phase preset))
+    buf))
+
+(defun cv-jobs-orchestrator--finish (reason)
+  "Stop the orchestrator, reporting REASON."
+  (setq cv-jobs-orchestrator--running nil
+        cv-jobs-orchestrator--phase nil)
+  (message "Job-search orchestrator stopped: %s" reason))
+
+(defun cv-jobs-orchestrator--after-error (phase state)
+  "Handle a failed PHASE agent run that ended in STATE.
+
+Retries the step a few times before giving up, so a transient network glitch
+does not end an otherwise unattended run."
+  (cl-incf cv-jobs-orchestrator--errors)
+  (if (> cv-jobs-orchestrator--errors cv-jobs-orchestrator-max-errors)
+      (cv-jobs-orchestrator--finish
+       (format "%s agent ended in %s %d time(s)"
+               phase state cv-jobs-orchestrator--errors))
+    (progn
+      (message "cv-jobs: %s agent ended in %s; retrying (%d/%d)"
+               phase state cv-jobs-orchestrator--errors
+               cv-jobs-orchestrator-max-errors)
+      (run-at-time 5 nil #'cv-jobs-orchestrator--step))))
+
+(defun cv-jobs-orchestrator--after-apply (state)
+  "Handle the end of an apply round that reached STATE."
+  (when cv-jobs-orchestrator--running
+    (if (eq state 'DONE)
+        (progn
+          (setq cv-jobs-orchestrator--errors 0)
+          (message "cv-jobs: apply round finished, %d lead(s) left"
+                   (cv-jobs-count-leads))
+          (run-at-time 0.5 nil #'cv-jobs-orchestrator--step))
+      (cv-jobs-orchestrator--after-error 'apply state))))
+
+(defun cv-jobs-orchestrator--after-search (state)
+  "Handle the end of a search round that reached STATE."
+  (when cv-jobs-orchestrator--running
+    (if (eq state 'DONE)
+        (cv-jobs--orchestrator-search-result)
+      (cv-jobs-orchestrator--after-error 'search state))))
+
+(defun cv-jobs--orchestrator-search-result ()
+  "Handle the result of a completed search round.
+
+Records whether the round added any leads and decides whether to keep going."
+  (let* ((added (- (cv-jobs-count-leads) cv-jobs-orchestrator--search-before)))
+    (setq cv-jobs-orchestrator--errors 0)
+    (if (> added 0)
+        (setq cv-jobs-orchestrator--fruitless-searches 0
+              cv-jobs-orchestrator--apply-rounds 0)
+      (cl-incf cv-jobs-orchestrator--fruitless-searches))
+    (cond
+     ((> added 0)
+      (message "cv-jobs: search added %d lead(s)" added)
+      (run-at-time 0.5 nil #'cv-jobs-orchestrator--step))
+     ((>= cv-jobs-orchestrator--fruitless-searches
+          cv-jobs-orchestrator-max-search-rounds)
+      (cv-jobs-orchestrator--finish "search found no new leads"))
+     (t
+      (message "cv-jobs: search found nothing new; searching again")
+      (run-at-time 0.5 nil #'cv-jobs-orchestrator--step)))))
+
+(defun cv-jobs-orchestrator--step ()
+  "Decide and launch the next orchestrator step."
+  (cond
+   ((not cv-jobs-orchestrator--running) nil)
+   ((zerop (cv-jobs-count-leads)) (cv-jobs-orchestrator--start-search))
+   (t (cv-jobs-orchestrator--start-apply))))
+
+(defun cv-jobs-orchestrator--start-apply ()
+  "Launch an apply round, unless the round cap has been reached."
+  (cond
+   ((>= cv-jobs-orchestrator--apply-rounds cv-jobs-orchestrator-max-apply-rounds)
+    (cv-jobs-orchestrator--finish
+     (format "apply-round limit (%d) reached with %d lead(s) left"
+             cv-jobs-orchestrator-max-apply-rounds (cv-jobs-count-leads))))
+   (t
+    (cl-incf cv-jobs-orchestrator--apply-rounds)
+    (message "cv-jobs: applying (%d lead(s) in the pipeline)"
+             (cv-jobs-count-leads))
+    (unless (cv-jobs--run-agent 'job-apply cv-jobs-apply-prompt
+                                #'cv-jobs-orchestrator--after-apply)
+      (cv-jobs-orchestrator--after-error 'apply 'ERRS)))))
+
+(defun cv-jobs-orchestrator--start-search ()
+  "Launch a search round, unless the fruitless-search cap has been reached."
+  (cond
+   ((>= cv-jobs-orchestrator--fruitless-searches
+        cv-jobs-orchestrator-max-search-rounds)
+    (cv-jobs-orchestrator--finish "no leads left and search is exhausted"))
+   (t
+    (setq cv-jobs-orchestrator--search-before (cv-jobs-count-leads))
+    (message "cv-jobs: searching for new leads")
+    (unless (cv-jobs--run-agent 'job-search cv-jobs-search-prompt
+                                #'cv-jobs-orchestrator--after-search)
+      (cv-jobs-orchestrator--after-error 'search 'ERRS)))))
+
+(defun cv-jobs--abort-agent-buffer (buf)
+  "Abort any gptel request running in BUF."
+  (when (buffer-live-p buf)
+    (with-current-buffer buf
+      (ignore-errors (gptel-abort (current-buffer))))))
+
+;;;###autoload
+(defun cv-jobs-orchestrate ()
+  "Drive the `job-search' and `job-apply' agents as asynchronous subagents.
+
+The apply agent keeps applying to leads while the pipeline still has any;
+once it runs dry the search agent is asked for more leads, and the cycle
+repeats until a search round adds nothing new (or a safety cap is hit).
+Emacs stays responsive throughout: each agent runs through gptel's
+asynchronous request machinery and the orchestrator resumes from the
+request's completion handler.
+
+Stop the run early with `cv-jobs-orchestrate-stop'."
+  (interactive)
+  (when cv-jobs-orchestrator--running
+    (user-error "Orchestrator already running; use `cv-jobs-orchestrate-stop'"))
+  (setq cv-jobs-orchestrator--running t
+        cv-jobs-orchestrator--fruitless-searches 0
+        cv-jobs-orchestrator--apply-rounds 0
+        cv-jobs-orchestrator--errors 0
+        cv-jobs-orchestrator--search-before 0)
+  (message "Job-search orchestrator started (%d lead(s) in the pipeline)"
+           (cv-jobs-count-leads))
+  (cv-jobs-orchestrator--step))
+
+;;;###autoload
+(defun cv-jobs-orchestrate-stop ()
+  "Stop the job-search orchestrator and abort the current agent request."
+  (interactive)
+  (cond
+   ((not cv-jobs-orchestrator--running)
+    (message "Job-search orchestrator is not running"))
+   (t
+    (setq cv-jobs-orchestrator--running nil)
+    (cv-jobs--abort-agent-buffer cv-jobs-orchestrator--buffer)
+    (message "Job-search orchestrator stopped"))))
 
 (provide 'jobsearch)
 ;;; jobsearch.el ends here
