@@ -154,7 +154,8 @@
    :APPLIED_ON: 2026-10-14
    :END:
 
-** LEAD Matcha.fm — Founding Software Engineer :small:english:global:
+** APPLIED Matcha.fm — Founding Software Engineer      :small:english:global:
+SCHEDULED: <2026-10-22 Thu>
    :PROPERTIES:
    :URL: https://matcha.fm/apply/fse
    :LOCATION: Remote — worldwide (US / Canada / Europe / UK / LATAM); some US/EU overlap
@@ -165,22 +166,15 @@
    :CREATED: 2026-10-13
    :INTERVIEW: No detail. INFERRED: founder chat -> technical / paid work-sample -> offer. Canadian repeat founder.
    :NOTES: "Agents that cut the noise in large dataset search." Explicitly: fully remote anywhere, SAME salary regardless of location, no micromanagement, no unnecessary calls. Founding role. HN Oct 2026.
+   :APPLIED_ON: 2026-10-15
    :END:
+:LOGBOOK:
+Note taken on 2026-10-15 Thu 14:01 \\
+  Application sent.
+:END:
 
-** LEAD Tether — Backend Developer (Wallets) :large:english:global:
-   :PROPERTIES:
-   :URL: https://careers.tether.io/o/backend-engineer-wallets-100-remote-31
-   :LOCATION: Remote — worldwide ("100% remote")
-   :NATION: unknown
-   :SIZE: large
-   :ENGLISH: yes
-   :CONTACT:
-   :CREATED: 2026-10-13
-   :INTERVIEW: No loop detail. INFERRED: recruiter/screen -> technical -> team. Large org but fully distributed.
-   :NOTES: Stablecoin issuer (USDt). All roles posted "fully remote, worldwide" (wallets backend, AI inference, DevOps, research). Backend stack for wallets unconfirmed — verify. HQ-less / large. HN Oct 2026.
-   :END:
-
-** LEAD Cardog — Product / Data Engineer :small:english:
+** APPLIED Cardog — Product / Data Engineer                  :small:english:
+SCHEDULED: <2026-10-22 Thu>
    :PROPERTIES:
    :URL: https://cardog.app/careers
    :LOCATION: Toronto / Remote (role-dependent)
@@ -191,35 +185,15 @@
    :CREATED: 2026-10-13
    :INTERVIEW: No loop detail. INFERRED: small team, direct interviews, likely a paid practical task. Every engineer owns a whole area.
    :NOTES: Vehicle-data platform (VIN decode, recalls, pricing). Remote roles: Data Platform Eng, VIN Decode Eng, Design Eng (React/Next/Tailwind), Founding Eng (Postgres, multi-tenant). Stack: TS/Postgres/React (NOT Java) — lateral. Small => low HR. HN Oct 2026.
+   :APPLIED_ON: 2026-10-15
    :END:
+:LOGBOOK:
+Note taken on 2026-10-15 Thu 14:06 \\
+  Application sent.
+:END:
 
-** LEAD Albert — Principal / Distinguished Software Engineer :mid:english:global:
-   :PROPERTIES:
-   :URL: https://www.albert.com/careers
-   :LOCATION: Remote — "almost anywhere in the world" (some overlap)
-   :NATION: United States
-   :SIZE: mid
-   :ENGLISH: yes
-   :CONTACT: recruiting@albert.com
-   :CREATED: 2026-10-13
-   :INTERVIEW: "We review every application… reach out within a few business days." INFERRED: screen -> technical -> team; senior track is founder-led.
-   :NOTES: Consumer fintech (budget/save/invest/bank), 20M+ users, profitable 4+ yrs, unicorn. Hiring principal/distinguished engineers for net-new 0->1 products; up to ~$750k. Stack: Python, Postgres, React/React Native (NOT Java) — lateral. US-HQ, but explicit global remote + premium comp. HN Oct 2026.
-   :END:
-
-** LEAD Descartes – Finale Inventory — Senior Software Engineer :mid:english:
-   :PROPERTIES:
-   :URL: https://www.descartes.com/
-   :LOCATION: Remote-first (team across NA / South America / Western Europe)
-   :NATION: United States
-   :SIZE: mid
-   :ENGLISH: yes
-   :CONTACT: jforbes@descartes.com
-   :CREATED: 2026-10-13
-   :INTERVIEW: No loop detail. INFERRED: direct to hiring director (email) -> technical interview -> team.
-   :NOTES: SaaS inventory/ops for e-commerce sellers; integrates Amazon/eBay/Shopify/QuickBooks. 15 engineers; continuous deployment, strong TDD. Stack: Node.js/React + some C++ (NOT Java) — lateral. DIRECT email to Director of Software Development => low-HR signal. HN Oct 2026.
-   :END:
-
-** LEAD Coder — Software Engineer (Enterprise Experience, Backend) :mid:english:
+** APPLIED Coder — Software Engineer (Enterprise Experience, Backend) :mid:english:
+SCHEDULED: <2026-10-22 Thu>
    :PROPERTIES:
    :URL: https://coder.com/careers
    :LOCATION: Fully remote (Europe; also UK / Ireland / Poland)
@@ -230,7 +204,12 @@
    :CREATED: 2026-10-13
    :INTERVIEW: No loop detail. INFERRED: screen -> technical -> team. 100k+ star OSS (github.com/coder).
    :NOTES: Agentic development environment (self-hosted ADE) for enterprises; open-core. Fully remote in the countries listed. Backend (Go) — STACK STRETCH. US-HQ (SF) but hiring across Europe. HN Oct 2026.
+   :APPLIED_ON: 2026-10-15
    :END:
+:LOGBOOK:
+Note taken on 2026-10-15 Thu 14:13 \\
+  Application sent.
+:END:
 
 * Archive
 :PROPERTIES:
@@ -1208,5 +1187,74 @@ Note taken on 2026-10-15 Thu 11:52 \\
 :LOGBOOK:
 Note taken on 2026-10-15 Thu 13:16 \\
   No application form to complete: Trackerbot has no careers/application page (https://www.trackerbot.me/careers, /jobs, /contact, /about all 404; site is a Wix marketing page whose only form is a course signup). The HN Oct 2026 posting specifies an email-only application ("email me at dobrev.d10@gmail.com with your LinkedIn, GitHub, CV"), which cannot be submitted by driving a browser.
+:END:
+
+** LEAD Tether — Backend Developer (Wallets) :jobsearch:large:english:global:
+   :PROPERTIES:
+   :URL: https://careers.tether.io/o/backend-engineer-wallets-100-remote-31
+   :LOCATION: Remote — worldwide ("100% remote")
+   :NATION: unknown
+   :SIZE: large
+   :ENGLISH: yes
+   :CONTACT:
+   :CREATED: 2026-10-13
+   :INTERVIEW: No loop detail. INFERRED: recruiter/screen -> technical -> team. Large org but fully distributed.
+   :NOTES: Stablecoin issuer (USDt). All roles posted "fully remote, worldwide" (wallets backend, AI inference, DevOps, research). Backend stack for wallets unconfirmed — verify. HQ-less / large. HN Oct 2026.
+   :ARCHIVE_TIME: 2026-10-15 Thu 14:04
+   :ARCHIVE_FILE: ~/src/cv/jobs.org
+   :ARCHIVE_OLPATH: Pipeline
+   :ARCHIVE_CATEGORY: jobs
+   :ARCHIVE_TODO: LEAD
+   :ARCHIVE_ITAGS: jobsearch
+   :END:
+:LOGBOOK:
+Note taken on 2026-10-15 Thu 14:04 \\
+  Could not complete: the original Backend Developer (Wallets) req is dead (404); after browsing the careers board I picked the closest suitable opening (Frontend Software Engineer, 100% remote worldwide), but its application form requires several mandatory free-text opinion answers ("Why are you interested in working at Tether?", state-management approach, code-quality tooling, deadline story, plus expected annual salary in USD) that are not in the CV. The form also explicitly states AI-generated application answers may disqualify the candidate, so the answers could not be written without fabricating reasoning. No application submitted.
+:END:
+
+** LEAD Albert — Principal / Distinguished Software Engineer :jobsearch:mid:english:global:
+   :PROPERTIES:
+   :URL: https://www.albert.com/careers
+   :LOCATION: Remote — "almost anywhere in the world" (some overlap)
+   :NATION: United States
+   :SIZE: mid
+   :ENGLISH: yes
+   :CONTACT: recruiting@albert.com
+   :CREATED: 2026-10-13
+   :INTERVIEW: "We review every application… reach out within a few business days." INFERRED: screen -> technical -> team; senior track is founder-led.
+   :NOTES: Consumer fintech (budget/save/invest/bank), 20M+ users, profitable 4+ yrs, unicorn. Hiring principal/distinguished engineers for net-new 0->1 products; up to ~$750k. Stack: Python, Postgres, React/React Native (NOT Java) — lateral. US-HQ, but explicit global remote + premium comp. HN Oct 2026.
+   :ARCHIVE_TIME: 2026-10-15 Thu 14:07
+   :ARCHIVE_FILE: ~/src/cv/jobs.org
+   :ARCHIVE_OLPATH: Pipeline
+   :ARCHIVE_CATEGORY: jobs
+   :ARCHIVE_TODO: LEAD
+   :ARCHIVE_ITAGS: jobsearch
+   :END:
+:LOGBOOK:
+Note taken on 2026-10-15 Thu 14:07 \\
+  No application form exists. albert.com/careers has no job listings and no ATS/apply link — the only route is emailing "what you've built" to careers@albert.com (open-ended pitch, not a browser-submittable form). The page also states "We're fully remote across the US", which conflicts with the global-remote note on the lead. Nothing to fill in or submit.
+:END:
+
+** LEAD Descartes – Finale Inventory — Senior Software Engineer :jobsearch:mid:english:
+   :PROPERTIES:
+   :URL: https://www.descartes.com/
+   :LOCATION: Remote-first (team across NA / South America / Western Europe)
+   :NATION: United States
+   :SIZE: mid
+   :ENGLISH: yes
+   :CONTACT: jforbes@descartes.com
+   :CREATED: 2026-10-13
+   :INTERVIEW: No loop detail. INFERRED: direct to hiring director (email) -> technical interview -> team.
+   :NOTES: SaaS inventory/ops for e-commerce sellers; integrates Amazon/eBay/Shopify/QuickBooks. 15 engineers; continuous deployment, strong TDD. Stack: Node.js/React + some C++ (NOT Java) — lateral. DIRECT email to Director of Software Development => low-HR signal. HN Oct 2026.
+   :ARCHIVE_TIME: 2026-10-15 Thu 14:10
+   :ARCHIVE_FILE: ~/src/cv/jobs.org
+   :ARCHIVE_OLPATH: Pipeline
+   :ARCHIVE_CATEGORY: jobs
+   :ARCHIVE_TODO: LEAD
+   :ARCHIVE_ITAGS: jobsearch
+   :END:
+:LOGBOOK:
+Note taken on 2026-10-15 Thu 14:10 \\
+  The Finale Inventory opening exists on the Descartes careers site as SAP SuccessFactors req 6276 "Senior Software Developer- Full Stack JavaScript" (Finale team, Šenčur, Slovenia) but the application cannot be completed: the form requires mandatory fields with no answer in the CV — "What are your salary requirements?" (free text), "What date are you available?", "Are you able to work 2 days week from our Šenčur, Slovenia office?" (hybrid on-site role, candidate is outside Slovenia) and country of residence — plus creating a portal account (password) and a captcha. Filling these would mean inventing data, so no application was submitted.
 :END:
 
