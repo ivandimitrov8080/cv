@@ -562,7 +562,7 @@ string.  Intended as a gptel tool for the `job-search' agent."
          (add-to-list 'mcp-hub-servers
                       '("playwright" . (
                                         :command "playwright-mcp"
-                                        :args ("--executable-path" "./.devenv/profile/bin/chromium-sandboxed"))))
+                                        :args ("--executable-path" "~/src/cv/.devenv/profile/bin/chromium-sandboxed"))))
          (gptel-mcp-connect '("playwright") t))
   :system "You apply for software jobs on behalf of the user by driving a web
 browser. First call the cv_jobs_next_lead tool to get the next lead and its URL,
