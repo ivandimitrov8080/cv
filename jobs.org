@@ -154,19 +154,6 @@
    :APPLIED_ON: 2026-10-14
    :END:
 
-** LEAD Modash — Senior Product Engineer :mid:english:
-   :PROPERTIES:
-   :URL: https://apply.workable.com/modash/j/C1507B65C3
-   :LOCATION: Remote (Europe) — engineering fully remote
-   :NATION: Estonia
-   :SIZE: mid
-   :ENGLISH: yes
-   :CONTACT:
-   :CREATED: 2026-10-13
-   :INTERVIEW: No loop detail. INFERRED: screen -> technical -> team. "No ticket factory, no seven layers of approval."
-   :NOTES: Influencer-marketing data platform; indexes 380M+ creator profiles; 1,700+ brands; 85 people, EUR 11M Series A, ARR doubling. Stack not stated (JS/TS likely) — lateral. Engineering blog public. Mid => some HR. HN Oct 2026.
-   :END:
-
 ** LEAD Trackerbot — Full-Stack Developer (Node.js) :small:english:
    :PROPERTIES:
    :URL: https://trackerbot.me
@@ -1189,3 +1176,27 @@ CLOSED: [2026-10-13 Tue 09:05]
    :ARCHIVE_TODO: LEAD
    :ARCHIVE_ITAGS: jobsearch
    :END:
+
+** LEAD Modash — Senior Product Engineer           :jobsearch:mid:english:
+   :PROPERTIES:
+   :URL: https://apply.workable.com/modash/j/C1507B65C3
+   :LOCATION: Remote (Europe) — engineering fully remote
+   :NATION: Estonia
+   :SIZE: mid
+   :ENGLISH: yes
+   :CONTACT:
+   :CREATED: 2026-10-13
+   :INTERVIEW: No loop detail. INFERRED: screen -> technical -> team. "No ticket factory, no seven layers of approval."
+   :NOTES: Influencer-marketing data platform; indexes 380M+ creator profiles; 1,700+ brands; 85 people, EUR 11M Series A, ARR doubling. Stack not stated (JS/TS likely) — lateral. Engineering blog public. Mid => some HR. HN Oct 2026.
+   :ARCHIVE_TIME: 2026-10-15 Thu 11:52
+   :ARCHIVE_FILE: ~/src/cv/jobs.org
+   :ARCHIVE_OLPATH: Pipeline
+   :ARCHIVE_CATEGORY: jobs
+   :ARCHIVE_TODO: LEAD
+   :ARCHIVE_ITAGS: jobsearch
+   :END:
+:LOGBOOK:
+Note taken on 2026-10-15 Thu 11:52 \\
+  Archived on request without applying (no application attempt made).
+:END:
+

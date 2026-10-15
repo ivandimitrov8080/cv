@@ -404,57 +404,33 @@ application."
  :args nil
  :category "jobsearch")
 
-(defun cv-jobs--backtrace ()
-  "Return the backtrace of the error currently being handled, as a string."
-  (with-temp-buffer
-    (let ((standard-output (current-buffer)))
-      (backtrace))
-    (buffer-string)))
-
-(defun cv-jobs-archive-lead (reason)
+(defun cv-jobs-archive-lead (&optional reason)
   "Archive the lead selected by the last `cv-jobs-next-lead' call.
 
-Records REASON as a note on the entry, then files the subtree under the
-file's "* Archive" tree.  Intended as a gptel tool so the agent can
-close out a lead it cannot apply to -- e.g. a required field whose answer
-is not in the CV and must not be fabricated -- without having to edit
-jobs.org by hand.  The lead is left in its current TODO state (LEAD).
+Reuses `cv-jobs-archive' (the command bound to C-c j x), so the tool cannot
+drift from the proven archive path.  The lead keeps its current TODO state.
 
-The archive move is delegated to `cv-jobs-archive', the exact command
-bound to `C-c j x', so the tool cannot drift from the proven code path.
-Every step is wrapped so that a failure is reported back to the model as
-a plain string -- carrying a backtrace -- instead of escaping the tool
-boundary as a raw error such as `void-variable'."
+REASON, when it is a non-blank string, is logged as a note on the entry;
+otherwise a default note is used.  Logging the note is best-effort and
+never blocks the archive."
   (if (not (and cv-jobs--next-lead-marker
                 (marker-buffer cv-jobs--next-lead-marker)))
       "No lead is selected; call cv_jobs_next_lead first."
     (with-current-buffer (marker-buffer cv-jobs--next-lead-marker)
       (goto-char cv-jobs--next-lead-marker)
       (org-back-to-heading t)
-      (let* ((heading (replace-regexp-in-string
-                       "\\`\\*+ +" ""
-                       (buffer-substring-no-properties
-                        (line-beginning-position) (line-end-position))))
-             (note-error nil)
-             (archive-error nil))
-        ;; The note is bookkeeping; its failure must not cost us the archive.
+      (let* ((heading (org-get-heading t t t t))
+             (note (if (and (stringp reason) (not (string-blank-p reason)))
+                       reason
+                     "Archiving due to application failure")))
         (condition-case err
-            (cv-jobs--add-note
-             (format "Archived without applying: %s" reason))
-          (error (setq note-error err)))
-        (condition-case err
-            (cv-jobs-archive)
-          (error (setq archive-error err)))
-        (if archive-error
-            (format "FAILED to archive %s: %S\nBacktrace:\n%s"
-                    heading archive-error (cv-jobs--backtrace))
-          (progn
-            (setq cv-jobs--next-lead-marker nil)
-            (format "Archived %s without applying: %s%s"
-                    heading reason
-                    (if note-error
-                        (format " (note failed: %S)" note-error)
-                      ""))))))))
+            (progn
+              (ignore-errors (cv-jobs--add-note note))
+              (cv-jobs-archive)
+              (setq cv-jobs--next-lead-marker nil)
+              (format "Archived %s without applying: %s" heading note))
+          (error
+           (format "Failed to archive %s: %S" heading err)))))))
 
 (gptel-make-tool
  :name "cv_jobs_mark_applied"
@@ -469,6 +445,7 @@ boundary as a raw error such as `void-variable'."
  :description "Archive the lead most recently returned by cv_jobs_next_lead after abandoning it, recording the reason as a note on the entry. Use this when the application cannot be completed -- for example a required field whose answer is not in the CV and must not be fabricated, or a broken/dead application form. Call this instead of marking the lead APPLIED."
  :args '((:name "reason"
           :type string
+          :optional t
           :description "Why the application could not be completed and the lead is being archived."))
  :category "jobsearch")
 
