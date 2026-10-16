@@ -154,8 +154,8 @@
    :APPLIED_ON: 2026-10-14
    :END:
 
-** APPLIED Matcha.fm — Founding Software Engineer      :small:english:global:
-SCHEDULED: <2026-10-22 Thu>
+** REJECTED Matcha.fm — Founding Software Engineer  :small:english:global:
+CLOSED: [2026-10-16 Fri 08:09] SCHEDULED: <2026-10-22 Thu>
    :PROPERTIES:
    :URL: https://matcha.fm/apply/fse
    :LOCATION: Remote — worldwide (US / Canada / Europe / UK / LATAM); some US/EU overlap
@@ -168,6 +168,13 @@ SCHEDULED: <2026-10-22 Thu>
    :NOTES: "Agents that cut the noise in large dataset search." Explicitly: fully remote anywhere, SAME salary regardless of location, no micromanagement, no unnecessary calls. Founding role. HN Oct 2026.
    :APPLIED_ON: 2026-10-15
    :END:
+   - CLOSING NOTE [2026-10-16 Fri 08:09] \\
+     Hey thanks for taking the time to apply, impressive profile :)
+
+     I'm looking for a very narrow skillset so not a good fit for this specific role. I'll keep
+     you in mind if anything else makes sense in the future.
+
+     All the best,
 :LOGBOOK:
 Note taken on 2026-10-15 Thu 14:01 \\
   Application sent.
