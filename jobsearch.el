@@ -14,7 +14,7 @@
 ;; companies out of the way.  Capture only ever creates a new LEAD; "applying"
 ;; is just a state change (`cv-jobs-apply' / C-c C-t).
 ;;
-;; Nothing here modifies the global `jobsearch' preset.
+;; Nothing here modifies the global `job-search' preset.
 
 ;;; Code:
 
@@ -321,7 +321,7 @@ You are immune to job market propaganda and know exactly how to find the perfect
 
 ;;; Applying to leads (Playwright MCP)
 
-;; The `jobsearch-apply' preset turns the browser into the applicant: it fetches
+;; The `job-apply' preset turns the browser into the applicant: it fetches
 ;; the next LEAD with the `cv_jobs_next_lead' tool, then drives a real browser
 ;; through the Playwright MCP server to fill in, and submit, the application.
 ;; The `playwright-mcp' binary comes from the project dev shell (see
@@ -355,7 +355,7 @@ having to pass a buffer position around.")
 Leads are searched in file order under the \"Pipeline\" tree of
 `cv-jobs-file'; archived entries are ignored.  Returns an explanatory
 string instead when the pipeline has run dry.  Intended as a gptel tool
-for the `jobsearch-apply' preset."
+for the `job-apply' preset."
   (with-current-buffer (find-file-noselect cv-jobs-file)
     (save-excursion
       (save-restriction
