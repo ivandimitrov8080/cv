@@ -14,7 +14,17 @@
 ;; companies out of the way.  Capture only ever creates a new LEAD; "applying"
 ;; is just a state change (`cv-jobs-apply' / C-c C-t).
 ;;
-;; Nothing here modifies the global `job-search' preset.
+;; Three gptel presets are registered here:
+;;
+;;   job         the supervisor (`@job'); its only tool is gptel-agent's
+;;               `Agent' tool, so it answers questions and delegates.
+;;   job-search  defined in agents/job-search.org -- finds new leads.
+;;   job-apply   defined in agents/job-apply.org -- drives a browser to apply.
+;;
+;; The latter two are also sub-agents of `job'.  They are defined once, as
+;; gptel-agent files, and each is registered both as an agent (for the `Agent'
+;; tool) and as an ordinary preset (so `@job-search' / `@job-apply' still work
+;; directly).  Nothing here modifies the global `job-search' preset.
 
 ;;; Code:
 
@@ -279,19 +289,31 @@ valid.  With a numeric prefix argument, override the age in days, e.g.
   (let* ((bind (lookup-key global-map (kbd "C-c c")))
          (bind-desc (cond ((keymapp bind) "C-c c is a prefix")
                           ((null bind) "C-c c unbound")
-                          (t (format "C-c c => %s" bind)))))
+                          (t (format "C-c c => %s" bind))))
+         (agent-tool (ignore-errors (gptel-get-tool "Agent")))
+         (agent-enum
+          (when agent-tool
+            (plist-get
+             (seq-find (lambda (arg) (equal (plist-get arg :name) "subagent_type"))
+                       (gptel-tool-args agent-tool))
+             :enum))))
     (message (concat "jobsearch: %s | %s | capture keys: %s | "
-                     "jobs.org in agenda: %s")
+                     "jobs.org in agenda: %s | gptel-agent: %s | "
+                     "agents: %s | Agent enum: %s")
              (if (featurep 'jobsearch) "loaded" "NOT LOADED")
              bind-desc
              (mapcar #'car (seq-filter #'listp org-capture-templates))
-             (if (member cv-jobs-file org-agenda-files) "yes" "no"))))
+             (if (member cv-jobs-file org-agenda-files) "yes" "no")
+             (if (featurep 'gptel-agent) "loaded" "NOT LOADED")
+             (mapcar #'car (bound-and-true-p gptel-agent--agents))
+             (if agent-enum (seq-into agent-enum 'list) "n/a"))))
 
 (defun cv-jobs-setup ()
-  "(Re)install the job-search capture, agenda, key and gptel wiring.
+  "(Re)install the job-search captures, agenda, keys and gptel wiring.
 
 Safe to call repeatedly; the capture templates this file adds are refreshed
-in place and the hooks and agenda entries are idempotent."
+in place and the hooks and agenda entries are idempotent.  The sub-agent
+files are re-parsed too, so editing agents/*.org only needs `cv-jobs-reload'."
   (interactive)
   (cv-jobs--setup-captures)
   (cv-jobs--setup-agenda)
@@ -299,9 +321,8 @@ in place and the hooks and agenda entries are idempotent."
   (add-hook 'org-after-todo-state-change-hook #'cv-jobs--record-applied-date)
   ;; `org-mode-hook' may already have run for the triggering buffer.
   (cv-jobs--setup-buffer)
+  (cv-jobs--install-subagents)
   (setq cv-jobs--loaded t))
-
-(cv-jobs-setup)
 
 (setq org-modern-todo-faces
       '(("LEAD" . "⟳") ("APPLIED" . "⇒") ("INTERVIEW" . "★")
@@ -309,27 +330,109 @@ in place and the hooks and agenda entries are idempotent."
 
 (setq org-export-with-properties t)
 
-(gptel-make-preset 'job-search
-  :description "Search the web for remote software dev jobs."
-  :backend "Deepseek"
-  :model 'deepseek-v4-flash
-  :system "You find remote software development jobs given a CV and previous application statuses as context.
-Focus less on job boards/agencies and more on finding individual software development companies that are hiring.
-You are immune to job market propaganda and know exactly how to find the perfect remote job for the provided CV."
-  :context '("~/src/cv/jobs.org" "~/src/cv/cv.typ")
-  :tools '("mcp-websearch" "mcp-fetch"))
+;; The `job-search' preset used to be defined here.  It now lives in
+;; agents/job-search.org and is registered by `cv-jobs--install-subagents',
+;; called from `cv-jobs-setup'.
 
 ;;; Applying to leads (Playwright MCP)
 
 ;; The `job-apply' preset turns the browser into the applicant: it fetches
 ;; the next LEAD with the `cv_jobs_next_lead' tool, then drives a real browser
 ;; through the Playwright MCP server to fill in, and submit, the application.
+;; Its definition lives in agents/job-apply.org; this section only provides the
+;; emacs-side tools it calls and `cv-jobs--connect-playwright', the function its
+;; `:PRE' property names.
+;;
 ;; The `playwright-mcp' binary comes from the project dev shell (see
 ;; flake.nix), so Emacs has to inherit the dev-shell environment (e.g. be
 ;; started from `~/src/cv' under direnv) for it to be on PATH.
 
 (require 'mcp)
 (require 'gptel-integrations)
+
+;; Soft require: everything else in this file (capture, agenda, the cv_jobs_*
+;; tools) has nothing to do with gptel-agent, so a stale Emacs image without it
+;; must not take the job-search tracker down with it.  `cv-jobs-verify' says
+;; whether the sub-agent layer is up.
+(require 'gptel-agent nil t)
+
+;;; Sub-agents
+
+;; `job-search' and `job-apply' are defined as gptel-agent files under
+;; agents/, not as `gptel-make-preset' forms here.  gptel-agent parses them,
+;; rebuilds the `subagent_type' enum of its `Agent' tool from whatever it
+;; finds, and `cv-jobs--install-subagents' republishes each one as an ordinary
+;; preset -- so `@job-search' / `@job-apply' behave exactly as before while a
+;; master preset can also spawn them as sub-agents.
+;;
+;; Pointing `gptel-agent-dirs' at our directory *and only ours* is what keeps
+;; gptel-agent's bundled `executor' / `researcher' / `introspector' agents out
+;; of the enum; it also means the `gptel-agent' and `gptel-plan' presets (and
+;; their Bash / Eval / Write / Edit toolset) are never defined at all.
+
+;; NOTE: gptel-agent's Org property parser runs `intern' on the result of
+;; `read', so `:PARENTS:' must be written as a list of *strings*:
+;;
+;;   :PARENTS: ("job-search")
+;;
+;; The more natural-looking `:PARENTS: (job-search)' reads as the symbol
+;; `job-search' and makes `gptel-agent-update' signal
+;; `(wrong-type-argument stringp job-search)' before any agent is
+;; registered.  Do not drop the quotes in agents/*.org.
+
+(defconst cv-jobs-agent-directory (expand-file-name "agents" cv-jobs-directory)
+  "Directory of the project's gptel-agent sub-agent definitions.")
+
+(defconst cv-jobs-agent-names '("job-search" "job-apply")
+  "Agents under `cv-jobs-agent-directory' that are also gptel presets.
+
+Names are the file base names, which is what gptel-agent defaults to when an
+agent file has no `name' property.")
+
+(setq gptel-agent-dirs (list cv-jobs-agent-directory))
+
+(defun cv-jobs--connect-playwright ()
+  "Start the Playwright MCP server used by the `job-apply' agent.
+
+The `playwright-mcp' binary comes from the project dev shell (see
+flake.nix), so Emacs has to inherit the dev-shell environment (e.g. be
+started from `~/src/cv' under direnv) for it to be on PATH.
+
+This is the `:PRE' property of agents/job-apply.org.  It lives here because
+an Org property value has to be a single readable form, and a lambda would
+be unreadable inside a property drawer."
+  (add-to-list 'mcp-hub-servers
+               '("playwright" . (:command "playwright-mcp"
+                                :args ("--executable-path"
+                                       "/home/ivand/src/cv/.devenv/profile/bin/chromium-sandboxed"))))
+  (gptel-mcp-connect '("playwright") t))
+
+(defun cv-jobs--install-subagents ()
+  "Parse `cv-jobs-agent-directory' and register each agent as a preset.
+
+`gptel-agent-update' re-reads the agent files and rebuilds the enum of the
+`Agent' tool; each agent is then published under its own name.  Re-running is
+idempotent: `gptel-make-preset' replaces the spec of an existing preset."
+  (if (not (fboundp 'gptel-agent-update))
+      (message "cv-jobs: gptel-agent is not available; the `job' supervisor \
+and its sub-agents are disabled")
+    (gptel-agent-update)
+    ;; `gptel-agent-update' registers *every* regular file in the directory and
+    ;; does not check the extension, so editor droppings -- undo-tree history
+    ;; (`undo-tree-auto-save-history' is on globally), `#file#', `.file.swp' --
+    ;; end up in `gptel-agent--agents' and in the `subagent_type' enum.  Keep
+    ;; only the agents this project actually ships.
+    (setq gptel-agent--agents
+          (seq-filter (lambda (entry) (member (car entry) cv-jobs-agent-names))
+                      gptel-agent--agents))
+    ;; Rebuild the enum from the pruned list.  This mirrors what
+    ;; `gptel-agent-update' does a few lines earlier; gptel-agent offers no
+    ;; public entry point for it, so it has to be spelled out here.
+    (setf (plist-get (car (gptel-tool-args (gptel-get-tool "Agent"))) :enum)
+          (vconcat (mapcar #'car gptel-agent--agents)))
+    (dolist (name cv-jobs-agent-names)
+      (when-let* ((spec (cdr (assoc name gptel-agent--agents))))
+        (apply #'gptel-make-preset (intern name) spec)))))
 
 (defvar cv-jobs--next-lead-marker nil
   "Marker to the lead last returned by `cv_jobs_next_lead'.
@@ -449,39 +552,60 @@ never blocks the archive."
           :description "Why the application could not be completed and the lead is being archived."))
  :category "jobsearch")
 
-(gptel-make-preset 'job-apply
-  :description "Apply to the next LEAD in the pipeline in a real browser."
-  :parents 'jobsearch
-  :pre (lambda ()
-         (add-to-list 'mcp-hub-servers
-                      '("playwright" . (
-                                        :command "playwright-mcp"
-                                        :args ("--executable-path" "/home/ivand/src/cv/.devenv/profile/bin/chromium-sandboxed"))))
-         (gptel-mcp-connect '("playwright") t))
-  :system "You apply for software jobs on behalf of the user by driving a web
-browser. First call the cv_jobs_next_lead tool to get the next lead and its URL,
-then use the playwright mcp to navigate to the url and fill out an application form.
-If the url list more than one job find the most suitable opening and apply to that one.
-Do not apply to more than one job per lead. The relevant files are
-~/src/cv/result/Ivan_Dimitrov_Resume_Software_Developer.pdf
-~/src/cv/result/Ivan_Dimitrov_Resume_Software_Developer_ATS.pdf
-~/src/cv/cv.typ
-~/src/cv/cv-ats.typ
-Other relevant information:
-Name: Ivan Dimitrov
-Email: ivan@idimitrov.dev
-Phone number +84898532337
-Upwork url: https://www.upwork.com/freelancers/idimitrov
-LinkedIn url: https://www.linkedin.com/in/devidimitrov
-GitHub url: https://github.com/ivandimitrov8080
-GitLab url: https://gitlab.com/ivandimitrov8080
-Resume url: https://idimitrov.dev
-Right to work in EU and B2B remote.
-Business is registered in Bulgaria.
-VERY IMPORTANT:
-Do not fabricate information. Inferring information from the CV is allowed. Do not fill out form fields that are not absolutely required. Avoid free text fields that want an open answer. If the field is required but the information is not present in the CV then stop applying. If you stop applying, or otherwise cannot complete the application, do not leave the lead in the pipeline: call the cv_jobs_archive_lead tool with a short reason explaining why, so the lead is archived with a note instead."
-  :tools '("mcp-playwright" "cv_jobs_next_lead" "cv_jobs_mark_applied"
-           "cv_jobs_archive_lead"))
+;;; The supervisor
+
+;; `job' is the preset you address as `@job'.  It has exactly one tool, the
+;; `Agent' tool that gptel-agent provides, so all it can do with the outside
+;; world is delegate to `job-search' or `job-apply'.  It deliberately has no
+;; file or shell tools of its own: the pipeline is the sub-agents' business.
+
+(defun cv-jobs--agent-roster ()
+  "Return a bulleted list of the available sub-agents, for the `job' prompt."
+  (mapconcat
+   (lambda (name)
+     (format "- `%s`: %s" name
+             (or (plist-get (cdr (assoc name (bound-and-true-p gptel-agent--agents)))
+                            :description)
+                 "(no description)")))
+   cv-jobs-agent-names "\n"))
+
+(gptel-make-preset 'job
+  :description "Job-search supervisor: answers questions and delegates to sub-agents."
+  :backend "Deepseek"
+  :model 'deepseek-v4-flash
+  :use-tools t
+  :tools '("Agent")
+  :system
+  (lambda ()
+    (concat
+     "You are the job-search supervisor for the CV project in ~/src/cv.
+
+You have one tool, `Agent', which runs a specialised sub-agent to completion
+and returns its report.  Available sub-agents:
+
+"
+     (cv-jobs--agent-roster)
+     "
+
+Rules:
+- Answer directly from what you already know.  Only delegate work that
+  genuinely needs a tool.
+- Sub-agents share no context with this conversation: they see only the
+  `prompt' you pass them.  Every brief must be self-contained -- name the
+  company, the URL, which lead, and exactly what to report back.  Never write
+  \"the one we discussed\".
+- Delegate a whole browser application run to `job-apply'.  Do not try to
+  drive the pipeline yourself: `job-apply' owns the cv_jobs_* tools and the
+  per-run state behind them.
+- Never edit jobs.org directly and never invent an answer for an application
+  form.  If a required field is not in the CV, the sub-agent archives the lead
+  instead of guessing.
+- Report what the sub-agent returned.  Do not hand the task back to the user.")))
+
+;; The setup call lives here rather than next to `cv-jobs-setup' because the
+;; function now registers the sub-agents, and `cv-jobs--install-subagents'
+;; (and gptel-agent itself) are only defined further down this file.
+(cv-jobs-setup)
 
 (provide 'jobsearch)
 ;;; jobsearch.el ends here
