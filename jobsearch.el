@@ -309,7 +309,7 @@ in place and the hooks and agenda entries are idempotent."
 
 (setq org-export-with-properties t)
 
-(gptel-make-preset 'jobsearch
+(gptel-make-preset 'job-search
   :description "Search the web for remote software dev jobs."
   :backend "Deepseek"
   :model 'deepseek-v4-flash
@@ -449,7 +449,7 @@ never blocks the archive."
           :description "Why the application could not be completed and the lead is being archived."))
  :category "jobsearch")
 
-(gptel-make-preset 'jobsearch-apply
+(gptel-make-preset 'job-apply
   :description "Apply to the next LEAD in the pipeline in a real browser."
   :parents 'jobsearch
   :pre (lambda ()
