@@ -43,8 +43,8 @@
             installPhase = ''
               runHook preBuild
               mkdir -p $out
-              cp cv.pdf $out/Ivan_Dimitrov_Resume_Software_Developer.pdf
-              cp cv-ats.pdf $out/Ivan_Dimitrov_Resume_Software_Developer_ATS.pdf
+              cp cv.pdf $out/Ivan_Dimitrov_Resume_IT_Consultant.pdf
+              cp cv-ats.pdf $out/Ivan_Dimitrov_Resume_IT_Consultant_ATS.pdf
               runHook postBuild
             '';
           };

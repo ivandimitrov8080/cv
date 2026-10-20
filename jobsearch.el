@@ -57,7 +57,7 @@ Only {{position}} and {{company}} are substituted."
   :type 'file)
 
 (defcustom cv-jobs-email-attachments
-  (list (expand-file-name "cv.pdf" cv-jobs-directory))
+  (list (expand-file-name "result/Ivan_Dimitrov_Resume_Software_Developer.pdf" cv-jobs-directory))
   "Files attached to application emails."
   :type '(repeat file))
 
@@ -281,16 +281,32 @@ it when nothing matches and :company and :role are given."
 
 ;;; Application email
 
+(defvar cv-jobs--send-step "start"
+  "Last step attempted by `cv-jobs-send-application-email'.")
+
 (defun cv-jobs--fill (text lead)
   "Substitute {{position}} and {{company}} in TEXT from LEAD."
   (replace-regexp-in-string
    "{{\\([a-z]+\\)}}"
    (lambda (m)
-     (let ((key (intern (substring m 2 -2))))
+     (let ((key (intern (concat ":" (substring m 2 -2)))))
        (unless (memq key '(:position :company))
          (user-error "Unsupported placeholder %s in the email template" m))
        (or (plist-get lead key) "")))
    text t t))
+
+(defun cv-jobs--mail-buffer (email subject body)
+  "Return an unsent `mail-mode' buffer with EMAIL, SUBJECT and BODY.
+The caller attaches the CV files and sends it, then kills the buffer."
+  (let ((buffer (generate-new-buffer "*job application*")))
+    (with-current-buffer buffer
+      (insert "To: " email "\n"
+              "Subject: " subject "\n"
+              mail-header-separator "\n"
+              body)
+      (unless (bolp) (insert "\n"))
+      (mail-mode)
+      buffer)))
 
 (defun cv-jobs-send-application-email (email company position)
   "Send the user's pre-written application email to EMAIL.
@@ -298,33 +314,50 @@ COMPANY and POSITION are the only values substituted into
 `cv-jobs-email-template-file'; the body is never generated here, and the
 files in `cv-jobs-email-attachments' are attached."
   (interactive "sApplication email: \nsCompany: \nsPosition: ")
-  (condition-case err
-      (let ((text (with-temp-buffer
-                    (insert-file-contents cv-jobs-email-template-file)
-                    (buffer-string))))
-        (when (string-match-p "<<<" text)
-          (user-error "Write your application email in %s first"
-                      cv-jobs-email-template-file))
-        (unless (string-match "\\`Subject:[ \t]*\\(.+\\)\n" text)
-          (user-error "The first line of %s must be `Subject: ...'"
-                      cv-jobs-email-template-file))
-        (let* ((subject-line (match-string 1 text))
-               (rest (substring text (match-end 0)))
-               (lead (list :company company :position position))
-               (subject (cv-jobs--fill subject-line lead))
-               (body (cv-jobs--fill rest lead))
-               (buffer (message-mail email subject)))
-          (with-current-buffer buffer
-            (setq-local message-signature nil)
-            (message-goto-body)
-            (insert body)
-            (unless (bolp) (insert "\n"))
-            (dolist (file cv-jobs-email-attachments)
-              (mml-attach-file file "application/pdf" nil "attachment"))
-            (message-send))
-          (format "Application email sent to %s for %s at %s."
-                  email position company)))
-    (error (format "Application email NOT sent: %s" (error-message-string err)))))
+  (let ((cv-jobs--send-step "reading the template")
+        buffer)
+    (condition-case err
+        (progn
+          (unless (string-match-p "@" email)
+            (user-error "Not an email address: %s" email))
+          (let ((text (with-temp-buffer
+                        (insert-file-contents cv-jobs-email-template-file)
+                        (buffer-string))))
+            (when (string-match-p "<<<" text)
+              (user-error "Write your application email in %s first"
+                          cv-jobs-email-template-file))
+            (setq cv-jobs--send-step "parsing the template")
+            (unless (string-match "\\`Subject:[ \t]*\\(.+\\)\n" text)
+              (user-error "The first line of %s must be `Subject: ...'"
+                          cv-jobs-email-template-file))
+            (let* ((lead (list :company company :position position))
+                   (subject (cv-jobs--fill (match-string 1 text) lead))
+                   (body (cv-jobs--fill (substring text (match-end 0)) lead))
+                   (attachments (seq-filter #'identity cv-jobs-email-attachments)))
+              (dolist (file attachments)
+                (unless (file-readable-p file)
+                  (user-error "Attachment %s is missing" file)))
+              (when (and attachments (not (fboundp 'mail-add-attachment)))
+                (user-error "Cannot attach %s: this Emacs has no `mail-add-attachment'"
+                            (car attachments)))
+              (setq cv-jobs--send-step "composing the message")
+              (setq buffer (cv-jobs--mail-buffer email subject body))
+              (with-current-buffer buffer
+                (setq cv-jobs--send-step "attaching the CV")
+                (dolist (file attachments)
+                  (mail-add-attachment file))
+                (setq cv-jobs--send-step "sending")
+                ;; `send-mail-function' is sendmail-send-it here, so this
+                ;; hands the message to msmtp and waits for the exit status.
+                (let ((mail-interactive t))
+                  (mail-send)))
+              (when (buffer-live-p buffer) (kill-buffer buffer))
+              (format "Application email sent to %s for %s at %s."
+                      email position company))))
+      (error
+       (when (buffer-live-p buffer) (kill-buffer buffer))
+       (format "Application email NOT sent (%s): %s"
+               cv-jobs--send-step (error-message-string err))))))
 
 ;;; Agent tools
 
@@ -351,8 +384,8 @@ files in `cv-jobs-email-attachments' are attached."
   (if (not (and cv-jobs--current (marker-buffer cv-jobs--current)))
       "No lead selected; call cv_jobs_next_lead first."
     (let ((heading (plist-get (cv-jobs-lead cv-jobs--current
-                                             :state "APPLIED"
-                                             :note "Application sent.")
+                                            :state "APPLIED"
+                                            :note "Application sent.")
                               :heading)))
       (setq cv-jobs--current nil)
       (format "Marked %s as APPLIED and scheduled a follow-up." heading))))
