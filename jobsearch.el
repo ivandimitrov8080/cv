@@ -57,7 +57,7 @@ Only {{position}} and {{company}} are substituted."
   :type 'file)
 
 (defcustom cv-jobs-email-attachments
-  (list (expand-file-name "result/Ivan_Dimitrov_Resume_Software_Developer.pdf" cv-jobs-directory))
+  (list (expand-file-name "result/Ivan_Dimitrov_Resume_IT_Consultant.pdf" cv-jobs-directory))
   "Files attached to application emails."
   :type '(repeat file))
 
