@@ -217,7 +217,8 @@ SCHEDULED: <2026-10-22 Thu>
 Note taken on 2026-10-15 Thu 14:13 \\
   Application sent.
 :END:
-** LEAD Better Stack — Full-stack Engineer                       :jobsearch:
+** APPLIED Better Stack — Full-stack Engineer                  :jobsearch:
+SCHEDULED: <2026-10-27 Tue>
    :PROPERTIES:
    :URL: https://betterstack.com/careers/fullstack-engineer
    :LOCATION: Remote (North America &amp; Europe)
@@ -225,8 +226,13 @@ Note taken on 2026-10-15 Thu 14:13 \\
    :ENGLISH: yes
    :NOTES: Observability/uptime + logging + incident SaaS. ENGINEER-LED company (CEO, COO and CTO are all engineers): "we are engineers, making the tools we always wanted" = strong no-HR signal. Looking for full-stack product-engineer generalists who "given enough time, could build Better Stack on their own"; high-quality UX, end-to-end ownership. Remote across North America &amp; Europe (works for CET). Public engineering culture (juraj.blog, /careers/engineering). React frontend, backend not Java (lateral). Source: HN Oct 2026.
    :CREATED: 2026-10-15
+   :APPLIED_ON: 2026-10-20
    :END:
-** LEAD SerpApi — Full-stack Engineer (Junior–Senior)            :jobsearch:
+:LOGBOOK:
+Note taken on 2026-10-20 Tue 12:02 \\
+  Application sent.
+:END:
+** APPLIED SerpApi — Full-stack Engineer (Junior–Senior)       :jobsearch:
    :PROPERTIES:
    :URL: https://serpapi.com/careers
    :LOCATION: Fully remote (worldwide) — Austin, TX HQ
@@ -234,6 +240,7 @@ Note taken on 2026-10-15 Thu 14:13 \\
    :ENGLISH: yes
    :NOTES: Search-engine scraping/parsing API (100+ APIs for Google, Maps, Images, Bing, Baidu). Remote-first BEFORE Covid — hours from the Da Nang track: fully distributed, mostly async via GitHub, CI/CD, code reviews, code pairings, profit sharing. Strong transparency: open books, public roadmap, donates to EFF. Stack Ruby/Rails/MongoDB + React (NOT Java — lateral). Pay: $150–180K US 1099, or local avg +20% outside US. Source: HN Oct 2026.
    :CREATED: 2026-10-15
+   :APPLIED_ON: 2026-10-20
    :END:
 ** LEAD All Gravy — Senior Software Engineer (Full-stack TypeScript) :jobsearch:
    :PROPERTIES:
