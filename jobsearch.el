@@ -468,6 +468,7 @@ files in `cv-jobs-email-attachments' are attached."
   :model 'deepseek-v4-flash
   :use-tools t
   :tools '("Agent")
+  :confirm-tool-calls nil
   :system
   (lambda ()
     (format "You are the job-search supervisor for ~/src/cv.
