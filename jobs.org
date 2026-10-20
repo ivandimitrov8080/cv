@@ -242,34 +242,8 @@ Note taken on 2026-10-20 Tue 12:02 \\
    :CREATED: 2026-10-15
    :APPLIED_ON: 2026-10-20
    :END:
-** LEAD All Gravy — Senior Software Engineer (Full-stack TypeScript) :jobsearch:
-   :PROPERTIES:
-   :URL: https://allgravy.com/careers
-   :LOCATION: Remote (European time zones) or Copenhagen/London
-   :SIZE: small
-   :ENGLISH: yes
-   :NOTES: Workforce platform for frontline hospitality/retail (scheduling, shift swaps, AI assistant); 2,000+ stores incl. Dishoom, Ottolenghi, Gail's, 7-Eleven; 10x growth in 2 years. Owns features end-to-end from employee/manager UI to backend services and data. Stack: TypeScript everywhere — React, React Native, Node.js, NestJS, MongoDB (NOT Java — lateral, but React-strong CV matches the front half). Remote across European time zones; AI-first dev culture. Source: HN Oct 2026.
-   :CREATED: 2026-10-15
-   :END:
-** LEAD Salmon Group — Software Developer (Kotlin/Java), Payment Platform :jobsearch:
-   :PROPERTIES:
-   :URL: https://www.linkedin.com/jobs/view/software-developer-kotlin-java-payment-platform-at-salmon-group-ltd-4478478946
-   :LOCATION: Remote (European Union)
-   :SIZE: small
-   :ENGLISH: yes
-   :NOTES: Fintech building digital banking/lending + QR payments across SE Asia (Philippines), backed by international investors. JVM core: Kotlin/Java, high-load mission-critical banking and payments platforms, DDD, concurrency/async, public APIs + internal SDKs. DIRECT Java stack hit — closest large-scale fit found this round. Several JVM roles open (Backend Lead Java/Kotlin; Java Developer RBB — Kotlin transition; Kotlin Developer, Core). CAVEAT: one variant lists core collaboration hours in Manila time (UTC+8) — verify CET overlap before investing. Source: remotejavajobs EU + LinkedIn.
-   :CREATED: 2026-10-15
-   :END:
-** LEAD Appfire — Fullstack Developer (Java &amp; TypeScript)    :jobsearch:
-   :PROPERTIES:
-   :URL: https://appfire.com/careers
-   :LOCATION: Remote (Poland / Bulgaria)
-   :SIZE: mid
-   :ENGLISH: yes
-   :NOTES: Enterprise-collaboration / Atlassian-ecosystem tooling vendor (PE-backed by TA Associates). DIRECT stack match: Java + Spring Boot + REST APIs, plus TypeScript/Node.js and React with modern state management; unit/integration/e2e testing, code reviews. Team: Workflow &amp; Automation solutions used by thousands of companies. Remote; explicitly no relocation/visa sponsorship. Source: remotejavajobs (EU) + TA Associates job board.
-   :CREATED: 2026-10-15
-   :END:
-** LEAD Oscilar — Senior/Staff Java Backend Engineer             :jobsearch:
+** APPLIED Oscilar — Senior/Staff Java Backend Engineer          :jobsearch:
+SCHEDULED: <2026-10-27 Tue>
    :PROPERTIES:
    :URL: https://jobs.ashbyhq.com/oscilar
    :LOCATION: Remote (Brazil / Poland / India)
@@ -277,27 +251,12 @@ Note taken on 2026-10-20 Tue 12:02 \\
    :ENGLISH: yes
    :NOTES: AI risk-decisioning platform for onboarding, fraud, credit and compliance (fintech). DIRECT Java backend role. GEO-GATED: the backend role is listed for Brazil/Poland/India only — Bulgaria is not in the named list, so verify eligibility before applying. Other openings span US/Canada/UK. Source: HN Oct 2026.
    :CREATED: 2026-10-15
+   :APPLIED_ON: 2026-10-20
    :END:
-** LEAD Checkly — Senior Product Engineer (DevTools &amp; AI reliability) :jobsearch:
-   :PROPERTIES:
-   :URL: https://jobs.ashbyhq.com/checkly/8d068314-5ef8-4dcb-96a0-f79030a42dc1
-   :LOCATION: Remote (UTC-3 to UTC+3) — Europe-friendly
-   :SIZE: mid
-   :ENGLISH: yes
-   :NOTES: Monitoring-as-code / synthetic monitoring built on OpenTelemetry + Playwright, plus "Rocky" AI. Remote-first, async-first; you talk directly to on-call/SRE users. €79K–€105K + equity. Stack TS/Node (NOT Java — lateral), but strong product-engineering + DevTools domain. Source: HN Oct 2026.
-   :CREATED: 2026-10-15
-   :END:
-** LEAD Kestra Technologies — Open Application (Engineering) / Senior Security Engineer :jobsearch:
-   :PROPERTIES:
-   :URL: https://kestra.io/careers
-   :LOCATION: Remote (Europe)
-   :SIZE: small
-   :ENGLISH: yes
-   :NOTES: Open-source declarative orchestration/scheduling platform for data, AI and infrastructure workflows (2,100+ plugins). JVM/Java core — plausible stack fit for a Spring developer. Remote-first, fully distributed, "work from anywhere"; covers office/coworking costs + hardware. Current Europe-remote openings: Senior Security Engineer and an Open Application (no matching job title yet) — submit an open application for engineering. Source: HN Oct 2026.
-   :CREATED: 2026-10-15
-   :END:
+- Note [2026-10-20 Tue 16:48] Application sent.
 
-** LEAD CloudLinux — Java Developer (worldwide remote)           :jobsearch:
+** APPLIED CloudLinux — Java Developer (worldwide remote)        :jobsearch:
+SCHEDULED: <2026-10-27 Tue>
    :PROPERTIES:
    :URL: https://www.cloudlinux.com/about-us-careers
    :LOCATION: Remote — worldwide ("work anywhere")
@@ -305,23 +264,12 @@ Note taken on 2026-10-20 Tue 12:02 \\
    :ENGLISH: yes
    :NOTES: Linux/hosting security vendor (TuxCare extended-lifecycle). Java Developer AND Senior Java Developer roles posted explicitly as "remote, work anywhere" — NO location restrictions, flexible hours, 24 days vacation. Stack Java/Python/PHP/Angular. Direct Java fit; values async. Source: TrulyRemoteWork + Workable (apply.workable.com/cloudlinux-1). Promising worldwide lane.
    :CREATED: 2026-10-15
+   :APPLIED_ON: 2026-10-20
    :END:
-** LEAD Metabase — Software Engineer (Backend)                   :jobsearch:
-   :PROPERTIES:
-   :URL: https://www.metabase.com/jobs
-   :LOCATION: Remote — worldwide (fully distributed)
-   :SIZE: small
-   :ENGLISH: yes
-   :NOTES: Open-source BI/analytics (90k+ orgs). Engineering-led, async-first, global team (50% outside US). Codebase is Clojure + JS/TS; JDBC/DB-integration and Java/JVM-ecosystem experience listed as nice-to-have. Multiple backend openings. $110K–$210K (US base). One of the strongest true-worldwide, low-HR fits. Source: TrulyRemoteWork / Lever.
-   :CREATED: 2026-10-15
-   :ARCHIVE_TIME: 2026-10-15 Thu 14:56
-   :ARCHIVE_FILE: ~/src/cv/jobs.org
-   :ARCHIVE_OLPATH: Pipeline
-   :ARCHIVE_CATEGORY: jobs
-   :ARCHIVE_TODO: LEAD
-   :ARCHIVE_ITAGS: jobsearch
-   :END:
-** LEAD Volante Technologies — Java Full Stack Developer (React/Angular) :jobsearch:
+- Note [2026-10-20 Tue 16:52] Application sent.
+
+** APPLIED Volante Technologies — Java Full Stack Developer (React/Angular) :jobsearch:
+SCHEDULED: <2026-10-27 Tue>
    :PROPERTIES:
    :URL: https://www.volantetech.com/about/careers/
    :LOCATION: Remote
@@ -335,52 +283,10 @@ Note taken on 2026-10-20 Tue 12:02 \\
    :ARCHIVE_CATEGORY: jobs
    :ARCHIVE_TODO: LEAD
    :ARCHIVE_ITAGS: jobsearch
+   :APPLIED_ON: 2026-10-20
    :END:
-** LEAD Hazelcast — Senior Software Engineer, Applications (Java / Spring Boot) :jobsearch:
-   :PROPERTIES:
-   :URL: https://hazelcast.pinpointhq.com/
-   :LOCATION: Remote (remote-first company)
-   :SIZE: small
-   :ENGLISH: yes
-   :NOTES: In-memory data grid / real-time stream processing platform; "a remote company — work where you want". TWO direct hits: Applications team (Java + Spring Boot) and Core team (Senior Java Engineer — JVM, concurrency, networking, strong consistency). Excellent Java/Spring stack match.
-   :CREATED: 2026-10-15
-   :ARCHIVE_TIME: 2026-10-15 Thu 14:56
-   :ARCHIVE_FILE: ~/src/cv/jobs.org
-   :ARCHIVE_OLPATH: Pipeline
-   :ARCHIVE_CATEGORY: jobs
-   :ARCHIVE_TODO: LEAD
-   :ARCHIVE_ITAGS: jobsearch
-   :END:
-** LEAD Vaadin — Java Developer                                  :jobsearch:
-   :PROPERTIES:
-   :URL: https://vaadin.com/company/careers
-   :LOCATION: Remote-first (Finland HQ)
-   :SIZE: small
-   :ENGLISH: yes
-   :NOTES: Open-source Java web-UI framework + commercial tooling; used by 150k+ Java developers. Explicit remote-first culture, flexible hours, transparency. Direct Java fit; small => low HR. Source: vaadin.com/company/careers (Workable).
-   :CREATED: 2026-10-15
-   :ARCHIVE_TIME: 2026-10-15 Thu 14:56
-   :ARCHIVE_FILE: ~/src/cv/jobs.org
-   :ARCHIVE_OLPATH: Pipeline
-   :ARCHIVE_CATEGORY: jobs
-   :ARCHIVE_TODO: LEAD
-   :ARCHIVE_ITAGS: jobsearch
-   :END:
-** LEAD team.blue — Senior Java Backend Developer (Full Remote)  :jobsearch:
-   :PROPERTIES:
-   :URL: https://careers.team.blue/jobs
-   :LOCATION: Remote — Europe (Italy brand)
-   :SIZE: large
-   :ENGLISH: yes
-   :NOTES: European digital-enabler / hosting group (3.3M customers, 2000+ staff) across 23 countries with explicit fully-remote roles. Direct Java/Spring backend match; listed band EUR 34,297–48,995. Source: Remote Java Jobs (Europe) + itcareers.team.blue.
-   :CREATED: 2026-10-15
-   :ARCHIVE_TIME: 2026-10-15 Thu 14:56
-   :ARCHIVE_FILE: ~/src/cv/jobs.org
-   :ARCHIVE_OLPATH: Pipeline
-   :ARCHIVE_CATEGORY: jobs
-   :ARCHIVE_TODO: LEAD
-   :ARCHIVE_ITAGS: jobsearch
-   :END:
+- Note [2026-10-20 Tue 16:54] Application sent.
+
 ** LEAD InPost — Senior Software Engineer (Java)                 :jobsearch:
    :PROPERTIES:
    :URL: https://tech.inpost-group.com/careers
@@ -1728,4 +1634,152 @@ Note taken on 2026-10-15 Thu 14:10 \\
    :ARCHIVE_TODO: APPLIED
    :ARCHIVE_ITAGS: jobsearch
    :END:
+
+** LEAD All Gravy — Senior Software Engineer (Full-stack TypeScript) :jobsearch:
+   :PROPERTIES:
+   :URL: https://allgravy.com/careers
+   :LOCATION: Remote (European time zones) or Copenhagen/London
+   :SIZE: small
+   :ENGLISH: yes
+   :NOTES: Workforce platform for frontline hospitality/retail (scheduling, shift swaps, AI assistant); 2,000+ stores incl. Dishoom, Ottolenghi, Gail's, 7-Eleven; 10x growth in 2 years. Owns features end-to-end from employee/manager UI to backend services and data. Stack: TypeScript everywhere — React, React Native, Node.js, NestJS, MongoDB (NOT Java — lateral, but React-strong CV matches the front half). Remote across European time zones; AI-first dev culture. Source: HN Oct 2026.
+   :CREATED: 2026-10-15
+   :ARCHIVE_TIME: 2026-10-20 Tue 16:45
+   :ARCHIVE_FILE: ~/src/cv/jobs.org
+   :ARCHIVE_OLPATH: Pipeline
+   :ARCHIVE_CATEGORY: jobs
+   :ARCHIVE_TODO: LEAD
+   :END:
+- Note [2026-10-20 Tue 16:45] Blocked: lead role 'Senior Software Engineer (Full-stack TypeScript)' is no longer on allgravy.com/careers (page 404s; careers.allgravy.com has 16 other roles). No application email found (only privacy@). Closest opening, Senior AI Engineer, requires a mandatory free-text answer to "What's the last thing you built with AI?", which cannot be sourced from the CV/materials without fabricating.
+
+** LEAD Salmon Group — Software Developer (Kotlin/Java), Payment Platform :jobsearch:
+   :PROPERTIES:
+   :URL: https://www.linkedin.com/jobs/view/software-developer-kotlin-java-payment-platform-at-salmon-group-ltd-4478478946
+   :LOCATION: Remote (European Union)
+   :SIZE: small
+   :ENGLISH: yes
+   :NOTES: Fintech building digital banking/lending + QR payments across SE Asia (Philippines), backed by international investors. JVM core: Kotlin/Java, high-load mission-critical banking and payments platforms, DDD, concurrency/async, public APIs + internal SDKs. DIRECT Java stack hit — closest large-scale fit found this round. Several JVM roles open (Backend Lead Java/Kotlin; Java Developer RBB — Kotlin transition; Kotlin Developer, Core). CAVEAT: one variant lists core collaboration hours in Manila time (UTC+8) — verify CET overlap before investing. Source: remotejavajobs EU + LinkedIn.
+   :CREATED: 2026-10-15
+   :ARCHIVE_TIME: 2026-10-20 Tue 16:46
+   :ARCHIVE_FILE: ~/src/cv/jobs.org
+   :ARCHIVE_OLPATH: Pipeline
+   :ARCHIVE_CATEGORY: jobs
+   :ARCHIVE_TODO: LEAD
+   :END:
+- Note [2026-10-20 Tue 16:46] Blocked: no application email (only service@salmon.ph, not for job applications; LinkedIn route requires login). Ashby form at careers.salmon.ph requires unsourceable mandatory data: Telegram username, gross monthly USD salary expectation, visa sponsorship status, years of JVM experience, Spring Boot/payments-domain experience, English CEFR level, and commitment to 13:00-19:00 GMT+8 sync hours. Nothing in the CV/materials provides these, so applying would require fabrication.
+
+** LEAD Appfire — Fullstack Developer (Java &amp; TypeScript)    :jobsearch:
+   :PROPERTIES:
+   :URL: https://appfire.com/careers
+   :LOCATION: Remote (Poland / Bulgaria)
+   :SIZE: mid
+   :ENGLISH: yes
+   :NOTES: Enterprise-collaboration / Atlassian-ecosystem tooling vendor (PE-backed by TA Associates). DIRECT stack match: Java + Spring Boot + REST APIs, plus TypeScript/Node.js and React with modern state management; unit/integration/e2e testing, code reviews. Team: Workflow &amp; Automation solutions used by thousands of companies. Remote; explicitly no relocation/visa sponsorship. Source: remotejavajobs (EU) + TA Associates job board.
+   :CREATED: 2026-10-15
+   :ARCHIVE_TIME: 2026-10-20 Tue 16:47
+   :ARCHIVE_FILE: ~/src/cv/jobs.org
+   :ARCHIVE_OLPATH: Pipeline
+   :ARCHIVE_CATEGORY: jobs
+   :ARCHIVE_TODO: LEAD
+   :END:
+- Note [2026-10-20 Tue 16:47] Blocked: no application email (only privacy@appfire.com, which is not an application address). The matching opening 'Fullstack Developer (Java & React)' (Bulgaria, req 890) has a mandatory Greenhouse form with required questions I cannot answer without fabricating: 'What is your desired compensation? (EU gross per year)' (salary expectation - prohibited), 'How many years of experience do you have in similar roles?', 'Do you have professional experience in Java 11?', 'Do you have professional experience of React?' - none of these are sourceable from the CV/materials available to me.
+
+** LEAD Checkly — Senior Product Engineer (DevTools &amp; AI reliability) :jobsearch:
+   :PROPERTIES:
+   :URL: https://jobs.ashbyhq.com/checkly/8d068314-5ef8-4dcb-96a0-f79030a42dc1
+   :LOCATION: Remote (UTC-3 to UTC+3) — Europe-friendly
+   :SIZE: mid
+   :ENGLISH: yes
+   :NOTES: Monitoring-as-code / synthetic monitoring built on OpenTelemetry + Playwright, plus "Rocky" AI. Remote-first, async-first; you talk directly to on-call/SRE users. €79K–€105K + equity. Stack TS/Node (NOT Java — lateral), but strong product-engineering + DevTools domain. Source: HN Oct 2026.
+   :CREATED: 2026-10-15
+   :ARCHIVE_TIME: 2026-10-20 Tue 16:49
+   :ARCHIVE_FILE: ~/src/cv/jobs.org
+   :ARCHIVE_OLPATH: Pipeline
+   :ARCHIVE_CATEGORY: jobs
+   :ARCHIVE_TODO: LEAD
+   :END:
+- Note [2026-10-20 Tue 16:49] Blocked: no application email on the posting, Checkly careers page or contact page (contact is sales only; no careers@/jobs@ address). The Ashby form requires free-text/evaluative answers that cannot be sourced from the CV or provided materials without fabricating: 'Tell us about an engineering project you're particularly proud of (max 5 sentences)', 'How do you leverage AI in your day to day work?', 'What monitoring/observability product do you love or hate, and why?', 'What are your annual pay expectations (in EUR)', 'What is your notice period/when can you start?' and 'Where did you find this job?' - all marked required.
+
+** LEAD Kestra Technologies — Open Application (Engineering) / Senior Security Engineer :jobsearch:
+   :PROPERTIES:
+   :URL: https://kestra.io/careers
+   :LOCATION: Remote (Europe)
+   :SIZE: small
+   :ENGLISH: yes
+   :NOTES: Open-source declarative orchestration/scheduling platform for data, AI and infrastructure workflows (2,100+ plugins). JVM/Java core — plausible stack fit for a Spring developer. Remote-first, fully distributed, "work from anywhere"; covers office/coworking costs + hardware. Current Europe-remote openings: Senior Security Engineer and an Open Application (no matching job title yet) — submit an open application for engineering. Source: HN Oct 2026.
+   :CREATED: 2026-10-15
+   :ARCHIVE_TIME: 2026-10-20 Tue 16:50
+   :ARCHIVE_FILE: ~/src/cv/jobs.org
+   :ARCHIVE_OLPATH: Pipeline
+   :ARCHIVE_CATEGORY: jobs
+   :ARCHIVE_TODO: LEAD
+   :END:
+- Note [2026-10-20 Tue 16:50] Blocked: no application email anywhere on kestra.io (careers, contact pages and postings contain no mailto/careers address; contact page is a form only). The Open Application (Remote, Europe) Ashby form requires a mandatory free-text answer to "Why you want to join Kestra?" - an open-ended motivational answer that is not present in the CV/materials and must not be invented. The only other engineering posting is Senior Security Engineer (security-specialist role, not a match for a software developer), and only one job per lead may be applied to.
+
+** LEAD Metabase — Software Engineer (Backend)                   :jobsearch:
+   :PROPERTIES:
+   :URL: https://www.metabase.com/jobs
+   :LOCATION: Remote — worldwide (fully distributed)
+   :SIZE: small
+   :ENGLISH: yes
+   :NOTES: Open-source BI/analytics (90k+ orgs). Engineering-led, async-first, global team (50% outside US). Codebase is Clojure + JS/TS; JDBC/DB-integration and Java/JVM-ecosystem experience listed as nice-to-have. Multiple backend openings. $110K–$210K (US base). One of the strongest true-worldwide, low-HR fits. Source: TrulyRemoteWork / Lever.
+   :CREATED: 2026-10-15
+   :ARCHIVE_TIME: 2026-10-20 Tue 16:53
+   :ARCHIVE_FILE: ~/src/cv/jobs.org
+   :ARCHIVE_OLPATH: Pipeline
+   :ARCHIVE_CATEGORY: jobs
+   :ARCHIVE_TODO: LEAD
+   :ARCHIVE_ITAGS: jobsearch
+   :END:
+- Note [2026-10-20 Tue 16:53] Blocked: no application email (jobs page and Lever posting have no mailto/careers address; Lever form only). The required Lever fields include 'Current location' and 'Where are you based? (city, country)' - the exact location/city is not available in the materials I can access (only that the business is registered in Bulgaria), so answering would be guessing - plus a required anti-robot 'application code' from the browser console. Stopped rather than inventing a location.
+
+** LEAD Hazelcast — Senior Software Engineer, Applications (Java / Spring Boot) :jobsearch:
+   :PROPERTIES:
+   :URL: https://hazelcast.pinpointhq.com/
+   :LOCATION: Remote (remote-first company)
+   :SIZE: small
+   :ENGLISH: yes
+   :NOTES: In-memory data grid / real-time stream processing platform; "a remote company — work where you want". TWO direct hits: Applications team (Java + Spring Boot) and Core team (Senior Java Engineer — JVM, concurrency, networking, strong consistency). Excellent Java/Spring stack match.
+   :CREATED: 2026-10-15
+   :ARCHIVE_TIME: 2026-10-20 Tue 16:55
+   :ARCHIVE_FILE: ~/src/cv/jobs.org
+   :ARCHIVE_OLPATH: Pipeline
+   :ARCHIVE_CATEGORY: jobs
+   :ARCHIVE_TODO: LEAD
+   :ARCHIVE_ITAGS: jobsearch
+   :END:
+- Note [2026-10-20 Tue 16:55] Blocked: no application email (hazelcast.com/company/careers redirects to the Pinpoint board; no mailto/careers address). The lead's role 'Senior Software Engineer, Applications (Java/Spring Boot)' is not posted; closest is 'Senior Java Engineer (Core)' - Remote, UK. Its required form fields cannot be sourced without fabricating: salary expectations, home address (Address Line 1, Town, Postcode), 'Are you eligible to work in the United Kingdom?' and UK visa-sponsorship status (candidate's right to work is EU-only per materials), plus 'system-level vs application-level Java' focus.
+
+** LEAD Vaadin — Java Developer                                  :jobsearch:
+   :PROPERTIES:
+   :URL: https://vaadin.com/company/careers
+   :LOCATION: Remote-first (Finland HQ)
+   :SIZE: small
+   :ENGLISH: yes
+   :NOTES: Open-source Java web-UI framework + commercial tooling; used by 150k+ Java developers. Explicit remote-first culture, flexible hours, transparency. Direct Java fit; small => low HR. Source: vaadin.com/company/careers (Workable).
+   :CREATED: 2026-10-15
+   :ARCHIVE_TIME: 2026-10-20 Tue 16:56
+   :ARCHIVE_FILE: ~/src/cv/jobs.org
+   :ARCHIVE_OLPATH: Pipeline
+   :ARCHIVE_CATEGORY: jobs
+   :ARCHIVE_TODO: LEAD
+   :ARCHIVE_ITAGS: jobsearch
+   :END:
+- Note [2026-10-20 Tue 16:56] Blocked: no Java Developer vacancy on vaadin.com/company/careers - the only posting is an 'Open application' (Workable, apply.workable.com/vaadin/j/967B2F728D) which is On-site in Turku, Finland and explicitly requires 'a cover letter telling us what kinds of opportunities you are looking for, and why they are of interest to you' - an open-ended written answer that is not in the CV/materials and that I must not write on the candidate's behalf. No application email address exists on the careers pages.
+
+** LEAD team.blue — Senior Java Backend Developer (Full Remote)  :jobsearch:
+   :PROPERTIES:
+   :URL: https://careers.team.blue/jobs
+   :LOCATION: Remote — Europe (Italy brand)
+   :SIZE: large
+   :ENGLISH: yes
+   :NOTES: European digital-enabler / hosting group (3.3M customers, 2000+ staff) across 23 countries with explicit fully-remote roles. Direct Java/Spring backend match; listed band EUR 34,297–48,995. Source: Remote Java Jobs (Europe) + itcareers.team.blue.
+   :CREATED: 2026-10-15
+   :ARCHIVE_TIME: 2026-10-20 Tue 16:58
+   :ARCHIVE_FILE: ~/src/cv/jobs.org
+   :ARCHIVE_OLPATH: Pipeline
+   :ARCHIVE_CATEGORY: jobs
+   :ARCHIVE_TODO: LEAD
+   :ARCHIVE_ITAGS: jobsearch
+   :END:
+- Note [2026-10-20 Tue 16:58] Blocked: no application email (posting/careers site offer only a share-link mailto; Teamtailor form is the only route). The Senior Java Backend Developer form (itcareers.team.blue) has mandatory questions I cannot answer without fabricating: 'Do you have the right to work in Italy?', 'Briefly describe your experience with Spring', 'What are your annual gross salary expectations?', 'When would you be available to start?', 'Which Java versions have you used most extensively so far?', a mandatory choice of office (Firenze/Torino/Milano/Bergamo) and a mandatory cover letter. The posting also requires fluency in written and spoken Italian, which is not evidenced anywhere in the materials.
 

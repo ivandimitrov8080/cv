@@ -32,6 +32,7 @@
 (require 'gptel-integrations)
 (require 'gptel-agent nil t)
 
+(setq-default gptel-confirm-tool-calls nil)
 ;; Modern Org no longer installs the global entry points.
 (dolist (k '("C-c c" "C-c a"))
   (unless (lookup-key global-map (kbd k))
