@@ -19,7 +19,8 @@
 ;;   job         the supervisor (`@job'); its only tool is gptel-agent's
 ;;               `Agent' tool, so it answers questions and delegates.
 ;;   job-search  defined in agents/job-search.org -- finds new leads.
-;;   job-apply   defined in agents/job-apply.org -- drives a browser to apply.
+;;   job-apply   defined in agents/job-apply.org -- applies by email when the
+;;               lead offers a direct address, otherwise in a browser.
 ;;
 ;; The latter two are also sub-agents of `job'.  They are defined once, as
 ;; gptel-agent files, and each is registered both as an agent (for the `Agent'
@@ -34,6 +35,10 @@
 (require 'subr-x)
 (require 'seq)
 (require 'gptel)
+(require 'sendmail)
+(require 'message)
+(require 'mml)
+(require 'mail-parse)
 
 (defvar cv-jobs--loaded nil
   "Non-nil once the job-search setup has run in this session.")
@@ -50,6 +55,27 @@
 
 (defconst cv-jobs-cv-file (expand-file-name "cv.typ" cv-jobs-directory)
   "The CV source handed to gptel as context.")
+
+(defcustom cv-jobs-email-template-file
+  (expand-file-name "application-email-template.txt" cv-jobs-directory)
+  "Human-written application email template.
+
+The file must start with a `Subject:' line; everything after the first
+newline is the body.  The only placeholders substituted are
+`{{position}}' and `{{company}}' (the single-brace forms `{position}'
+and `{company}' are accepted too).  Everything else is sent verbatim,
+which is what keeps the email human-written rather than model-written."
+  :type 'file
+  :group 'org)
+
+(defcustom cv-jobs-email-attachments
+  (list (expand-file-name "cv.pdf" cv-jobs-directory))
+  "Files attached to application emails sent by
+`cv-jobs-send-application-email'.  Every listed file must be readable;
+the tool refuses to send rather than send an application without the
+CV.  Set this to nil to send without attachments."
+  :type '(repeat file)
+  :group 'org)
 
 (defcustom cv-jobs-auto-commit nil
   "When non-nil, commit jobs.org automatically after each capture."
@@ -299,14 +325,17 @@ valid.  With a numeric prefix argument, override the age in days, e.g.
              :enum))))
     (message (concat "jobsearch: %s | %s | capture keys: %s | "
                      "jobs.org in agenda: %s | gptel-agent: %s | "
-                     "agents: %s | Agent enum: %s")
+                     "agents: %s | Agent enum: %s | email template: %s")
              (if (featurep 'jobsearch) "loaded" "NOT LOADED")
              bind-desc
              (mapcar #'car (seq-filter #'listp org-capture-templates))
              (if (member cv-jobs-file org-agenda-files) "yes" "no")
              (if (featurep 'gptel-agent) "loaded" "NOT LOADED")
              (mapcar #'car (bound-and-true-p gptel-agent--agents))
-             (if agent-enum (seq-into agent-enum 'list) "n/a"))))
+             (if agent-enum (seq-into agent-enum 'list) "n/a")
+             (if (file-readable-p cv-jobs-email-template-file)
+                 cv-jobs-email-template-file
+               "MISSING"))))
 
 (defun cv-jobs-setup ()
   "(Re)install the job-search captures, agenda, keys and gptel wiring.
@@ -334,14 +363,16 @@ files are re-parsed too, so editing agents/*.org only needs `cv-jobs-reload'."
 ;; agents/job-search.org and is registered by `cv-jobs--install-subagents',
 ;; called from `cv-jobs-setup'.
 
-;;; Applying to leads (Playwright MCP)
+;;; Applying to leads (email first, Playwright fallback)
 
-;; The `job-apply' preset turns the browser into the applicant: it fetches
-;; the next LEAD with the `cv_jobs_next_lead' tool, then drives a real browser
-;; through the Playwright MCP server to fill in, and submit, the application.
-;; Its definition lives in agents/job-apply.org; this section only provides the
-;; emacs-side tools it calls and `cv-jobs--connect-playwright', the function its
-;; `:PRE' property names.
+;; The `job-apply' preset fetches the next LEAD with `cv_jobs_next_lead'.
+;; If the lead's site offers a direct application email, it sends the user's
+;; own pre-written template with `cv_jobs_send_application_email' (this file
+;; only substitutes the position and company names).  If there is no email
+;; route, it falls back to driving a real browser through the Playwright MCP
+;; server to fill in, and submit, the application form.  Its definition lives
+;; in agents/job-apply.org; this section provides the emacs-side tools it calls
+;; and `cv-jobs--connect-playwright', the function its `:PRE' property names.
 ;;
 ;; The `playwright-mcp' binary comes from the project dev shell (see
 ;; flake.nix), so Emacs has to inherit the dev-shell environment (e.g. be
@@ -486,8 +517,8 @@ for the `job-apply' preset."
 
 Reuses `cv-jobs-apply', so the follow-up is scheduled and the
 :APPLIED_ON: property stamped exactly as for a manual application.
-Intended as a gptel tool to call once the browser has submitted the
-application."
+Intended as a gptel tool to call once the application has been
+submitted, whether by the application email tool or by the browser."
   (if (not (and cv-jobs--next-lead-marker
                 (marker-buffer cv-jobs--next-lead-marker)))
       "No lead is selected; call cv_jobs_next_lead first."
@@ -505,6 +536,167 @@ application."
  :function #'cv-jobs-next-lead
  :description "Return the next LEAD from the job-search pipeline in jobs.org, with its URL, location, size, English requirement and contact. Call this first to choose which company to apply to."
  :args nil
+ :category "jobsearch")
+
+;;; Application email
+
+(defconst cv-jobs--email-placeholder-marker
+  "<<<WRITE YOUR APPLICATION EMAIL HERE>>>"
+  "Marker in the starter email template that refuses an unwritten template.")
+
+(defun cv-jobs--email-header-value (value)
+  "Return VALUE with newlines collapsed, safe for an email header."
+  (string-trim (replace-regexp-in-string "[\r\n]+" " " (or value ""))))
+
+(defun cv-jobs--email-address (value)
+  "Return the bare mailbox in VALUE, or signal a `user-error'."
+  (let* ((parsed (ignore-errors (mail-header-parse-address value)))
+         (address (cond ((consp parsed) (car parsed))
+                        ((stringp parsed) parsed)
+                        (t nil))))
+    (unless (and address
+                 (string-match-p "\\`[^@[:space:]<>]+@[^@[:space:]<>]+\\'"
+                                 address))
+      (user-error "Not a valid application email address: %S" value))
+    address))
+
+(defun cv-jobs--email-template-check (text)
+  "Signal if TEXT contains a placeholder other than position/company."
+  (let ((regexp "{{\\([^{}\n]+\\)}}\\|{\\([^{}\n]+\\)}")
+        (start 0))
+    (while (string-match regexp text start)
+      (let ((placeholder (match-string 0 text)))
+        (unless (member placeholder
+                        '("{{position}}" "{{company}}"
+                          "{position}" "{company}"))
+          (user-error "Unknown template placeholder %s; only {{position}} and {{company}} are substituted"
+                      placeholder)))
+      (setq start (match-end 0)))))
+
+(defun cv-jobs--email-fill (text position company)
+  "Replace only the position and company placeholders in TEXT."
+  (replace-regexp-in-string
+   "\\({{\\(?:position\\|company\\)}}\\|{\\(?:position\\|company\\)}\\)"
+   (lambda (match)
+     (pcase match
+       ((or "{{position}}" "{position}") position)
+       ((or "{{company}}" "{company}") company)
+       (_ match)))
+   text t t))
+
+(defun cv-jobs--application-email-parts (position company)
+  "Return (SUBJECT . BODY) built from the user's email template."
+  (unless (file-readable-p cv-jobs-email-template-file)
+    (user-error "Application email template not found: %s"
+                cv-jobs-email-template-file))
+  (let ((template (with-temp-buffer
+                    (insert-file-contents cv-jobs-email-template-file)
+                    (buffer-string))))
+    (setq template (string-trim-left
+                    (replace-regexp-in-string "\r\n?" "\n" template)))
+    (cv-jobs--email-template-check template)
+    (when (string-match-p (regexp-quote cv-jobs--email-placeholder-marker)
+                          template)
+      (user-error "The email template is still the starter file; write it first: %s"
+                  cv-jobs-email-template-file))
+    (let* ((parts (split-string template "\n" nil 2))
+           (subject-line (car parts))
+           (body (or (cadr parts) "")))
+      (unless (string-match "\\`Subject:[ \t]*\\(.*\\)\\'" subject-line)
+        (user-error "The first line of %s must be `Subject: ...'"
+                    cv-jobs-email-template-file))
+      (setq subject-line (match-string 1 subject-line))
+      ;; `split-string' leaves the newline that separated the subject from
+      ;; the body on the front of BODY.  Drop just that one newline; blank
+      ;; lines the user typed after it are part of the body.
+      (when (string-prefix-p "\n" body)
+        (setq body (substring body 1)))
+      (let ((subject (string-trim
+                      (cv-jobs--email-fill subject-line position company)))
+            (body (cv-jobs--email-fill body position company)))
+        (when (string-blank-p subject)
+          (user-error "The email template subject is empty"))
+        (when (string-blank-p body)
+          (user-error "The email template body is empty"))
+        (cons subject body)))))
+
+(defun cv-jobs--send-application-email (email company position)
+  "Send the templated application email.  Internal, may signal."
+  (let* ((address (cv-jobs--email-address email))
+         (company (cv-jobs--email-header-value company))
+         (position (cv-jobs--email-header-value position)))
+    (when (string-blank-p company)
+      (user-error "Company name is empty"))
+    (when (string-blank-p position)
+      (user-error "Position name is empty"))
+    (let ((missing (seq-remove #'file-readable-p cv-jobs-email-attachments)))
+      (when missing
+        (user-error "Application email attachment(s) missing: %s"
+                    (string-join missing ", "))))
+    (let* ((parts (cv-jobs--application-email-parts position company))
+           (subject (car parts))
+           (body (cdr parts))
+           (sent nil)
+           (send-error nil))
+      (save-window-excursion
+        (let ((message-signature nil))
+          (let ((mail-buffer (message-mail address subject)))
+            (with-current-buffer mail-buffer
+              (setq-local message-send-mail-function
+                          #'message-send-mail-with-sendmail)
+              (setq-local message-confirm-send nil)
+              (setq-local message-interactive t)
+              (setq-local mail-interactive t)
+              (message-goto-body)
+              (insert body)
+              (unless (bolp) (insert "\n"))
+              (dolist (file cv-jobs-email-attachments)
+                (mml-attach-file file "application/pdf" nil "attachment"))
+              (condition-case err
+                  (progn
+                    (message-send)
+                    (setq sent t))
+                (error (setq send-error err)))
+              (when sent
+                (let ((kill-buffer-query-functions nil))
+                  (kill-buffer mail-buffer)))))))
+      (unless sent
+        (user-error "Sending failed: %s"
+                    (if send-error
+                        (error-message-string send-error)
+                      "unknown error")))
+      (format "Application email sent to %s for %s at %s."
+              address position company))))
+
+(defun cv-jobs-send-application-email (email company position)
+  "Send the user-written application email to EMAIL.
+
+COMPANY and POSITION are substituted into the template at
+`cv-jobs-email-template-file'; they are the only values taken from the
+agent, and the body of the email is never generated or edited here.
+The files in `cv-jobs-email-attachments' are attached."
+  (interactive "sApplication email: \nsCompany: \nsPosition: ")
+  (let ((result (condition-case err
+                    (cv-jobs--send-application-email email company position)
+                  (error (format "Application email could not be sent: %s"
+                                 (error-message-string err))))))
+    (when (called-interactively-p 'interactive)
+      (message "%s" result))
+    result))
+
+(gptel-make-tool
+ :name "cv_jobs_send_application_email"
+ :function #'cv-jobs-send-application-email
+ :description "Send the user's pre-written application email to a direct job-application address found on the lead's website. Use this first, before trying an application form, whenever the posting or careers/contact page explicitly invites applications by email. The tool substitutes only the position title and company name into the user's template and attaches the CV; do not write or rewrite the email body."
+ :args '((:name "email"
+          :type string
+          :description "The application email address found on the lead's website, e.g. careers@company.com or a named hiring manager's address.")
+         (:name "company"
+          :type string
+          :description "The company name exactly as it should appear in the email.")
+         (:name "position"
+          :type string
+          :description "The exact title of the position being applied for."))
  :category "jobsearch")
 
 (defun cv-jobs-archive-lead (&optional reason)
@@ -594,9 +786,11 @@ Rules:
   `prompt' you pass them.  Every brief must be self-contained -- name the
   company, the URL, which lead, and exactly what to report back.  Never write
   \"the one we discussed\".
-- Delegate a whole browser application run to `job-apply'.  Do not try to
-  drive the pipeline yourself: `job-apply' owns the cv_jobs_* tools and the
-  per-run state behind them.
+- Delegate a whole application run to `job-apply'.  Do not try to drive the
+  pipeline yourself: `job-apply' owns the cv_jobs_* tools and the per-run
+  state behind them.  It sends the user's own email template when the site
+  offers an application address, and falls back to the browser form only
+  when there is no email route.
 - Never edit jobs.org directly and never invent an answer for an application
   form.  If a required field is not in the CV, the sub-agent archives the lead
   instead of guessing.
