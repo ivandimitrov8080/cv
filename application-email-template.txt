@@ -1,3 +1,8 @@
-Subject: Application for {{position}} at {{company}}
+Subject: Ivan Dimitrov IT Consultant Application
 
-<<<WRITE YOUR APPLICATION EMAIL HERE>>>
+Greetings,
+
+I would like to extend my application for {{position}} at {{company}}.
+
+Best Regards,
+Ivan
