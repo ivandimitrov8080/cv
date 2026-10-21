@@ -47,7 +47,7 @@
 (defconst cv-jobs-file (expand-file-name "jobs.org" cv-jobs-directory)
   "The Org tracker file for the job search.")
 
-(defcustom cv-jobs-follow-up-days 7
+(defcustom cv-jobs-follow-up-days 14
   "Days until the follow-up when a lead becomes APPLIED."
   :type 'integer)
 
