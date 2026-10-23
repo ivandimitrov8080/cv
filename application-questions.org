@@ -155,3 +155,24 @@
    :ANSWER: I would like a fully-remote software development job that offers genuinely challenging problems not due to bad management, unrealistic deadlines and lack of testing or bad code quality, but because the problems are technically unique and the solution is not a solved problem. I dislike working with software that reinvents the wheel in a worse way. I like improving on existing solutions if the change is meaningfully different.
    :SOURCE: Vaadin, team.blue
    :END:
+** Address Line 1: / City: / State/Province: / Zip/Postal Code: (all marked required on the Dynatrace SAP SuccessFactors application form)
+:PROPERTIES:
+:SOURCE:
+** Address Line 1 (also City, State/Province and Zip/Postal Code are required)
+:PROPERTIES:
+:SOURCE:
+** What is your full postal address - Address Line 1, City, State/Province and Zip or Postal Code?
+:PROPERTIES:
+:SOURCE:
+** Address Line 1 - City - State/Province - Zip/Postal Code (required by Dynatrace application form)
+:PROPERTIES:
+:SOURCE:
+** Do you have experience with Node.JS
+:PROPERTIES:
+:SOURCE:
+** How would you rate/describe your knowledge of Java?
+:PROPERTIES:
+:SOURCE:
+** If needed, would being employed by an EOR/employer of record be acceptable to you in the future?
+:PROPERTIES:
+:SOURCE:       

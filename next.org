@@ -1,0 +1,7 @@
+** What needs you
+1. *Pipeline is empty and un-writable.* Either jobs.org needs the 10 leads added manually, or =cv_jobs_add_lead= needs to exist. Until then the apply loop cannot continue.
+2. *=cv_jobs_hold_for_question= is broken* — =wrong-type-argument char-or-string-p nil=, hit on JetBrains, Neo4j and BVNK. Two leads that should be /on hold/ were archived instead.
+3. *Missing stored answers* that blocked real applications: out-of-hours on-call willingness; employee contract vs B2B (BVNK is employee-only); postal address (stored as "N/A", fails SAP SuccessFactors); Node.js yes/no; card-issuing/PCI DSS depth; Neo4j/Spring/TDD self-ratings. Salary is stored as the literal string "100 000 EUR / year, 8 000 EUR / month…", which some forms reject.
+4. *Four manual submits* in a browser: Azul, Kalamba, CrateDB, Bitpanda.
+
+One caveat on the email applications: both ads specified a subject line ("HN – Buoyant Control Plane", "Backend Hackernews 2026") that the email tool cannot set, so those two may be filtered on arrival.

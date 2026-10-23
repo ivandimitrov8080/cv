@@ -306,98 +306,8 @@ SCHEDULED: <2026-11-06 Fri>
    :END:
 - Note [2026-10-23 Fri 15:53] Application sent.
 
-** LEAD Dynatrace — Senior Java Software Engineer                :jobsearch:
-   :PROPERTIES:
-   :URL: https://www.dynatrace.com/careers/jobs/
-   :LOCATION: Remote — Europe (e.g. Gdańsk, PL)
-   :SIZE: large
-   :ENGLISH: yes
-   :NOTES: Software-intelligence / APM platform with a Java core. Multiple remote "Senior Java Software Engineer" roles (cloud focus, extensions). Non-US HQ (Austria). Direct Java match; large => HR/ATS-gated. Source: Built In / Jobgether.
-   :CREATED: 2026-10-15
-   :ARCHIVE_TIME: 2026-10-15 Thu 14:57
-   :ARCHIVE_FILE: ~/src/cv/jobs.org
-   :ARCHIVE_OLPATH: Pipeline
-   :ARCHIVE_CATEGORY: jobs
-   :ARCHIVE_TODO: LEAD
-   :ARCHIVE_ITAGS: jobsearch
-   :END:
-** LEAD Azul — Senior Compiler Performance Engineer (Java/JVM)   :jobsearch:
-   :PROPERTIES:
-   :URL: https://www.azul.com/careers/
-   :LOCATION: Remote — Czechia / Serbia / Cyprus
-   :SIZE: mid
-   :ENGLISH: yes
-   :NOTES: Zulu JDK / JVM runtime vendor — pure Java domain company (Azul Platform Prime, Falcon compiler). Remote compiler/performance roles in CZ/RS/CY. Deep JVM fit for a Java dev moving toward platform/runtime work. Source: Remote Java Jobs (Europe).
-   :CREATED: 2026-10-15
-   :ARCHIVE_TIME: 2026-10-15 Thu 14:57
-   :ARCHIVE_FILE: ~/src/cv/jobs.org
-   :ARCHIVE_OLPATH: Pipeline
-   :ARCHIVE_CATEGORY: jobs
-   :ARCHIVE_TODO: LEAD
-   :ARCHIVE_ITAGS: jobsearch
-   :END:
-** LEAD Bitpanda — Java Engineer                                 :jobsearch:
-   :PROPERTIES:
-   :URL: https://www.bitpanda.com/en/careers
-   :LOCATION: Remote — Austria / Europe
-   :SIZE: mid
-   :ENGLISH: yes
-   :NOTES: Vienna-based fintech (crypto/stocks/savings). Java/Kotlin + Spring backends; remote roles across Europe. Non-US HQ. Direct Java/Spring match in a regulated-fintech domain that echoes the Deutsche Börse experience. Source: Remote Java Jobs (Europe).
-   :CREATED: 2026-10-15
-   :ARCHIVE_TIME: 2026-10-15 Thu 14:57
-   :ARCHIVE_FILE: ~/src/cv/jobs.org
-   :ARCHIVE_OLPATH: Pipeline
-   :ARCHIVE_CATEGORY: jobs
-   :ARCHIVE_TODO: LEAD
-   :ARCHIVE_ITAGS: jobsearch
-   :END:
-** LEAD JetBrains — Java/Kotlin Software Engineer (tooling)      :jobsearch:
-   :PROPERTIES:
-   :URL: https://www.jetbrains.com/careers/jobs/
-   :LOCATION: Remote-friendly (EU offices)
-   :SIZE: mid
-   :ENGLISH: yes
-   :NOTES: Makers of IntelliJ IDEA and the Kotlin language — a JVM-centric product company. Several remote roles (30–65 open at a time). Strong domain fit for a Java/Spring developer. Non-US HQ (Czechia). Source: JetBrains careers + remote aggregators.
-   :CREATED: 2026-10-15
-   :ARCHIVE_TIME: 2026-10-15 Thu 14:57
-   :ARCHIVE_FILE: ~/src/cv/jobs.org
-   :ARCHIVE_OLPATH: Pipeline
-   :ARCHIVE_CATEGORY: jobs
-   :ARCHIVE_TODO: LEAD
-   :ARCHIVE_ITAGS: jobsearch
-   :END:
-** LEAD Kalamba Games — Senior Back End Developer (Java)         :jobsearch:
-   :PROPERTIES:
-   :URL: https://kalambagames.com/careers/
-   :LOCATION: Remote
-   :SIZE: small
-   :ENGLISH: yes
-   :NOTES: iGaming studio; its Remote Games Server (RGS) Platform is built on Java/Spring. Senior + mid Back End Developer roles, remote, 26 days PTO. Direct Spring match at a small product studio. Source: Remote Java Jobs (Worldwide) / Built In.
-   :CREATED: 2026-10-15
-   :ARCHIVE_TIME: 2026-10-15 Thu 14:57
-   :ARCHIVE_FILE: ~/src/cv/jobs.org
-   :ARCHIVE_OLPATH: Pipeline
-   :ARCHIVE_CATEGORY: jobs
-   :ARCHIVE_TODO: LEAD
-   :ARCHIVE_ITAGS: jobsearch
-   :END:
-** LEAD Neo4j — Software Engineer (Java)                         :jobsearch:
-   :PROPERTIES:
-   :URL: https://neo4j.com/careers/
-   :LOCATION: Remote-friendly — Europe
-   :SIZE: mid
-   :ENGLISH: yes
-   :NOTES: Graph database written in Java; remote-friendly across Europe (Sweden/Italy/Czechia/UK). Direct Java core-engine fit. Adjacent GraphAware Hume (Neo4j consultancy) also posts EU remote Java roles. Source: neo4j.com/careers + EU Remote Jobs.
-   :CREATED: 2026-10-15
-   :ARCHIVE_TIME: 2026-10-15 Thu 14:58
-   :ARCHIVE_FILE: ~/src/cv/jobs.org
-   :ARCHIVE_OLPATH: Pipeline
-   :ARCHIVE_CATEGORY: jobs
-   :ARCHIVE_TODO: LEAD
-   :ARCHIVE_ITAGS: jobsearch
-   :END:
-
-** LEAD Twikey — Senior Java / Back-end Developer                :jobsearch:
+** APPLIED Twikey — Senior Java / Back-end Developer           :jobsearch:
+SCHEDULED: <2026-11-06 Fri>
    :PROPERTIES:
    :URL: https://www.twikey.com/jobs
    :LOCATION: Remote — Europe (CET ±1); postings explicitly cover Bulgaria
@@ -411,8 +321,12 @@ SCHEDULED: <2026-11-06 Fri>
    :ARCHIVE_CATEGORY: jobs
    :ARCHIVE_TODO: LEAD
    :ARCHIVE_ITAGS: jobsearch
+   :APPLIED_ON: 2026-10-23
    :END:
-** LEAD Feedzai — Software Engineer (Java) — platform / customer engineering :jobsearch:
+- Note [2026-10-23 Fri 17:12] Application sent.
+
+** APPLIED Feedzai — Software Engineer (Java) — platform / customer engineering :jobsearch:
+SCHEDULED: <2026-11-06 Fri>
    :PROPERTIES:
    :URL: https://careers.feedzai.com/
    :LOCATION: Remote (Portugal) — EU-friendly; verify remote eligibility
@@ -426,8 +340,12 @@ SCHEDULED: <2026-11-06 Fri>
    :ARCHIVE_CATEGORY: jobs
    :ARCHIVE_TODO: LEAD
    :ARCHIVE_ITAGS: jobsearch
+   :APPLIED_ON: 2026-10-23
    :END:
-** LEAD Five9 — Software Engineer II — Data Platform (Java / Spring Boot) :jobsearch:
+- Note [2026-10-23 Fri 17:15] Application sent.
+
+** APPLIED Five9 — Software Engineer II — Data Platform (Java / Spring Boot) :jobsearch:
+SCHEDULED: <2026-11-06 Fri>
    :PROPERTIES:
    :URL: https://www.five9.com/company/careers
    :LOCATION: Remote (Portugal) — fully remote for candidates outside the Porto metro area
@@ -441,23 +359,12 @@ SCHEDULED: <2026-11-06 Fri>
    :ARCHIVE_CATEGORY: jobs
    :ARCHIVE_TODO: LEAD
    :ARCHIVE_ITAGS: jobsearch
+   :APPLIED_ON: 2026-10-23
    :END:
-** LEAD CrateDB (Crate.io) — Software Engineer / Database Engineer (open application) :jobsearch:
-   :PROPERTIES:
-   :URL: https://cratedb.com/careers
-   :LOCATION: Remote (Germany / Austria) — remote-first team
-   :SIZE: small
-   :ENGLISH: yes
-   :NOTES: CrateDB is an open-source distributed SQL database written in Java (JVM), PostgreSQL wire-compatible, used for real-time analytics. Company (Dornbirn AT / Berlin) runs a distributed engineering team and accepts a speculative/open application. Strong deep-JVM/Java fit for a Spring developer moving toward database/infrastructure work. NOTE: the careers page was behind Cloudflare at fetch time — check the live openings list before applying. Source: NoDesk EU remote engineering listings ("Speculative Application", CrateDB, Remote Germany).
-   :CREATED: 2026-10-15
-   :ARCHIVE_TIME: 2026-10-15 Thu 15:09
-   :ARCHIVE_FILE: ~/src/cv/jobs.org
-   :ARCHIVE_OLPATH: Pipeline
-   :ARCHIVE_CATEGORY: jobs
-   :ARCHIVE_TODO: LEAD
-   :ARCHIVE_ITAGS: jobsearch
-   :END:
-** LEAD Playson — Senior Backend Engineer                        :jobsearch:
+- Note [2026-10-23 Fri 17:20] Application sent.
+
+** APPLIED Playson — Senior Backend Engineer                   :jobsearch:
+SCHEDULED: <2026-11-06 Fri>
    :PROPERTIES:
    :URL: https://playson.com/careers/
    :LOCATION: Remote — Europe
@@ -471,24 +378,12 @@ SCHEDULED: <2026-11-06 Fri>
    :ARCHIVE_CATEGORY: jobs
    :ARCHIVE_TODO: LEAD
    :ARCHIVE_ITAGS: jobsearch
+   :APPLIED_ON: 2026-10-23
    :END:
-** LEAD Help Scout — Mid/Senior Product Engineer, Intelligence (full-stack) :jobsearch:
-   :PROPERTIES:
-   :URL: https://www.helpscout.com/company/careers/
-   :LOCATION: Remote — fully remote; outside US/Canada hired as contractors
-   :SIZE: small
-   :ENGLISH: yes
-   :NOTES: Customer-support SaaS, fully remote since day one (120+ people worldwide). Engineering stack includes TypeScript/React, Kotlin, Java and PHP, with ClickHouse, Kafka, Postgres, Elasticsearch and LLM tooling. This specific role is frontend-leaning full-stack but the Java is genuinely in the stack, so a Java+React dev can land on a backend-weighted team. They explicitly hire contractors outside the US/Canada, do not sponsor visas, and ask that you don't use AI live in interviews. Transparent salary formula, $1800/yr learning stipend, co-working budget. Source: Jobicy.
-   :CREATED: 2026-10-15
-   :ARCHIVE_TIME: 2026-10-15 Thu 15:09
-   :ARCHIVE_FILE: ~/src/cv/jobs.org
-   :ARCHIVE_OLPATH: Pipeline
-   :ARCHIVE_CATEGORY: jobs
-   :ARCHIVE_TODO: LEAD
-   :ARCHIVE_ITAGS: jobsearch
-   :END:
+- Note [2026-10-23 Fri 17:29] Application sent.
 
-** LEAD Timefold — Platform Backend Engineer / Optimization Model Engineer (Java)
+** APPLIED Timefold — Platform Backend Engineer / Optimization Model Engineer (Java)
+SCHEDULED: <2026-11-06 Fri>
    :PROPERTIES:
    :URL: https://jobs.timefold.ai/
    :LOCATION: Remote-first — hubs in Belgium (Ghent), Czech Republic, Brazil, US; remote/hybrid/on-site
@@ -496,29 +391,13 @@ SCHEDULED: <2026-11-06 Fri>
    :ENGLISH: yes
    :NOTES: Direct Java stack hit: Timefold is the next chapter of OptaPlanner (open-source constraint solver / AI planning optimization). Platform Backend Engineer: Java, Kubernetes, Maven, REST API, JUnit, Docker, cloud, API design, messaging, storage, OAuth; bonus distributed systems/optimization. Also Optimization Model Engineer (Java). ~44 people, Seed $8.8M (Lakestar, SmartFin), founded 2023. Remote-first culture, travel 1-2x/year. IDEAL for a Java/Spring dev wanting product + algorithms. Source: Matcha + SmartFin/KOMPAS job boards.
    :CREATED: 2026-10-15
+   :APPLIED_ON: 2026-10-23
    :END:
+- Note [2026-10-23 Fri 17:34] Application sent.
 
-** LEAD Dreamix Ltd. — Java Engineer / Senior Java Engineer
-   :PROPERTIES:
-   :URL: https://dreamix.eu/careers/
-   :LOCATION: Remote (Bulgaria) — Sofia HQ
-   :SIZE: small
-   :ENGLISH: yes
-   :NOTES: Bulgarian AI-native custom software company; builds quality software/services for enterprises worldwide via Java + Web technologies (also cloud/DevOps, AI/ML, Ericsson-type clients). Explicitly remote Java Engineer and Senior Java Engineer openings; stack includes PostgreSQL, REST, Git, MySQL, MongoDB. Local to the CV (Bulgaria) => no relocation, EU. Small => low-HR signal. Also reachable via Workable (apply.workable.com/dreamix-ltd). Source: Remotive/Himalayas/jobera.
-   :CREATED: 2026-10-15
-   :END:
 
-** LEAD Devexperts — Middle/Senior Java Developer (capital markets / R&amp;D)
-   :PROPERTIES:
-   :URL: https://careers.devexperts.com/vacancies/
-   :LOCATION: Remote (offices incl. Sofia, Bulgaria; Limassol HQ)
-   :SIZE: mid
-   :ENGLISH: yes
-   :NOTES: Capital-markets software vendor (founded 2002) — order lifecycle, low-latency Java trading / exchange systems. Multiple remote Middle/Senior Java Developer roles; ~25 remote jobs open. Direct Java + Spring fit and echoes the Deutsche Börse C7 / capital-markets domain. NOTE: some listings tag a specific region (e.g. BR) — verify remote eligibility for Bulgaria before investing. Source: own careers site + SmartRecruiters.
-   :CREATED: 2026-10-15
-   :END:
-
-** LEAD Bloomreach — Staff Software Engineer (Python, Java/Spring or Go)
+** APPLIED Bloomreach — Staff Software Engineer (Python, Java/Spring or Go)
+SCHEDULED: <2026-11-06 Fri>
    :PROPERTIES:
    :URL: https://job-boards.greenhouse.io/bloomreach
    :LOCATION: Remote/hybrid — Czechia / Slovakia (also UK, India)
@@ -526,9 +405,13 @@ SCHEDULED: <2026-11-06 Fri>
    :ENGLISH: yes
    :NOTES: Agentic personalization / e-commerce search platform (former Apache Solr people); Java-heavy core. Live role "Staff Software Engineer - Python, Java / Spring or Go" (Czechia/Slovakia) plus "Senior Software Engineer" (UK) and engineering-manager/SRE roles. Direct Java/Spring match. CAVEAT: postings name CZ/SK (and UK/IN) — confirm whether EU-remote from Bulgaria is allowed. ATS = Greenhouse. Source: own Greenhouse board.
    :CREATED: 2026-10-15
+   :APPLIED_ON: 2026-10-23
    :END:
+- Note [2026-10-23 Fri 17:48] Application sent.
 
-** LEAD Imply — Software Engineer (Apache Druid / real-time analytics)
+
+** APPLIED Imply — Software Engineer (Apache Druid / real-time analytics)
+SCHEDULED: <2026-11-06 Fri>
    :PROPERTIES:
    :URL: https://imply.io/careers/
    :LOCATION: Remote-first
@@ -536,9 +419,13 @@ SCHEDULED: <2026-11-06 Fri>
    :ENGLISH: yes
    :NOTES: Founded by the creators of Apache Druid — real-time analytics / observability data layer; Druid is a Java/JVM codebase, so a strong deep-Java fit. Explicitly "remote first" (decide how and where you work). Competitive comp + stock, unlimited PTO. Values OSS contributions. Source: own careers page.
    :CREATED: 2026-10-15
+   :APPLIED_ON: 2026-10-23
    :END:
+- Note [2026-10-23 Fri 17:50] Application sent.
 
-** LEAD Starburst — Software Engineer (Trino / data lakehouse — Java)
+
+** APPLIED Starburst — Software Engineer (Trino / data lakehouse — Java)
+SCHEDULED: <2026-11-06 Fri>
    :PROPERTIES:
    :URL: https://www.starburst.io/careers/
    :LOCATION: Remote — offices Boston, San Francisco, London, Warsaw, Tel Aviv
@@ -546,9 +433,13 @@ SCHEDULED: <2026-11-06 Fri>
    :ENGLISH: yes
    :NOTES: Commercial company behind Trino (open-source MPP SQL engine), a Java codebase. "Working remotely, but more connected than ever"; remote work opportunities + equity. EU hub in Warsaw => EU-friendly. Direct JVM/Java engineering fit for a backend dev (query engine, connectors, distributed systems). Source: own careers page.
    :CREATED: 2026-10-15
+   :APPLIED_ON: 2026-10-23
    :END:
+- Note [2026-10-23 Fri 17:54] Application sent.
 
-** LEAD Aiven — Software Engineer / Senior Software Engineer (data platform)
+
+** APPLIED Aiven — Software Engineer / Senior Software Engineer (data platform)
+SCHEDULED: <2026-11-06 Fri>
    :PROPERTIES:
    :URL: https://aiven.io/careers/job
    :LOCATION: Remote-first (Finland HQ) — EMEA + US offices
@@ -556,19 +447,13 @@ SCHEDULED: <2026-11-06 Fri>
    :ENGLISH: yes
    :NOTES: Open-source data & AI platform (Kafka, PostgreSQL, ClickHouse, OpenSearch, Valkey) across clouds; ~40 open roles incl. many Senior/Staff Software Engineer positions (Platform Delivery, Analytics, ClickHouse, PostgreSQL, Context). Remote-first with EMEA (Helsinki/Ireland) anchors. JVM/Java in the stack (Kafka/OpenSearch tooling) alongside Python/Go — verify how Java-weighted the specific team is. ATS = Greenhouse. Source: own careers page.
    :CREATED: 2026-10-15
+   :APPLIED_ON: 2026-10-23
    :END:
+- Note [2026-10-23 Fri 17:59] Application sent.
 
-** LEAD Crossref — Head of Infrastructure Services (Java / cloud infrastructure)
-   :PROPERTIES:
-   :URL: https://www.crossref.org/jobs/
-   :LOCATION: Fully remote — hiring globally; needs ~2h overlap with European timezones
-   :SIZE: small
-   :ENGLISH: yes
-   :NOTES: Not-for-profit scholarly-publishing infrastructure. Fully remote, hiring globally, 120k USD or local equivalent. Stack: AWS + Terraform, Java, Clojure, Elasticsearch, PostgreSQL; modernizing a complex legacy system into loosely coupled services. Leadership + hands-on infra role (fits the Director background) — more senior/ops-weighted than a pure dev role, but genuine remote-global with Java. All applications screened by the hiring director (low HR, no AI screening). Source: HN Who-is-hiring (Sep 2026).
-   :CREATED: 2026-10-15
-   :END:
 
-** LEAD Buoyant (Linkerd) — Senior Software Engineer — Kubernetes / Distributed Systems
+** APPLIED Buoyant (Linkerd) — Senior Software Engineer — Kubernetes / Distributed Systems
+SCHEDULED: <2026-11-06 Fri>
    :PROPERTIES:
    :URL: https://buoyant.io/careers
    :LOCATION: Remote — US / Canada / Brazil / Europe (CET-compatible)
@@ -576,9 +461,13 @@ SCHEDULED: <2026-11-06 Fri>
    :ENGLISH: yes
    :NOTES: Company behind Linkerd, the CNCF service mesh for Kubernetes; small fully-remote engineering team building a new cloud-native infra product. EU candidates with CET-compatible hours explicitly welcome. STACK STRETCH: Go and/or Rust (not Java) — lateral move into infra/control-plane engineering. Contact scott.deakin@buoyant.io ("HN – Buoyant Control Plane"). Source: HN Who-is-hiring (Oct 2026).
    :CREATED: 2026-10-15
+   :APPLIED_ON: 2026-10-23
    :END:
+- Note [2026-10-23 Fri 18:01] Application sent.
 
-** LEAD Splash Tech — Backend Engineer (Java) / DevOps Engineer
+
+** APPLIED Splash Tech — Backend Engineer (Java) / DevOps Engineer
+SCHEDULED: <2026-11-06 Fri>
    :PROPERTIES:
    :URL: https://splash.tech/
    :LOCATION: Remote — distributed EU team (±2h CET)
@@ -586,17 +475,11 @@ SCHEDULED: <2026-11-06 Fri>
    :ENGLISH: yes
    :NOTES: Small UK-based free-to-play gaming company with a distributed EU team, scaling its backend after recent success. Backend role: strong backend dev "ideally Java" (open to learning), 5+ yrs, product-first full-cycle ownership, SQL-first, devops expected as part of the role. Stack: Java, Python, TypeScript, Angular, AWS, Kubernetes, Postgres, Trino, Flux, Flagger, Terraform. Remote ±2h CET => works from Bulgaria. Low-HR: email the founder directly (jack[at]splash.tech, subject "Backend Hackernews 2026") with a git project. Source: HN Who-is-hiring (Jul 2026).
    :CREATED: 2026-10-15
+   :APPLIED_ON: 2026-10-23
    :END:
+- Note [2026-10-23 Fri 18:04] Application sent.
 
-** LEAD Starbridge — Backend Engineer (Kotlin / Java / Scala)
-   :PROPERTIES:
-   :URL: https://starbridge.ai/careers
-   :LOCATION: Remote (or NYC in-person) — early startup
-   :SIZE: small
-   :ENGLISH: yes
-   :NOTES: Early-stage AI platform turning large-scale public/enterprise data into sales insights; building zero-to-one with huge ownership. Backend Engineer wants Kotlin/Java/Scala for enterprise integrations and large-scale scraping/parsing pipelines applying LLMs to millions of documents. Direct Java/JVM backend fit (lateral into LLM data platform). "In-person team in NYC but also open to remote" — confirm remote/EU feasibility. Apply via site or recruiting@starbridge.ai, mention HackerNews. Source: HN Who-is-hiring (Jun 2026).
-   :CREATED: 2026-10-15
-   :END:
+
 * Archive
 :PROPERTIES:
 :NOTES: no jobs available matching profile so did not apply
@@ -1786,4 +1669,208 @@ Note taken on 2026-10-15 Thu 14:10 \\
    :ARCHIVE_ITAGS: jobsearch
    :END:
 - Note [2026-10-20 Tue 16:58] Blocked: no application email (posting/careers site offer only a share-link mailto; Teamtailor form is the only route). The Senior Java Backend Developer form (itcareers.team.blue) has mandatory questions I cannot answer without fabricating: 'Do you have the right to work in Italy?', 'Briefly describe your experience with Spring', 'What are your annual gross salary expectations?', 'When would you be available to start?', 'Which Java versions have you used most extensively so far?', a mandatory choice of office (Firenze/Torino/Milano/Bergamo) and a mandatory cover letter. The posting also requires fluency in written and spoken Italian, which is not evidenced anywhere in the materials.
+
+** LEAD Dynatrace — Senior Java Software Engineer                :jobsearch:
+   :PROPERTIES:
+   :URL: https://www.dynatrace.com/careers/jobs/
+   :LOCATION: Remote — Europe (e.g. Gdańsk, PL)
+   :SIZE: large
+   :ENGLISH: yes
+   :NOTES: Software-intelligence / APM platform with a Java core. Multiple remote "Senior Java Software Engineer" roles (cloud focus, extensions). Non-US HQ (Austria). Direct Java match; large => HR/ATS-gated. Source: Built In / Jobgether.
+   :CREATED: 2026-10-15
+   :ARCHIVE_TIME: 2026-10-23 Fri 16:55
+   :ARCHIVE_FILE: ~/src/cv/jobs.org
+   :ARCHIVE_OLPATH: Pipeline
+   :ARCHIVE_CATEGORY: jobs
+   :ARCHIVE_TODO: LEAD
+   :ARCHIVE_ITAGS: jobsearch
+   :END:
+- Note [2026-10-23 Fri 16:55] Could not complete application. (1) The lead's URL dynatrace.com/careers/jobs/ is a generic listing: 107 open roles but no "Senior Java Software Engineer" and no Poland/Gdańsk vacancy at all; closest match is Senior Full-Stack Software Engineer - Threat Observability (req 6098, Tallinn, hybrid) - not the remote-Europe role the lead claims. (2) Dynatrace explicitly refuses applications by email (careers@dynatrace.com is verification only), so the web form was the only channel. (3) That form (SAP SuccessFactors, career41.sapsf.com) has required fields for Address Line 1, City, State/Province and Zip/Postal Code, and forces creation of a candidate account with a password. The stored answer for "Home address (Address Line 1, Town, Postcode)" is "N/A", so the required address fields cannot be filled truthfully. MISSING INFO TO SUPPLY: full postal address (street, city, province, postcode) and residence country confirmation. Note: cv_jobs_hold_for_question failed 4x with "wrong-type-argument char-or-string-p nil", so the lead was archived instead of put on hold.
+
+** LEAD Azul — Senior Compiler Performance Engineer (Java/JVM)   :jobsearch:
+   :PROPERTIES:
+   :URL: https://www.azul.com/careers/
+   :LOCATION: Remote — Czechia / Serbia / Cyprus
+   :SIZE: mid
+   :ENGLISH: yes
+   :NOTES: Zulu JDK / JVM runtime vendor — pure Java domain company (Azul Platform Prime, Falcon compiler). Remote compiler/performance roles in CZ/RS/CY. Deep JVM fit for a Java dev moving toward platform/runtime work. Source: Remote Java Jobs (Europe).
+   :CREATED: 2026-10-15
+   :ARCHIVE_TIME: 2026-10-23 Fri 16:58
+   :ARCHIVE_FILE: ~/src/cv/jobs.org
+   :ARCHIVE_OLPATH: Pipeline
+   :ARCHIVE_CATEGORY: jobs
+   :ARCHIVE_TODO: LEAD
+   :ARCHIVE_ITAGS: jobsearch
+   :END:
+- Note [2026-10-23 Fri 16:58] Blocked by hCaptcha image challenge on the Lever apply form (https://jobs.lever.co/azul/dea918e5-0b89-4781-b8af-0eb08b9a8e4f/apply). Form was fully filled (location Cyprus - Remote, name Ivan Dimitrov, email ivan@idimitrov.dev, phone +447411180797, CV Ivan_Dimitrov_Resume_IT_Consultant_ATS.pdf attached successfully, GitHub/Upwork auto-filled), but submission is intercepted by an unsolvable visual hCaptcha ("drag the correct icon" / "click the TWO points where the line breaks") with no text-audio alternative available; two attempts failed. No application email address exists on azul.com/careers or azul.com/contact, so the email channel is not available. Needs manual submission by the user.
+
+** LEAD Bitpanda — Java Engineer                                 :jobsearch:
+   :PROPERTIES:
+   :URL: https://www.bitpanda.com/en/careers
+   :LOCATION: Remote — Austria / Europe
+   :SIZE: mid
+   :ENGLISH: yes
+   :NOTES: Vienna-based fintech (crypto/stocks/savings). Java/Kotlin + Spring backends; remote roles across Europe. Non-US HQ. Direct Java/Spring match in a regulated-fintech domain that echoes the Deutsche Börse experience. Source: Remote Java Jobs (Europe).
+   :CREATED: 2026-10-15
+   :ARCHIVE_TIME: 2026-10-23 Fri 17:02
+   :ARCHIVE_FILE: ~/src/cv/jobs.org
+   :ARCHIVE_OLPATH: Pipeline
+   :ARCHIVE_CATEGORY: jobs
+   :ARCHIVE_TODO: LEAD
+   :ARCHIVE_ITAGS: jobsearch
+   :END:
+- Note [2026-10-23 Fri 17:02] Bitpanda (Greenhouse) application could not be submitted: careers URL in lead (bitpanda.com/en/careers) 404s, real board is job-boards.eu.greenhouse.io/bitpanda. No email/application address exists (careers page only links the Greenhouse board), so email route unavailable. Filled the 'Open Application' requisition (job 4872578101, Engineering, Senior, CV Ivan_Dimitrov_Resume_IT_Consultant.pdf attached) because the only open Java req is 'Intern, Java Engineer' (Vienna, 5 days onsite, Feb 2027 start, early-career — unsuitable). On submit, Greenhouse demanded an 8-character email verification code sent to ivan@idimitrov.dev; no inbox access here, so submission could not be completed — NEEDS MANUAL SUBMIT. Note: form's required 'hybrid 3 days in office' question was answered 'No, remote only' per stored answer, and no Bitpanda req is remote-only.
+
+** LEAD JetBrains — Java/Kotlin Software Engineer (tooling)      :jobsearch:
+   :PROPERTIES:
+   :URL: https://www.jetbrains.com/careers/jobs/
+   :LOCATION: Remote-friendly (EU offices)
+   :SIZE: mid
+   :ENGLISH: yes
+   :NOTES: Makers of IntelliJ IDEA and the Kotlin language — a JVM-centric product company. Several remote roles (30–65 open at a time). Strong domain fit for a Java/Spring developer. Non-US HQ (Czechia). Source: JetBrains careers + remote aggregators.
+   :CREATED: 2026-10-15
+   :ARCHIVE_TIME: 2026-10-23 Fri 17:05
+   :ARCHIVE_FILE: ~/src/cv/jobs.org
+   :ARCHIVE_OLPATH: Pipeline
+   :ARCHIVE_CATEGORY: jobs
+   :ARCHIVE_TODO: LEAD
+   :ARCHIVE_ITAGS: jobsearch
+   :END:
+- Note [2026-10-23 Fri 17:05] JetBrains Greenhouse form (Software Developer Java/Node.JS, Web Development Team, req 4866608101 — chosen from https://www.jetbrains.com/careers/jobs/ as best match; no "Java/Kotlin Software Engineer (tooling)" req exists) has two required questions I cannot answer truthfully: "Do you have experience with Node.JS*" (no stored answer, Node.js not evidenced in CV/stored answers) and "Which is your preferred location for this role?*" (24 options, none covering the candidate's Bulgaria-based remote/EU setup). cv_jobs_hold_for_question failed with "wrong-type-argument char-or-string-p nil", so lead archived instead — it SHOULD HAVE BEEN ON HOLD pending the Node.js Yes/No answer (and preferred location choice). No application was submitted.
+
+** LEAD Kalamba Games — Senior Back End Developer (Java)         :jobsearch:
+   :PROPERTIES:
+   :URL: https://kalambagames.com/careers/
+   :LOCATION: Remote
+   :SIZE: small
+   :ENGLISH: yes
+   :NOTES: iGaming studio; its Remote Games Server (RGS) Platform is built on Java/Spring. Senior + mid Back End Developer roles, remote, 26 days PTO. Direct Spring match at a small product studio. Source: Remote Java Jobs (Worldwide) / Built In.
+   :CREATED: 2026-10-15
+   :ARCHIVE_TIME: 2026-10-23 Fri 17:08
+   :ARCHIVE_FILE: ~/src/cv/jobs.org
+   :ARCHIVE_OLPATH: Pipeline
+   :ARCHIVE_CATEGORY: jobs
+   :ARCHIVE_TODO: LEAD
+   :ARCHIVE_ITAGS: jobsearch
+   :END:
+- Note [2026-10-23 Fri 17:08] Blocked by reCAPTCHA. Best-matching open requisition is BambooHR req 50 "Back End Developer" (RGS Platform, Kraków/hybrid) — Kalamba lists no separate Senior Java req (only Game Tester, Game Artist, Back End Dev, React Dev, Junior Backend Dev, Account Manager). Filled the full application form (Ivan Dimitrov, ivan@idimitrov.dev, +447411180797, Resume Ivan_Dimitrov_Resume_IT_Consultant.pdf attached), but Google reCAPTCHA served an image challenge ("Select all squares with bicycles") whose overlay intercepts all clicks, so "Submit Application" cannot be reached. No application email published anywhere on the site (/career, /contact-us, /gdpr-notice contain no mailto/address; their contact + CV forms are also captcha-protected). Needs a manual submit of the prefilled form.
+
+** LEAD Neo4j — Software Engineer (Java)                         :jobsearch:
+   :PROPERTIES:
+   :URL: https://neo4j.com/careers/
+   :LOCATION: Remote-friendly — Europe
+   :SIZE: mid
+   :ENGLISH: yes
+   :NOTES: Graph database written in Java; remote-friendly across Europe (Sweden/Italy/Czechia/UK). Direct Java core-engine fit. Adjacent GraphAware Hume (Neo4j consultancy) also posts EU remote Java roles. Source: neo4j.com/careers + EU Remote Jobs.
+   :CREATED: 2026-10-15
+   :ARCHIVE_TIME: 2026-10-23 Fri 17:10
+   :ARCHIVE_FILE: ~/src/cv/jobs.org
+   :ARCHIVE_OLPATH: Pipeline
+   :ARCHIVE_CATEGORY: jobs
+   :ARCHIVE_TODO: LEAD
+   :ARCHIVE_ITAGS: jobsearch
+   :END:
+- Note [2026-10-23 Fri 17:10] Neo4j Senior Software Engineer - GraphAware Hume (Greenhouse req 4707650006, Remote EMEA, https://job-boards.greenhouse.io/neo4j/jobs/4707650006). Greenhouse form has 6+ REQUIRED free-text self-assessment fields with no stored answers and nothing in the CV: "How would you rate/describe your knowledge of Java?", "…Spring Framework?", "…TDD?", "…Relational Databases?", "…Neo4j?", plus required dropdowns on EOR/employer-of-record acceptability, BrightHire interview recording and background-check acceptance. No application email; careers page states unsolicited resumes are not accepted. SHOULD HAVE BEEN ON-HOLD — cv_jobs_hold_for_question failed twice with "wrong-type-argument char-or-string-p nil" for both the Java-knowledge question and the EOR question. User needs to answer these Neo4j/GHC screening questions before applying.
+
+** LEAD CrateDB (Crate.io) — Software Engineer / Database Engineer (open application) :jobsearch:
+   :PROPERTIES:
+   :URL: https://cratedb.com/careers
+   :LOCATION: Remote (Germany / Austria) — remote-first team
+   :SIZE: small
+   :ENGLISH: yes
+   :NOTES: CrateDB is an open-source distributed SQL database written in Java (JVM), PostgreSQL wire-compatible, used for real-time analytics. Company (Dornbirn AT / Berlin) runs a distributed engineering team and accepts a speculative/open application. Strong deep-JVM/Java fit for a Spring developer moving toward database/infrastructure work. NOTE: the careers page was behind Cloudflare at fetch time — check the live openings list before applying. Source: NoDesk EU remote engineering listings ("Speculative Application", CrateDB, Remote Germany).
+   :CREATED: 2026-10-15
+   :ARCHIVE_TIME: 2026-10-23 Fri 17:24
+   :ARCHIVE_FILE: ~/src/cv/jobs.org
+   :ARCHIVE_OLPATH: Pipeline
+   :ARCHIVE_CATEGORY: jobs
+   :ARCHIVE_TODO: LEAD
+   :ARCHIVE_ITAGS: jobsearch
+   :END:
+- Note [2026-10-23 Fri 17:24] Blocked by Cloudflare Turnstile captcha on CrateDB's Personio application forms (checked /job/2521168 Senior Ecosystem Database Engineer Remote/Germany and /job/2463940 Speculative Application): the Turnstile widget never renders (CSP error from challenges.cloudflare.com), no cf-turnstile-response token is generated, and 'Submit Application' stays permanently disabled even with name/email/location filled and the CV uploaded (documents API returned 200). No application/careers email exists on cratedb.com (careers, imprint, privacy policy and contact pages list only office@crate.io, info@crate.io, contact@cratedb.com, privacy@crate.io), so no email application was possible either. Re-try later from a normal browser/session or apply via office@crate.io manually.
+
+** LEAD Help Scout — Mid/Senior Product Engineer, Intelligence (full-stack) :jobsearch:
+   :PROPERTIES:
+   :URL: https://www.helpscout.com/company/careers/
+   :LOCATION: Remote — fully remote; outside US/Canada hired as contractors
+   :SIZE: small
+   :ENGLISH: yes
+   :NOTES: Customer-support SaaS, fully remote since day one (120+ people worldwide). Engineering stack includes TypeScript/React, Kotlin, Java and PHP, with ClickHouse, Kafka, Postgres, Elasticsearch and LLM tooling. This specific role is frontend-leaning full-stack but the Java is genuinely in the stack, so a Java+React dev can land on a backend-weighted team. They explicitly hire contractors outside the US/Canada, do not sponsor visas, and ask that you don't use AI live in interviews. Transparent salary formula, $1800/yr learning stipend, co-working budget. Source: Jobicy.
+   :CREATED: 2026-10-15
+   :ARCHIVE_TIME: 2026-10-23 Fri 17:31
+   :ARCHIVE_FILE: ~/src/cv/jobs.org
+   :ARCHIVE_OLPATH: Pipeline
+   :ARCHIVE_CATEGORY: jobs
+   :ARCHIVE_TODO: LEAD
+   :ARCHIVE_ITAGS: jobsearch
+   :END:
+- Note [2026-10-23 Fri 17:31] US-only role — cannot be applied to truthfully from Bulgaria. Ashby requisition "Mid/Sr. Product Engineer, Intelligence" (86132a5a-1909-470d-9f4a-5557b234be07, the only engineering opening on the board) has Location: United States, and its required application questions state: "Please note, at this time we are only able to hire in the following locations: United States" (required country-of-residence radio offers only United States / Other) and "Please note that we cannot sponsor or transfer visas at this time" (required US visa-sponsorship question). Applicant lives in Sofia, Bulgaria (EEA/B2B remote), so any answer would either be false (claiming US residence / no US visa need) or disqualifying; company guidelines state non-US teammates are contractors and only some roles drop the location requirement — this one does not. No careers/application email address is published on the site (only the Ashby form and a "Future Openings" resume form), so no email application channel either. Not applied; nothing submitted.
+
+** LEAD Dreamix Ltd. — Java Engineer / Senior Java Engineer    :jobsearch:
+   :PROPERTIES:
+   :URL: https://dreamix.eu/careers/
+   :LOCATION: Remote (Bulgaria) — Sofia HQ
+   :SIZE: small
+   :ENGLISH: yes
+   :NOTES: Bulgarian AI-native custom software company; builds quality software/services for enterprises worldwide via Java + Web technologies (also cloud/DevOps, AI/ML, Ericsson-type clients). Explicitly remote Java Engineer and Senior Java Engineer openings; stack includes PostgreSQL, REST, Git, MySQL, MongoDB. Local to the CV (Bulgaria) => no relocation, EU. Small => low-HR signal. Also reachable via Workable (apply.workable.com/dreamix-ltd). Source: Remotive/Himalayas/jobera.
+   :CREATED: 2026-10-15
+   :ARCHIVE_TIME: 2026-10-23 Fri 17:37
+   :ARCHIVE_FILE: ~/src/cv/jobs.org
+   :ARCHIVE_OLPATH: Pipeline
+   :ARCHIVE_CATEGORY: jobs
+   :ARCHIVE_TODO: LEAD
+   :ARCHIVE_ITAGS: jobsearch
+   :END:
+- Note [2026-10-23 Fri 17:37] No open Java vacancy to apply to: dreamix.eu/careers and Dreamix's Workable board (apply.workable.com/dreamix-ltd, checked 2026-10-23) list only 6 openings — Databricks Champion (remote BG, Databricks certification mandatory), Senior Product Owner, Strategic Partnerships Manager, QA Engineer, Engineering Manager (hybrid Sofia), Senior Sales Executive — no Java Engineer / Senior Java Engineer requisition. No recruitment address (jobs@/careers@/hr@dreamix.eu) is published anywhere on the site; the only email found is the general sales inbox business@dreamix.eu (footer, obfuscated), which is not a job-application channel, so no application email was sent. The "Senior Java Engineer" role only survives on third-party aggregators (meetfrank, himalayas [Cloudflare-gated], jobgether, builtin) with no Dreamix-side application form. Worth re-checking dreamix.eu/careers in a few weeks or sending a speculative CV to business@dreamix.eu manually.
+
+** LEAD Devexperts — Middle/Senior Java Developer (capital markets / R&amp;D) :jobsearch:
+   :PROPERTIES:
+   :URL: https://careers.devexperts.com/vacancies/
+   :LOCATION: Remote (offices incl. Sofia, Bulgaria; Limassol HQ)
+   :SIZE: mid
+   :ENGLISH: yes
+   :NOTES: Capital-markets software vendor (founded 2002) — order lifecycle, low-latency Java trading / exchange systems. Multiple remote Middle/Senior Java Developer roles; ~25 remote jobs open. Direct Java + Spring fit and echoes the Deutsche Börse C7 / capital-markets domain. NOTE: some listings tag a specific region (e.g. BR) — verify remote eligibility for Bulgaria before investing. Source: own careers site + SmartRecruiters.
+   :CREATED: 2026-10-15
+   :ARCHIVE_TIME: 2026-10-23 Fri 17:42
+   :ARCHIVE_FILE: ~/src/cv/jobs.org
+   :ARCHIVE_OLPATH: Pipeline
+   :ARCHIVE_CATEGORY: jobs
+   :ARCHIVE_TODO: LEAD
+   :ARCHIVE_ITAGS: jobsearch
+   :END:
+- Note [2026-10-23 Fri 17:42] No open Java vacancy + required CV upload impossible. Devexperts careers API (api-careers.in.devexperts.com/v1/vacancies) lists all 24 open reqs: none is a Java/Java Developer role — the only backend reqs are 'Backend Engineer' (Sofia id 6c33ce29-7405-4be3-91a4-cd8e26aabd9c, Vilnius ada37b10-2e9a-4543-8cdd-1a8b338358d5, Porto 375590c8-cec6-4f37-9294-1d97c9205741) and all require 'strong proficiency in Go or Python' + Kafka; other reqs are DBA/SRE/support/analyst/QA-pool. No recruitment/HR email published anywhere on careers.devexperts.com, vacancy pages, office pages or contact-us (only privacy@devexperts.com and sales addresses), so an email application was not possible. The only channel is the web form, whose Resume* attachment is mandatory, and the CV PDFs (~/src/cv/result/Ivan_Dimitrov_Resume_IT_Consultant[_ATS].pdf) are not present on the Playwright browser host (no file:// access, ENOENT for all candidate paths), so the required attachment could not be supplied. Not applied; needs a Java req to open or a manual application.
+
+** LEAD Crossref — Head of Infrastructure Services (Java / cloud infrastructure) :jobsearch:
+   :PROPERTIES:
+   :URL: https://www.crossref.org/jobs/
+   :LOCATION: Fully remote — hiring globally; needs ~2h overlap with European timezones
+   :SIZE: small
+   :ENGLISH: yes
+   :NOTES: Not-for-profit scholarly-publishing infrastructure. Fully remote, hiring globally, 120k USD or local equivalent. Stack: AWS + Terraform, Java, Clojure, Elasticsearch, PostgreSQL; modernizing a complex legacy system into loosely coupled services. Leadership + hands-on infra role (fits the Director background) — more senior/ops-weighted than a pure dev role, but genuine remote-global with Java. All applications screened by the hiring director (low HR, no AI screening). Source: HN Who-is-hiring (Sep 2026).
+   :CREATED: 2026-10-15
+   :ARCHIVE_TIME: 2026-10-23 Fri 18:00
+   :ARCHIVE_FILE: ~/src/cv/jobs.org
+   :ARCHIVE_OLPATH: Pipeline
+   :ARCHIVE_CATEGORY: jobs
+   :ARCHIVE_TODO: LEAD
+   :ARCHIVE_ITAGS: jobsearch
+   :END:
+- Note [2026-10-23 Fri 18:00] No open vacancies: https://www.crossref.org/jobs/ states "We don't have any jobs open currently", and the specific ad https://www.crossref.org/jobs/2026-09-01-head-of-infrastructure-services/ says "Applications for this position closed on September 22, 2026" — no application form or email channel open. Role mismatch as well: Head of Infrastructure Services is a head-of-function/people-leadership role (lead and develop a team, Senior Management Team, 5+ yrs technical leadership) and the CV shows no people-management experience. Not applying; no fabricated fit.
+
+** LEAD Starbridge — Backend Engineer (Kotlin / Java / Scala)    :jobsearch:
+   :PROPERTIES:
+   :URL: https://starbridge.ai/careers
+   :LOCATION: Remote (or NYC in-person) — early startup
+   :SIZE: small
+   :ENGLISH: yes
+   :NOTES: Early-stage AI platform turning large-scale public/enterprise data into sales insights; building zero-to-one with huge ownership. Backend Engineer wants Kotlin/Java/Scala for enterprise integrations and large-scale scraping/parsing pipelines applying LLMs to millions of documents. Direct Java/JVM backend fit (lateral into LLM data platform). "In-person team in NYC but also open to remote" — confirm remote/EU feasibility. Apply via site or recruiting@starbridge.ai, mention HackerNews. Source: HN Who-is-hiring (Jun 2026).
+   :CREATED: 2026-10-15
+   :ARCHIVE_TIME: 2026-10-23 Fri 18:06
+   :ARCHIVE_FILE: ~/src/cv/jobs.org
+   :ARCHIVE_OLPATH: Pipeline
+   :ARCHIVE_CATEGORY: jobs
+   :ARCHIVE_TODO: LEAD
+   :ARCHIVE_ITAGS: jobsearch
+   :END:
+- Note [2026-10-23 Fri 18:06] Target role "Backend Engineer (Kotlin / Java / Scala) — Remote (or NYC in-person)" is no longer open: starbridge.ai/careers redirects to the Ashby board (jobs.ashbyhq.com/starbridge), whose full posting API lists 11 roles with NO backend/remote engineering opening, and the Wellfound ad ("Senior Backend Software Engineer | Java/Kotlin | NYC", wellfound.com/jobs/3182411) returns HTTP 410 Gone. Remaining engineering roles are both NYC on-site only: Senior Product Engineer | NYC (e2e55c8c-2eaf-4349-874d-7c18ebb11228) and Senior Security & Infrastructure Engineer (1490b0d3-b2ee-4bfc-bb67-3aa02e62496e). Its application form has mandatory questions "Are you based in NYC / willing to relocate to NYC?", "Are you able to work onsite five days a week at our Chelsea Piers office?" and "Do you require any form of authorization to work legally in the United States?" — a knowingly ineligible application for a Sofia, Bulgaria-based candidate with EEA/B2B remote-only right to work and no US work authorisation, so it was not submitted. No application/careers email exists on the site (only product support@starbridge.ai); all careers links go to Ashby.
 
