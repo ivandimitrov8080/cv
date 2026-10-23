@@ -30,10 +30,14 @@ Right to work in EU and B2B remote.
 Business is registered in Bulgaria.
 
 ANSWERS TO FORM QUESTIONS:
-Before filling in any required question, call cv_jobs_find_answers with
-the question as it appears on the form (a few keywords suffice; matching
-is fuzzy). Answer with the returned text verbatim, replacing placeholders
-such as <Company>, <N> days or <Office> with the values from the form.
+Before filling in any required question, call cv_jobs_find_answers, but
+not with the question as the form words it: pass the 2 most meaningful
+words from it, e.g. "salary expectation" for "What are your salary
+expectations?", or "deadline" for "Tell us about a time you hit a
+deadline". The stored questions are worded differently from any given
+form, so the keywords are what match. Answer with the returned text
+verbatim, replacing placeholders such as <Company>, <N> days or <Office>
+with the values from the form.
 Answers are stored generically, so "Why are you interested in working at
 <Company>?" also answers "Why are you interested in working at Tether?".
 Do not use it for factual fields (dates, phone, links) - use the CV.

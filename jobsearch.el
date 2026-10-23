@@ -492,9 +492,9 @@ property, so `cv-jobs-find-answers' keeps ignoring it."
 (gptel-make-tool
  :name "cv_jobs_find_answers"
  :function #'cv-jobs-find-answers
- :description "Look up the user's pre-written answers to application questions. Call this before filling any required free-text field, passing the form's question or a few words of it (matching is fuzzy). The result is plain text: numbered questions, each followed by its answer. Use the answer as written, substituting placeholders like <Company> or <N> days. If nothing matches, do not invent an answer: call cv_jobs_hold_for_question instead."
- :args '((:name "query" :type string :optional t
-          :description "Words from the form question, e.g. \"salary expectations\"."))
+ :description "Look up the user's pre-written answers to application questions. Call this before filling any required free-text field. Pass the 2 most meaningful words of the form's question, not its full wording, e.g. \"salary expectation\" or \"notice period\": the stored questions are worded differently, so keywords match where sentences do not. The result is plain text: numbered questions, each followed by its answer. Use the answer as written, substituting placeholders like <Company> or <N> days. If nothing matches, do not invent an answer: call cv_jobs_hold_for_question instead."
+ :args '((:name "query" :type string
+          :description "The 2 keywords that best capture the question, e.g. \"salary expectation\"."))
  :category "jobsearch")
 
 (gptel-make-tool
