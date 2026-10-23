@@ -1,0 +1,159 @@
+#+TITLE: Application Questions and Answers
+#+STARTUP: indent
+
+# One entry per question, with the answer in an :ANSWER: property.
+# Questions are phrased generically (<Company>, <N> days, ...) so the same
+# answer serves every application. :SOURCE: lists the forms that asked it.
+
+* Recurring answers
+
+** Salary expectation
+   :PROPERTIES:
+   :ANSWER: 100 000 EUR / year, 8 000 EUR / month, 120 000 USD / year, 10 000 USD / month
+   :FORMAT: Give a number you are happy to defend; askers below want EU gross/year, USD/month or USD/year.
+   :END:
+
+** Earliest start date / notice period
+   :PROPERTIES:
+   :ANSWER: Immediate start available
+   :END:
+
+** Current location (city, country)
+   :PROPERTIES:
+   :ANSWER: Sofia, Bulgaria
+   :NOTE: City level, not just "Bulgaria" - Metabase asks for city + country.
+   :END:
+
+** Right to work / visa status
+   :PROPERTIES:
+   :ANSWER: Right to work in EEA or B2B remote.
+   :NOTE: Right to work in EU (Bulgarian business, B2B remote). Not UK, not Italy-resident, not Slovenia-resident.
+   :END:
+
+** Years of professional software experience
+   :PROPERTIES:
+   :ANSWER: 10 years
+   :END:
+
+** Years of JVM / Java experience, and which Java versions
+   :PROPERTIES:
+   :ANSWER: 10 years JVM versions 8, 11, 17
+   :END:
+
+** Years of Spring / Spring Boot experience
+   :PROPERTIES:
+   :ANSWER: 10 years
+   :END:
+
+** Years of React experience
+   :PROPERTIES:
+   :ANSWER: 10 years
+   :END:
+
+** English level (CEFR)
+   :PROPERTIES:
+   :ANSWER: C2
+   :END:
+
+** How you use AI in day-to-day engineering work
+   :PROPERTIES:
+   :ANSWER: This is a paid question.
+   :END:
+
+** How you heard about the job / where you found it
+   :PROPERTIES:
+   :ANSWER: Other - internal jobsearch tool
+   :NOTE: Hacker News "Who is hiring", Oct 2026, for most of these.
+   :END:
+
+* Other questions
+
+** Why are you interested in working at <Company>?
+   :PROPERTIES:
+   :ANSWER: I am a professional interested in providing solutions to real problems.
+   :SOURCE: Tether, Kestra ("why you want to join us")
+   :END:
+
+** What is your approach to state management?
+   :PROPERTIES:
+   :ANSWER: Purely-functional.
+   :SOURCE: Tether (frontend role)
+   :END:
+
+** Which tooling do you use for code quality?
+   :PROPERTIES:
+   :ANSWER: Sonar mostly and sometimes AI code reviewers.
+   :SOURCE: Tether
+   :END:
+
+** Tell us about a time you hit a deadline (situation, what you did, outcome).
+   :PROPERTIES:
+   :ANSWER: I hit a deadline, because there were too many bugs in the system redesign work I did. The reason for that was lack of test coverage. I continued fixing bugs manually until it was ready for release and advised business to use Sonar to track test coverage for new code being written, which was implemented.
+   :SOURCE: Tether
+   :END:
+
+** What's the last thing you built with AI?
+   :PROPERTIES:
+   :ANSWER: A fully-autonomous job application agent that tracks leads and logs work.
+   :SOURCE: All Gravy
+   :END:
+
+** Tell us about an engineering project you're particularly proud of (max 5 sentences)
+   :PROPERTIES:
+   :ANSWER: My fully-reproducible, purely-functional, integration-tested, security-hardened client-server integration at github.com/ivandimitrov8080/hosts.nix. It defines a server that has both internal and external tooling that is connected to all my other devices through wireguard. The internal tooling is only available on the wireguard interface as the integration tests confirm and provides services like automatic sync between 3-4 devices for project planning, contacts, email, calendar and files. The external tooling consists of some small personal projects exposed as static sites.
+   :SOURCE: Checkly
+   :END:
+
+** What monitoring/observability product do you love or hate, and why?
+   :PROPERTIES:
+   :ANSWER: All of them, because it is the "there is no status quo", meaning it is not a choice for the average person whether or not he will be monitored. The choice has been made and the outcome is that everyone shall be monitored unless you run a pre-2008 thinkpad running a FSF-certified OS and use TOR for all your browsing while disabling javascript on all sites. That means you cannot use banking, government, utility online services without being monitored. The reason for the hate is that it is not a choice but forced upon the average consumer.
+   :SOURCE: Checkly
+   :END:
+
+** Experience with the payments / fintech domain
+   :PROPERTIES:
+   :ANSWER: 5 years
+   :SOURCE: Salmon Group
+   :END:
+
+** Are you able to work on-site or hybrid, <N> days a week at the company's office?
+   :PROPERTIES:
+   :ANSWER: No, remote only.
+   :SOURCE: Descartes/Finale (2 days/week, Šenčur, Slovenia), Vaadin (on-site, Turku)
+   :END:
+
+** Are you able to work the team's sync hours?
+   :PROPERTIES:
+   :ANSWER: Yes for any timezone. I will adjust my work hours accordingly.
+   :SOURCE: Salmon Group (13:00-19:00 GMT+8)
+   :END:
+
+** Which office location would you choose?
+   :PROPERTIES:
+   :ANSWER: Remote.
+   :SOURCE: team.blue (Firenze / Torino / Milano / Bergamo)
+   :END:
+
+** Do you prefer system-level or application-level Java work?
+   :PROPERTIES:
+   :ANSWER: System-level, but not by a big margin.
+   :SOURCE: Hazelcast
+   :END:
+
+** Home address (Address Line 1, Town, Postcode)
+   :PROPERTIES:
+   :ANSWER: N/A
+   :SOURCE: Hazelcast
+   :END:
+
+** Telegram username
+   :PROPERTIES:
+   :ANSWER: @bot456123
+   :SOURCE: Salmon Group
+   :END:
+
+** Cover letter: what kinds of opportunities are you looking for, and why are they of interest to you?
+   :PROPERTIES:
+   :ANSWER: I would like a fully-remote software development job that offers genuinely challenging problems not due to bad management, unrealistic deadlines and lack of testing or bad code quality, but because the problems are technically unique and the solution is not a solved problem. I dislike working with software that reinvents the wheel in a worse way. I like improving on existing solutions if the change is meaningfully different.
+   :SOURCE: Vaadin, team.blue
+   :END:
