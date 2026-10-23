@@ -4,6 +4,8 @@
 
 ;; Loaded from .dir-locals.el.  ONE entry per company; the TODO state is the
 ;; pipeline stage:  LEAD -> APPLIED -> INTERVIEW -> OFFER -> HIRED/REJECTED.
+;; HOLD = waiting until a form question has an answer in
+;; application-questions.org.
 ;;
 ;; `cv-jobs-lead-fields' is the only description of a LEAD.  Everything goes
 ;; through `cv-jobs-lead', and the rest are thin wrappers:
@@ -265,6 +267,7 @@ it when nothing matches and :company and :role are given."
                  ((tags-todo "+TODO=\"LEAD\"" ((org-agenda-overriding-header "Leads")))
                   (tags-todo "+TODO=\"APPLIED\"" ((org-agenda-overriding-header "Applied")))
                   (tags-todo "+TODO=\"INTERVIEW\"" ((org-agenda-overriding-header "Interviewing")))
+                  (tags-todo "+TODO=\"HOLD\"" ((org-agenda-overriding-header "Waiting for answers")))
                   (agenda "" ((org-agenda-span 14)))))))
 
 (defun cv-jobs-agenda ()
@@ -375,8 +378,8 @@ The best matches come first; nil means no limit."
 (defun cv-jobs-find-answers (&optional query)
   "Return the stored answers to application questions matching QUERY.
 
-QUERY is matched against the question headings with Emacs' `flex'
-completion style, so case, word order and typos do not matter; nil or an
+QUERY is matched against the question headings with Emacs' `orderless'
+completion style, so case and word order do not matter; nil or an
 empty string returns every answer.
 The result is plain text: numbered questions, each followed by
 its answer on a \"- \" line, ready to hand to the model as is."
@@ -431,6 +434,31 @@ its answer on a \"- \" line, ready to hand to the model as is."
       (setq cv-jobs--current nil)
       (format "Marked %s as APPLIED and scheduled a follow-up." heading))))
 
+(defun cv-jobs-hold-for-question (question)
+  "Put the remembered lead on HOLD until QUESTION has an answer.
+The question is added to `cv-jobs-answers-file' without an :ANSWER:
+property, so `cv-jobs-find-answers' keeps ignoring it."
+  (interactive "sQuestion: ")
+  (if (not (and cv-jobs--current (marker-buffer cv-jobs--current)))
+      "No lead selected; call cv_jobs_next_lead first."
+    (let* ((company (plist-get (cv-jobs-lead cv-jobs--current) :company))
+           (answers-file (file-name-nondirectory cv-jobs-answers-file)))
+      (with-current-buffer (find-file-noselect cv-jobs-answers-file)
+        (unless (org-find-exact-headline-in-buffer question)
+          (goto-char (point-min))
+          (unless (re-search-forward "^\\*+ Recurring answers" nil t)
+            (user-error "No Recurring answers tree in %s" answers-file))
+          (org-end-of-subtree t)
+          (unless (bolp) (insert "\n"))
+          (insert "** " question "\n:PROPERTIES:\n:SOURCE: " company
+                  "\n:END:\n")
+          (save-buffer)))
+      (cv-jobs-lead cv-jobs--current :state "HOLD"
+                    :note (format "On hold, no answer for: %s" question))
+      (setq cv-jobs--current nil)
+      (format "Put %s on hold and saved the question to %s. Answer it there and set the lead back to LEAD."
+              company answers-file))))
+
 (defun cv-jobs-archive-lead (&optional reason)
   "Archive the remembered lead, logging REASON as a note."
   (interactive "sReason: ")
@@ -464,9 +492,17 @@ its answer on a \"- \" line, ready to hand to the model as is."
 (gptel-make-tool
  :name "cv_jobs_find_answers"
  :function #'cv-jobs-find-answers
- :description "Look up the user's pre-written answers to application questions. Call this before filling any required free-text field, passing the form's question or a few words of it (matching is fuzzy). The result is plain text: numbered questions, each followed by its answer. Use the answer as written, substituting placeholders like <Company> or <N> days. If nothing matches, do not invent an answer: archive the lead with the question as the reason."
+ :description "Look up the user's pre-written answers to application questions. Call this before filling any required free-text field, passing the form's question or a few words of it (matching is fuzzy). The result is plain text: numbered questions, each followed by its answer. Use the answer as written, substituting placeholders like <Company> or <N> days. If nothing matches, do not invent an answer: call cv_jobs_hold_for_question instead."
  :args '((:name "query" :type string :optional t
           :description "Words from the form question, e.g. \"salary expectations\"."))
+ :category "jobsearch")
+
+(gptel-make-tool
+ :name "cv_jobs_hold_for_question"
+ :function #'cv-jobs-hold-for-question
+ :description "Put the lead from cv_jobs_next_lead on hold when a required free-text field asks something cv_jobs_find_answers has no answer for. Pass the question verbatim. The question is saved in application-questions.org for the user to answer later, and the lead leaves the pipeline until then. Never invent an answer."
+ :args '((:name "question" :type string
+          :description "The form's question, exactly as worded."))
  :category "jobsearch")
 
 (gptel-make-tool
@@ -553,7 +589,7 @@ Sub-agents:
 
 (setq org-modern-todo-faces
       '(("LEAD" . "⟳") ("APPLIED" . "⇒") ("INTERVIEW" . "★")
-        ("OFFER" . "★") ("HIRED" . "✔") ("REJECTED" . "✘")))
+        ("OFFER" . "★") ("HOLD" . "⏸") ("HIRED" . "✔") ("REJECTED" . "✘")))
 
 (cv-jobs-setup)
 

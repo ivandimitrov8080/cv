@@ -1,5 +1,5 @@
 #+TITLE: Job Search Tracker
-#+TODO: LEAD(l) APPLIED(a) INTERVIEW(i) OFFER(o) | HIRED(h) REJECTED(r) IGNORED(x)
+#+TODO: LEAD(l) APPLIED(a) INTERVIEW(i) OFFER(o) HOLD(w) | HIRED(h) REJECTED(r) IGNORED(x)
 #+FILETAGS: :jobsearch:
 #+STARTUP: indent
 
