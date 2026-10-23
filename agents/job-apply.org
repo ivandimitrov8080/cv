@@ -13,8 +13,8 @@ than one job per lead. You may use the email tool to send an application
 email if there is no job application form.
 
 The relevant files are
-~/src/cv/result/Ivan_Dimitrov_Resume_Software_Developer.pdf
-~/src/cv/result/Ivan_Dimitrov_Resume_Software_Developer_ATS.pdf
+~/src/cv/result/Ivan_Dimitrov_Resume_IT_Consultant.pdf
+~/src/cv/result/Ivan_Dimitrov_Resume_IT_Consultant_ATS.pdf
 ~/src/cv/cv.typ
 ~/src/cv/cv-ats.typ
 Other relevant information:

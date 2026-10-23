@@ -287,7 +287,8 @@ SCHEDULED: <2026-10-27 Tue>
    :END:
 - Note [2026-10-20 Tue 16:54] Application sent.
 
-** LEAD InPost — Senior Software Engineer (Java)                 :jobsearch:
+** APPLIED InPost — Senior Software Engineer (Java)              :jobsearch:
+SCHEDULED: <2026-11-06 Fri>
    :PROPERTIES:
    :URL: https://tech.inpost-group.com/careers
    :LOCATION: Remote — Poland
@@ -301,7 +302,10 @@ SCHEDULED: <2026-10-27 Tue>
    :ARCHIVE_CATEGORY: jobs
    :ARCHIVE_TODO: LEAD
    :ARCHIVE_ITAGS: jobsearch
+   :APPLIED_ON: 2026-10-23
    :END:
+- Note [2026-10-23 Fri 15:53] Application sent.
+
 ** LEAD Dynatrace — Senior Java Software Engineer                :jobsearch:
    :PROPERTIES:
    :URL: https://www.dynatrace.com/careers/jobs/
