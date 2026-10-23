@@ -66,8 +66,6 @@
    :NOTE: Hacker News "Who is hiring", Oct 2026, for most of these.
    :END:
 
-* Other questions
-
 ** Why are you interested in working at <Company>?
    :PROPERTIES:
    :ANSWER: I am a professional interested in providing solutions to real problems.

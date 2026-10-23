@@ -360,6 +360,46 @@ files in `cv-jobs-email-attachments' are attached."
        (format "Application email NOT sent (%s): %s"
                cv-jobs--send-step (error-message-string err))))))
 
+;;; Application answers
+
+(defconst cv-jobs-answers-file
+  (expand-file-name "application-questions.org" cv-jobs-directory)
+  "Org file of generic application-question answers, one per entry.
+The question is the heading; the answer is the :ANSWER: property.")
+
+(defcustom cv-jobs-answers-limit 3
+  "How many answers `cv-jobs-find-answers' returns at most.
+The best matches come first; nil means no limit."
+  :type '(choice (integer :tag "Answers") (const :tag "No limit" nil)))
+
+(defun cv-jobs-find-answers (&optional query)
+  "Return the stored answers to application questions matching QUERY.
+
+QUERY is matched against the question headings with Emacs' `flex'
+completion style, so case, word order and typos do not matter; nil or an
+empty string returns every answer.
+The result is plain text: numbered questions, each followed by
+its answer on a \"- \" line, ready to hand to the model as is."
+  (with-current-buffer (find-file-noselect cv-jobs-answers-file)
+    (let* ((completion-styles '(orderless))
+           (completion-ignore-case t)
+           (answers (org-map-entries
+                     (lambda ()
+                       (when-let* ((answer (org-entry-get nil "ANSWER")))
+                         (cons (org-get-heading t t t t) answer)))
+                     nil 'file))
+           (matches (completion-all-completions (or query "")
+                                                (mapcar #'car answers) nil 0)))
+      ;; The result's last cdr is a base size, not an element.
+      (when (integerp (cdr (last matches))) (setcdr (last matches) nil))
+      (mapconcat #'identity
+                 (seq-map-indexed (lambda (m i)
+                                    (let ((q (substring-no-properties m)))
+                                      (format "%d. %s\n- %s" (1+ i) q
+                                              (cdr (assoc q answers)))))
+                                  (seq-take matches cv-jobs-answers-limit))
+                 "\n"))))
+
 ;;; Agent tools
 
 (defvar cv-jobs--current nil
@@ -419,6 +459,14 @@ files in `cv-jobs-email-attachments' are attached."
           :description "Company name as it should appear in the email.")
          (:name "position" :type string
           :description "Exact title of the position applied for."))
+ :category "jobsearch")
+
+(gptel-make-tool
+ :name "cv_jobs_find_answers"
+ :function #'cv-jobs-find-answers
+ :description "Look up the user's pre-written answers to application questions. Call this before filling any required free-text field, passing the form's question or a few words of it (matching is fuzzy). The result is plain text: numbered questions, each followed by its answer. Use the answer as written, substituting placeholders like <Company> or <N> days. If nothing matches, do not invent an answer: archive the lead with the question as the reason."
+ :args '((:name "query" :type string :optional t
+          :description "Words from the form question, e.g. \"salary expectations\"."))
  :category "jobsearch")
 
 (gptel-make-tool
