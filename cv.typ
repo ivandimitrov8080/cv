@@ -43,7 +43,7 @@
 #show link: underline
 
 = Ivan Kirilov Dimitrov
-== Software Developer
+== IT Consultant
 #show link: set text(10pt)
 
 #link("mailto:ivan@idimitrov.dev")[ivan\@idimitrov.dev] |
