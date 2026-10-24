@@ -132,27 +132,49 @@ Nil means the entry at point in jobs.org, else the first LEAD."
     (unless (bolp) (insert "\n"))
     (insert "- Note " (format-time-string "[%Y-%m-%d %a %H:%M]") " " text "\n")))
 
-(defun cv-jobs--lead-insert (lead)
-  "Insert LEAD at the end of the Pipeline tree; return its marker."
+(defun cv-jobs--pipeline-anchor ()
+  "Return (MARKER . LEVEL) for appending a child to the Pipeline tree.
+MARKER is just past the last entry in the tree; LEVEL is the level of the
+Pipeline heading itself, so the child's level is (1+ LEVEL)."
   (with-current-buffer (find-file-noselect cv-jobs-file)
     (save-excursion
       (goto-char (point-min))
-      (unless (re-search-forward "^\\*+ Pipeline" nil t)
+      (unless (re-search-forward "^\\*+ +Pipeline\\_>" nil t)
         (user-error "No Pipeline tree in %s" cv-jobs-file))
-      (org-end-of-subtree t)
-      (unless (bolp) (insert "\n"))
-      (let ((start (point)))
-        (insert "* " (or (plist-get lead :state) "LEAD") " "
-                (plist-get lead :company) " — " (plist-get lead :role) "\n"
-                ":PROPERTIES:\n"
-                (mapconcat (lambda (f)
-                             (if-let* ((v (plist-get lead (car f))))
-                                 (format ":%s: %s\n" (cv-jobs--prop (car f)) v)
-                               ""))
-                           cv-jobs-lead-fields "")
-                ":END:\n")
-        (save-buffer)
-        (copy-marker start)))))
+      (org-back-to-heading t)
+      (let* ((level (org-current-level))
+             (limit (save-excursion (org-end-of-subtree) (point)))
+             (pos (progn (forward-line 1) (point))))
+        ;; Walk the tree; the last heading deeper than Pipeline marks the end.
+        (while (re-search-forward "^\\*+ " limit t)
+          (goto-char (match-beginning 0))
+          (when (> (org-current-level) level)
+            (setq pos (save-excursion (org-end-of-subtree) (point))))
+          (forward-line 1))
+        (goto-char pos)
+        (cons (point-marker) level)))))
+
+(defun cv-jobs--lead-insert (lead)
+  "Insert LEAD as the last child of the Pipeline tree; return its marker."
+  (with-current-buffer (find-file-noselect cv-jobs-file)
+    (save-excursion
+      (let* ((anchor (cv-jobs--pipeline-anchor))
+             (_ (goto-char (car anchor)))
+             (level (1+ (cdr anchor))))
+        (unless (bolp) (insert "\n"))
+        (let ((start (point)))
+          (insert (make-string level ?*) " "
+                  (or (plist-get lead :state) "LEAD") " "
+                  (plist-get lead :company) " — " (plist-get lead :role) "\n"
+                  ":PROPERTIES:\n"
+                  (mapconcat (lambda (f)
+                               (if-let* ((v (plist-get lead (car f))))
+                                   (format ":%s: %s\n" (cv-jobs--prop (car f)) v)
+                                 ""))
+                             cv-jobs-lead-fields "")
+                  ":END:\n")
+          (save-buffer)
+          (copy-marker start))))))
 
 (defun cv-jobs--lead-put (marker fields)
   "Write FIELDS to the entry at MARKER and return the updated lead."
@@ -403,6 +425,130 @@ its answer on a \"- \" line, ready to hand to the model as is."
                                   (seq-take matches cv-jobs-answers-limit))
                  "\n"))))
 
+;;; Recording leads (the `job-search' agent)
+
+(defconst cv-jobs--lead-sizes '("small" "mid" "large")
+  "Accepted values for the :SIZE: property.")
+
+(defconst cv-jobs--lead-english '("yes" "unknown" "no")
+  "Accepted values for the :ENGLISH: property.")
+
+(defun cv-jobs--one-line (string)
+  "Return STRING as a single trimmed line, or nil when it is blank.
+Property drawers hold one line per property, so newlines have to go."
+  (when string
+    (let ((line (string-trim (replace-regexp-in-string "[[:space:]]+" " " string))))
+      (unless (string-empty-p line) line))))
+
+(defun cv-jobs--normalise (string)
+  "Return STRING downcased with runs of whitespace collapsed, or nil."
+  (when-let* ((line (cv-jobs--one-line string)))
+    (downcase line)))
+
+(defun cv-jobs--heading-company ()
+  "Return the normalised company name of the entry at point, or nil.
+New entries carry a :COMPANY: property; older ones only the heading,
+which reads `Company — Role'."
+  (or (cv-jobs--normalise (org-entry-get nil "COMPANY"))
+      (let ((heading (org-get-heading t t t t)))
+        (when heading
+          (cv-jobs--normalise
+           (if (string-match "\\`\\(.+?\\)[ \t]*—[ \t]*" heading)
+               (match-string 1 heading)
+             heading))))))
+
+(defun cv-jobs--find-existing (company)
+  "Return a marker for the entry whose company is COMPANY, or nil.
+The whole file is searched, Archive tree included, so that a company the
+pipeline has already dealt with is never queued a second time."
+  (when-let* ((name (cv-jobs--normalise company)))
+    (with-current-buffer (find-file-noselect cv-jobs-file)
+      (let (found)
+        (org-map-entries
+         (lambda ()
+           (unless found
+             (when (equal name (cv-jobs--heading-company))
+               (setq found (point-marker)))))
+         nil 'file)
+        found))))
+
+(defun cv-jobs--describe-existing (marker)
+  "Return a one-line description of the entry at MARKER."
+  (with-current-buffer (marker-buffer marker)
+    (save-excursion
+      (goto-char marker)
+      (format "%s (%s%s)"
+              (org-get-heading t t t t)
+              (or (org-get-todo-state) "?")
+              (if-let* ((archived (org-entry-get nil "ARCHIVE_TIME")))
+                  (format ", archived %s" archived)
+                "")))))
+
+(defun cv-jobs-record-lead (company role url &optional location contact notes
+                                    size english)
+  "Record COMPANY applying to ROLE as a new LEAD in jobs.org.
+URL must be the http(s) address of the actual posting.  LOCATION, CONTACT,
+NOTES, SIZE and ENGLISH are optional; SIZE and ENGLISH are checked against
+the vocabularies this file uses.  Companies already present anywhere in
+jobs.org -- including the Archive tree -- are refused with their current
+state, so a search run cannot re-queue what the pipeline has finished with.
+Returns a one-line report; it never signals, so the model always gets an
+answer it can act on."
+  (let* ((company (cv-jobs--one-line company))
+         (role (cv-jobs--one-line role))
+         (url (cv-jobs--one-line url))
+         (existing (and company (cv-jobs--find-existing company)))
+         (warnings nil))
+    (cond
+     ((null company) "NOT recorded: no company name given.")
+     ((null role) (format "NOT recorded: %s has no role title." company))
+     ((not (and url (string-match-p "\\`https?://" url)))
+      (format "NOT recorded: %s — %s needs the posting's own http(s) URL, got %S."
+              company role url))
+     (existing
+      (format "Already tracked, so not added again: %s. Report it as a duplicate."
+              (cv-jobs--describe-existing existing)))
+     (t
+      (let ((size (cv-jobs--normalise size))
+            (english (cv-jobs--normalise english)))
+        (unless (member size cv-jobs--lead-sizes)
+          (when size (push (format "ignored unknown size %S" size) warnings))
+          (setq size nil))
+        (unless (member english cv-jobs--lead-english)
+          (when english (push (format "ignored unknown english %S" english) warnings))
+          (setq english nil))
+        (let ((same-url
+               (with-current-buffer (find-file-noselect cv-jobs-file)
+                 (let (hit)
+                   (org-map-entries
+                    (lambda ()
+                      (unless hit
+                        (when (equal url (cv-jobs--one-line (org-entry-get nil "URL")))
+                          (setq hit (org-get-heading t t t t)))))
+                    nil 'file)
+                   hit))))
+          (cv-jobs-lead nil :company company :role role :url url
+                        :location location :size size
+                        :english english :contact contact)
+          (let ((marker (cv-jobs--lead-at (concat company " — " role))))
+            (when marker
+              (with-current-buffer (marker-buffer marker)
+                (save-excursion
+                  (goto-char marker)
+                  (org-entry-put nil "CREATED" (format-time-string "%Y-%m-%d"))
+                  (when-let* ((note (cv-jobs--one-line notes)))
+                    (org-entry-put nil "NOTES" note)))
+                (save-buffer))))
+          (format "Recorded LEAD: %s — %s <%s>.%s%s"
+                  company role url
+                  (if warnings
+                      (format " Warnings: %s."
+                              (mapconcat #'identity (nreverse warnings) "; "))
+                    "")
+                  (if same-url
+                      (format " Note: that URL is already used by %s." same-url)
+                    ""))))))))
+
 ;;; Agent tools
 
 (defvar cv-jobs--current nil
@@ -469,6 +615,30 @@ property, so `cv-jobs-find-answers' keeps ignoring it."
       (cv-jobs--archive cv-jobs--current)
       (setq cv-jobs--current nil)
       (format "Archived %s: %s" heading reason))))
+
+(gptel-make-tool
+ :name "cv_jobs_add_lead"
+ :function #'cv-jobs-record-lead
+ :description "Record a company with a live opening as a new LEAD in jobs.org. Call this for every company worth applying to: a lead that is not recorded is lost, because clicking away from the posting loses it. Give the company, the exact advertised job title, and the http(s) URL of that specific posting (never a search-results page or a board's front page). Companies already in the tracker, in any state, are refused with that state reported: treat such a refusal as a duplicate, report it, and do not retry it under a different spelling of the name."
+ :args '((:name "company" :type string
+          :description "Company name, e.g. \"Payforge\".")
+         (:name "role" :type string
+          :description "Exact job title as advertised.")
+         (:name "url" :type string
+          :description "https URL of the individual job posting.")
+         (:name "location" :type string :optional t
+          :description "Where the job is and its remote terms, e.g. \"Remote (EU) — fully remote\".")
+         (:name "contact" :type string :optional t
+          :description "Application email address if the posting or company site publishes one, otherwise exactly \"form only\".")
+         (:name "notes" :type string :optional t
+          :description "One line of justification: stack match, salary, posting date, anything to watch out for.")
+         (:name "size" :type string :optional t
+          :enum ["small" "mid" "large"]
+          :description "Company size.")
+         (:name "english" :type string :optional t
+          :enum ["yes" "unknown" "no"]
+          :description "Whether the working language is English."))
+ :category "jobsearch")
 
 (gptel-make-tool
  :name "cv_jobs_next_lead"
@@ -561,7 +731,9 @@ property, so `cv-jobs-find-answers' keeps ignoring it."
 Delegate with the `Agent' tool; sub-agents see only your prompt, so briefs
 must be self-contained.  `job-apply' applies to the next lead (by email when
 the site offers an address, otherwise the form) and owns the cv_jobs_* tools.
-`job-search' finds new leads.  Never edit jobs.org or invent form answers.
+`job-search' finds new leads and records them with `cv_jobs_add_lead'.
+Never edit jobs.org yourself (only the tools may) and never invent form
+answers.
 Report what the sub-agent returned.
 
 Sub-agents:
