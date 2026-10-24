@@ -478,8 +478,282 @@ SCHEDULED: <2026-11-06 Fri>
    :APPLIED_ON: 2026-10-23
    :END:
 - Note [2026-10-23 Fri 18:04] Application sent.
-
-
+** LEAD Taulia (SAP Taulia) — Software Engineer (Full Stack)
+:PROPERTIES:
+:COMPANY: Taulia (SAP Taulia)
+:ROLE: Software Engineer (Full Stack)
+:URL: https://careers.taulia.com/job/Sofia-Software-Engineer-(Full-Stack)-1784/1419005800/
+:LOCATION: Sofia, Bulgaria — posting field says Remote: Yes; Bulgarian entity, no relocation
+:SIZE: large
+:ENGLISH: yes
+:CONTACT: form only
+:CREATED: 2026-10-24
+:NOTES: SAP supply-chain finance fintech. Backend Java/Spring + MySQL + REST + Spring Security/OAuth2, frontend TypeScript/React (60% FE / 40% BE split). Posted band EUR 37,970-51,860 (local BG). 3+ yrs. Asks about AI-assisted workflows. Verified live, Apply Now present.
+:END:
+** LEAD emerchantpay — Senior Java Developer
+:PROPERTIES:
+:COMPANY: emerchantpay
+:ROLE: Senior Java Developer
+:URL: https://jobs.workable.com/view/wVHpqJy8KCCPuKqZnvEGay/remote-senior-java-developer-in-sofia-at-emerchantpay
+:LOCATION: Remote (Bulgaria) — Workable locations TELECOMMUTE + Sofia; benefits say "Fully distributed and remote"
+:SIZE: mid
+:ENGLISH: yes
+:CONTACT: form only
+:CREATED: 2026-10-24
+:NOTES: Global payments PSP. 9-10+ yrs Java/J2EE + Spring, Hibernate/ORM, MySQL/PostgreSQL, JS/front-end, TDD/JUnit. Expects daily AI coding agents (Claude Code, Kiro, Copilot) and MCP awareness. Published 2026-10-16 via Workable API (state published); human page is JS-rendered.
+:END:
+** LEAD Whitebox — Senior Software Engineer (Java) (m/f/x)
+:PROPERTIES:
+:COMPANY: Whitebox
+:ROLE: Senior Software Engineer (Java) (m/f/x)
+:URL: https://www.whitebox.eu/karriere/senior-software-engineer-java
+:LOCATION: Remote (EU) — "100% remote", permanent full-time 40h/wk, 30 days vacation
+:SIZE: small
+:ENGLISH: yes
+:CONTACT: jobs@whitebox.eu
+:CREATED: 2026-10-24
+:NOTES: EU digital wealth manager (brokerage + robo-advisory); distributed engineering team. Concurrency, distributed transactions/state, TDD/BDD, Docker, secure APIs; FIX/MiFID II/Rust nice-to-have. 7+ yrs. EMAIL channel: CV + earliest start date + salary expectations (a figure must be supplied). Not an ATS.
+:END:
+** LEAD Graphwise (Ontotext) — Senior Backend Engineer (Sofia / Ruse)
+:PROPERTIES:
+:COMPANY: Graphwise (Ontotext)
+:ROLE: Senior Backend Engineer (Sofia / Ruse)
+:URL: https://graphwise.ai/jobs/senior-backend-engineer/
+:LOCATION: Sofia or Ruse, Bulgaria — hybrid; min. 8 days/month in a Sofia/Ruse/Vienna office (NOT fully remote)
+:SIZE: mid
+:ENGLISH: yes
+:CONTACT: form only
+:CREATED: 2026-10-24
+:NOTES: GraphDB is a Java codebase: feature design, peer review, DB concurrency/performance, debugging transactional issues. 4+ yrs Java (or Rust/C++/Go), strong multithreading/algorithms, graph DB internals, gRPC and JFR profiling a plus. 25 days, bonus up to 30%. TRAP: the application form's Address field requires a valid JSON-LD string (name + LinkedIn) or you are auto-filtered.
+:END:
+** LEAD Qualifyze GmbH — Java Backend Engineering Team Lead (remote)
+:PROPERTIES:
+:COMPANY: Qualifyze GmbH
+:ROLE: Java Backend Engineering Team Lead (remote)
+:URL: https://qualifyzegmbh.recruitee.com/o/java-backend-engineering-team-lead-remote
+:LOCATION: Remote/Hybrid — tagged "Remote, Hybrid" but anchored Barcelona (hybrid), Spain; up to 3 months/yr work from anywhere
+:SIZE: mid
+:ENGLISH: yes
+:CONTACT: form only
+:CREATED: 2026-10-24
+:NOTES: Supply-chain compliance/audit SaaS for life sciences. Java + Spring Boot + Liquibase + Postgres, architecture ownership, selective PR reviews. EUR 85,000-90,000. CAVEATS: people-management role (1:1s, hiring, perf reviews) which the CV does not evidence; Recruitee screening asks about relocating to Spain and commuting to Barcelona twice a week — confirm Bulgaria eligibility before investing.
+:END:
+** LEAD Hauler Hero — Senior Backend Engineer (Contractor)
+:PROPERTIES:
+:COMPANY: Hauler Hero
+:ROLE: Senior Backend Engineer (Contractor)
+:URL: https://jobs.ashbyhq.com/hauler-hero/368d53fb-99c8-4780-9cd4-f4dc3b8a2bfa
+:LOCATION: Remote — posting explicitly open to Eastern Europe or LATAM; contractor; consistent US working-hours overlap required
+:SIZE: small
+:ENGLISH: yes
+:CONTACT: form only
+:CREATED: 2026-10-24
+:NOTES: Vertical SaaS for waste haulers (dispatch, routing, billing, driver app); 240+ customers. Java/Kotlin + Spring Boot, PostgreSQL (schema + query tuning), microservices refactor, GCP (GKE/Cloud Run/Cloud SQL), Redis, React, GitHub Actions. 5+ yrs; $5-7k/month contractor. AI-first engineering culture. Do NOT confuse with their Senior Backend Engineer, Payments req (US-residents only).
+:END:
+** LEAD Afternow (formerly BB Agency) — Senior Backend Developer (Java/Spring Boot)
+:PROPERTIES:
+:COMPANY: Afternow (formerly BB Agency)
+:ROLE: Senior Backend Developer (Java/Spring Boot)
+:URL: https://afternow.bamboohr.com/careers/62
+:LOCATION: Remote — Europe (also hires LATAM); fully remote; occasional multi-day LATAM client travel
+:SIZE: small
+:ENGLISH: yes
+:CONTACT: form only
+:CREATED: 2026-10-24
+:NOTES: ~30-person fully remote agency (Krk, Croatia) building for AWS, ThoughtSpot, Descartes, ShipBob. Java 21, Spring Boot 3.2+, Hibernate, PostgreSQL, REST, distributed systems; 5+ yrs; B2B contractor. CAVEATS: EUR 3,000-4,000/month gross is low for seniority; DDD + event-driven architecture are required, not optional; Spanish a bonus. Verified via BambooHR ATS JSON (id 62, Contractor, Europe/Remote).
+:END:
+** LEAD IESF AG — Mid-Senior Back-End Engineer Java or Kotlin
+:PROPERTIES:
+:COMPANY: IESF AG
+:ROLE: Mid-Senior Back-End Engineer Java or Kotlin
+:URL: https://jobs.smartrecruiters.com/IESFAG/743999831511182-mid-senior-back-end-engineer-java-or-kotlin
+:LOCATION: Remote — Bulgaria (Sofia branch); relocation to Bulgaria supported (visa + 1 month accommodation)
+:SIZE: small
+:ENGLISH: yes
+:CONTACT: form only
+:CREATED: 2026-10-24
+:NOTES: Recruiter-mediated (end client is a UK product fintech opening a Bulgarian branch; employer unnamed until interview). Event-driven microservices on Spring Boot/Data/Cloud/Security + Kafka, RDBMS + NoSQL, Docker/K8s, SonarQube/Pact/Cucumber toolchain. 4+ yrs Java; Kotlin nice-to-have. Salary unpublished ("highly competitive" + equity potential); B2B unconfirmed.
+:END:
+** LEAD Tide — Senior Staff Software Engineer, Agentic Platform
+:PROPERTIES:
+:COMPANY: Tide
+:ROLE: Senior Staff Software Engineer, Agentic Platform
+:URL: https://job-boards.greenhouse.io/tide/jobs/7703992003
+:LOCATION: Bulgaria listed among hiring locations (Sofia tech centre, Tide Platform Ltd Bulgaria Branch); also Berlin, Lithuania, Serbia, UK, India — location-based, not stated 100% remote
+:SIZE: large
+:ENGLISH: yes
+:CONTACT: form only
+:CREATED: 2026-10-24
+:NOTES: Java + Spring Boot + JOOQ REST microservices, SNS/SQS + Kafka, MySQL/PostgreSQL on AWS, Sonarcloud/Semgrep CI. CAVEAT: staff-level architecture for an agentic AI platform — bar is above plain senior IC. Tide accepts applications only via its careers page (no agencies). Sibling per-country reqs exist; no plain Senior IC Java req open.
+:END:
+** LEAD Payforge — Senior Java Engineer (Payments)
+:PROPERTIES:
+:COMPANY: Payforge
+:ROLE: Senior Java Engineer (Payments)
+:URL: https://dev.bg/company/jobads/payforge-senior-java-engineer-payments/
+:LOCATION: Remote — "Anywhere" / fully remote (remote-first from day one); no residency gate stated
+:SIZE: small
+:ENGLISH: yes
+:CONTACT: form only
+:CREATED: 2026-10-24
+:NOTES: Payments consultancy (client variety, not one codebase). Java 21/25, Spring Boot 4 / Spring Framework 7, Kafka (idempotency, exactly-once), PostgreSQL/MySQL + Hibernate, REST/OpenAPI, Gradle/Maven, GitHub Actions/Helm/Terraform, AWS/Docker/K8s, JUnit5/Mockito/Testcontainers, OpenTelemetry/Prometheus/Grafana. 7+ yrs Java AND hands-on production payments (the real stretch). Expects daily AI/LLM coding assistants. Published 2026-10-15 on the dev.bg fully-remote Java board.
+:END:
+** LEAD NOTO – 360 Fraud and Compliance — Senior Java Back-End Developer
+:PROPERTIES:
+:COMPANY: NOTO – 360 Fraud and Compliance
+:ROLE: Senior Java Back-End Developer
+:URL: https://dev.bg/company/jobads/noto-360-fraud-and-compliance-senior-java-back-end-developer/
+:LOCATION: Fully Remote — listing location "Anywhere"; Sofia office optional; remote way of work with flexible hours
+:SIZE: small
+:ENGLISH: yes
+:CONTACT: form only
+:CREATED: 2026-10-24
+:NOTES: Fraud/risk-ops platform for fintech, product company since 2017, profitable from first client. 5+ yrs Java, Apache Kafka, Git, SQL/NoSQL, Docker, Linux, low-latency high-volume system design. Fintech/regtech or fraud-prevention background an advantage. No salary published — ask. Benefits imply BG/EU payroll, so settle FTE vs B2B early. Posted ~3 weeks before recording.
+:END:
+** LEAD Xebia — Senior Java Developer (legacy project)
+:PROPERTIES:
+:COMPANY: Xebia
+:ROLE: Senior Java Developer (legacy project)
+:URL: https://dev.bg/company/jobads/xebia-senior-java-developer-legacy-project/
+:LOCATION: Fully Remote — "Anywhere"; EU region + valid work permit required (Bulgaria qualifies)
+:SIZE: large
+:ENGLISH: yes
+:CONTACT: form only
+:CREATED: 2026-10-24
+:NOTES: Consultancy (5,000 staff, 16 countries). Improving a large mature/legacy Java codebase: structure and maintainability plus new features, code reviews, testing. English B2. Values practical AI-assistant use (Claude Code/Copilot/Cursor). Process: CV review -> HR call -> technical interview -> client interview -> decision. Salary undisclosed. Posted ~4 weeks before recording.
+:END:
+** LEAD Smartsheet — Sr. Software Engineer (Remote Eligible from Bulgaria)
+:PROPERTIES:
+:COMPANY: Smartsheet
+:ROLE: Sr. Software Engineer (Remote Eligible from Bulgaria)
+:URL: https://dev.bg/company/jobads/smartsheet-n-sr-software-engineer-remote-eligible-from-bulgaria/
+:LOCATION: Remote — Bulgaria ("You will work remotely from Bulgaria"; must be legally eligible to work in Bulgaria on an ongoing basis)
+:SIZE: large
+:ENGLISH: yes
+:CONTACT: form only
+:CREATED: 2026-10-24
+:NOTES: Legacy Java monolith plus Java/Go microservices on AWS + Terraform, React front end. "Proficiency in Java or Golang" — no stack stretch. Senior hands-on IC with mentoring (not line management). Bulgarian hub opened Oct 2024, 75+ engineers. Slug found via dev.bg job-listing sitemap (lastmod 2026-10-06).
+:END:
+** LEAD Tieto Tech Consulting — Senior Java Developer – Tieto Tech Consulting (m/f/d)
+:PROPERTIES:
+:COMPANY: Tieto Tech Consulting
+:ROLE: Senior Java Developer – Tieto Tech Consulting (m/f/d)
+:URL: https://dev.bg/company/jobads/senior-java-developer-tieto-tech-consulting-m-f-d/
+:LOCATION: Fully Remote — dev.bg tags it "Anywhere"; no geography restriction stated in the JD
+:SIZE: large
+:ENGLISH: yes
+:CONTACT: form only
+:CREATED: 2026-10-24
+:NOTES: Tieto/Tietoevry group (MentorMate delivery arm; ~14,000 staff). Java + Spring + React + SQL Server + Azure + GWT legacy modernisation on a veterinary practice-management platform. Hands-on senior IC. Large org => ATS/TA screen (38 reqs on dev.bg). No salary band. Sitemap lastmod 2026-10-15.
+:END:
+** LEAD DraftKings — Lead Backend Engineer [JR15298]
+:PROPERTIES:
+:COMPANY: DraftKings
+:ROLE: Lead Backend Engineer [JR15298]
+:URL: https://careers.draftkings.com/jobs/jr15298/lead-backend-engineer/
+:LOCATION: Remote — Bulgaria (#LI-REMOTE); DraftKings has Sofia and Plovdiv engineering hubs
+:SIZE: large
+:ENGLISH: yes
+:CONTACT: form only
+:CREATED: 2026-10-24
+:NOTES: 5+ yrs OO backend in Java or C#, distributed systems on AWS/GCP, real-time high-scale APIs, heavy automated-testing culture. Hands-on lead/mentor IC (writes code, owns lifecycle, runs design and code reviews), not people management. BG benefits (25 vacation days, 200 BGN food vouchers, MultiSport, health/dental) imply a local employment contract, not B2B. Regulated gaming may involve licence checks. No salary published. Apply via Workday.
+:END:
+** LEAD Avenga — Senior Java Engineer
+:PROPERTIES:
+:COMPANY: Avenga
+:ROLE: Senior Java Engineer
+:URL: https://career.avenga.com/jobs/8517503-senior-java-engineer
+:LOCATION: Sofia, Bulgaria — Fully Remote (Bulgarian entity; both employment and B2B plausible)
+:SIZE: large
+:ENGLISH: yes
+:CONTACT: form only
+:CREATED: 2026-10-24
+:NOTES: International engineering services firm (6,000+ staff). Long-term enterprise client project: WebSphere + IBM Business Automation Workflow, JPA, REST/SOAP, Oracle SQL, Jython/Ant legacy — enterprise-legacy weighted, not greenfield Spring. Senior IC, no direct reports. Process: application -> talent call -> technical interview -> sometimes customer interview -> offer. Published 2026-10-08 (Teamtailor job 8517503).
+:END:
+** LEAD SoftServe Bulgaria — Full-stack Software Engineer (Senior Full-Stack Java Engineer)
+:PROPERTIES:
+:COMPANY: SoftServe Bulgaria
+:ROLE: Full-stack Software Engineer (Senior Full-Stack Java Engineer)
+:URL: https://dev.bg/company/jobads/softserve-bulgaria-full-stack-software-engineer/
+:LOCATION: Fully Remote — "Anywhere" (Bulgarian IT market ad)
+:SIZE: large
+:ENGLISH: yes
+:CONTACT: form only
+:CREATED: 2026-10-24
+:NOTES: Large IT services firm (34 open ads on dev.bg). EU public-sector system (calls, proposals, grants, audits, funding). Java + Spring Boot + Hibernate + REST/OpenAPI, PostgreSQL/Oracle/MongoDB, JUnit/Mockito, SonarQube, React front end. 7+ yrs; English OR French B2. Legacy-weighted stack (JEE/WebLogic/EJB, Apache Camel, Drools). Salary undisclosed. Posted ~3 days before recording.
+:END:
+** LEAD wealthAPI GmbH — Senior Backend Engineer Java / Spring Boot - remote
+:PROPERTIES:
+:COMPANY: wealthAPI GmbH
+:ROLE: Senior Backend Engineer Java / Spring Boot - remote
+:URL: https://join.com/companies/wealthapi/16756334-senior-backend-engineer-java-spring-boot-remote
+:LOCATION: Remote (worldwide) — must reside within +/-2h of Berlin (CET+/-2), which Bulgaria satisfies
+:SIZE: small
+:ENGLISH: yes
+:CONTACT: form only
+:CREATED: 2026-10-24
+:NOTES: Berlin fintech (11-50 staff), wealth-management API sold to partners. 5+ yrs Java + Spring Boot, TDD, unit/integration testing, Postgres, GCP, Kubernetes; architecture input welcomed but no lead title. EUR 50,000-90,000 (50k is the floor, not senior pay — aim 75-90k). Described as German permanent employment, so confirm the entity/EOR route for a Bulgaria-based hire. Ruby on Rails also in the stack. join.com job id 16869315.
+:END:
+** LEAD Ceffu — Senior Java Engineer
+:PROPERTIES:
+:COMPANY: Ceffu
+:ROLE: Senior Java Engineer
+:URL: https://jobs.lever.co/pioneer-services/0a91cb1c-c3a6-4c13-8dac-d1f5ee589ae6
+:LOCATION: Remote — listed "Global / Hong Kong / Kuala Lumpur / Singapore / Taipei"; APAC-skewed, hired via Pioneer Services (EOR)
+:SIZE: mid
+:ENGLISH: unknown
+:CONTACT: form only
+:CREATED: 2026-10-24
+:NOTES: Custody/fintech (Binance-adjacent). 5+ yrs Java, Spring Boot + Spring MVC, MyBatis, PostgreSQL/MySQL, Redis, Kafka/RabbitMQ, microservices + Docker/K8s, code reviews, production ownership. React a plus. Asks only for basic English reading/writing. No salary. CAVEATS: "Global" listed first but all named hubs are APAC; employment via EOR/staffing intermediary; ad ~2 months old on aggregators though still live on Lever.
+:END:
+** LEAD Brandwatch — Senior Staff Software Engineer
+:PROPERTIES:
+:COMPANY: Brandwatch
+:ROLE: Senior Staff Software Engineer
+:URL: https://job-boards.eu.greenhouse.io/brandwatch/jobs/4968857101
+:LOCATION: Sofia, Bulgaria / Remote — Hungary; ATS "Acceptable Hiring Locations" = Sofia BG + Budapest HU only; hybrid/remote
+:SIZE: large
+:ENGLISH: yes
+:CONTACT: form only
+:CREATED: 2026-10-24
+:NOTES: Social listening arm of Cision; req 1420 (internal title "Staff Full Stack Software Engineer"). Backend services + APIs for collection/enrichment/querying, ETL over structured and semi-structured data, search UI, Docker/K8s, PostgreSQL, GCP/AWS. Java is one of four accepted backend languages (C#, Python, Go, Java) — not Spring-specific. Targets ~10+ yrs with prior Staff/Senior ownership. Pay EUR 65,000-75,000 gross for a BG-based hire. first_published 2026-09-04.
+:END:
+** LEAD MariaDB plc (GridGain engineering) — Java Senior Software Engineer
+:PROPERTIES:
+:COMPANY: MariaDB plc (GridGain engineering)
+:ROLE: Java Senior Software Engineer
+:URL: https://job-boards.eu.greenhouse.io/mariadbplc/jobs/4961679101
+:LOCATION: Remote — Bulgaria (Sofia office optional); also remote Croatia, Estonia, Finland, Italy, Poland, Romania, Serbia, Spain, Armenia, Cyprus
+:SIZE: mid
+:ENGLISH: yes
+:CONTACT: form only
+:CREATED: 2026-10-24
+:NOTES: Req BG-26R-ENGG-1, department ENGG - GridGain. Core Java on GridGain/Apache Ignite: Java Memory Model and concurrency, Java SE internals, replication/sharding, MVCC/Raft/ACID, JFR/JMC/async-profiler, SQL — core Java rather than Spring web, so prep JVM internals. Pay EUR 74,200-90,000 gross + 25 days. JD mentions managing several engineers and "excellent leadership" despite the Senior IC title. No visa sponsorship/relocation. first_published 2026-09-18.
+:END:
+** LEAD Sumsub — Senior Backend Developer – External Integrations
+:PROPERTIES:
+:COMPANY: Sumsub
+:ROLE: Senior Backend Developer – External Integrations
+:URL: https://careers.sumsub.com/jobs/8177178-senior-backend-developer-external-integrations
+:LOCATION: Fully Remote — remote-first, no mandatory office days; "Multiple locations", Limassol anchor; 1,000+ staff in 25 countries
+:SIZE: large
+:ENGLISH: yes
+:CONTACT: form only
+:CREATED: 2026-10-24
+:NOTES: KYC/KYB compliance and fraud/transaction-monitoring platform. Main language Java 17 with Dropwizard/Restler, Kafka/Kafka Streams, MongoDB/ClickHouse/Redis, OpenSearch; owns infrastructure for 100+ provider integrations. Senior IC, no lead title. Stages: TA -> hiring manager -> final. Comp "benchmarked to market", no band. CAVEAT: no country list published, Cyprus anchor — confirm Bulgaria eligibility with TA before investing.
+:END:
+** LEAD CoorB — Senior Java Engineer
+:PROPERTIES:
+:COMPANY: CoorB
+:ROLE: Senior Java Engineer
+:URL: https://coorb.zohorecruit.com/jobs/Careers/788027000005848018/Senior-Java-Engineer
+:LOCATION: Remote — "Anywhere in the World" (posting states "This is a remote position"); no country list, so Bulgaria is not excluded
+:SIZE: small
+:ENGLISH: yes
+:CONTACT: form only
+:CREATED: 2026-10-24
+:NOTES: Java 17+, Spring Boot, REST API design/versioning, PostgreSQL schema and query performance, microservices, JUnit/Mockito, Git/code review; nice-to-haves Kafka/RabbitMQ, Docker/K8s/OpenShift, OAuth2/Keycloak, Prometheus/Grafana. Senior IC, English only. CAVEATS: posted ~30 Jul 2026 (stale-ish, low ghost score); salary undisclosed and CoorB also hires in EG/PK so expect geo-adjustment — ask for the band first. Zoho Recruit form; page is a JS shell, liveness confirmed by req id + mirror JDs.
+:END:
 * Archive
 :PROPERTIES:
 :NOTES: no jobs available matching profile so did not apply

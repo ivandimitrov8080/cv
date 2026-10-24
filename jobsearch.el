@@ -82,6 +82,17 @@ entry.  This list drives capture, creation, reading and the gptel tools.")
   "Return the Org property name for FIELD."
   (upcase (symbol-name field)))
 
+(defun cv-jobs--field (fields field)
+  "Return the value of FIELD in FIELDS, keyed by symbol or by keyword.
+`cv-jobs-lead-fields' names its keys with plain symbols (company, role,
+url, ...), while the public write API takes keyword plists
+(:company, :role, ...).  `plist-get' compares keys with `eq', so looking
+one up as the other silently returns nil: the entry gets the right
+heading but an empty :PROPERTIES: drawer, and the lead loses its URL,
+location and contact."
+  (or (plist-get fields field)
+      (plist-get fields (intern (concat ":" (symbol-name field))))))
+
 (defun cv-jobs--format (lead)
   "Format LEAD as a short report for the model."
   (mapconcat (lambda (k)
@@ -168,7 +179,7 @@ Pipeline heading itself, so the child's level is (1+ LEVEL)."
                   (plist-get lead :company) " — " (plist-get lead :role) "\n"
                   ":PROPERTIES:\n"
                   (mapconcat (lambda (f)
-                               (if-let* ((v (plist-get lead (car f))))
+                               (if-let* ((v (cv-jobs--field lead (car f))))
                                    (format ":%s: %s\n" (cv-jobs--prop (car f)) v)
                                  ""))
                              cv-jobs-lead-fields "")
@@ -182,7 +193,7 @@ Pipeline heading itself, so the child's level is (1+ LEVEL)."
     (save-excursion
       (goto-char marker)
       (dolist (f cv-jobs-lead-fields)
-        (when-let* ((v (plist-get fields (car f))))
+        (when-let* ((v (cv-jobs--field fields (car f))))
           (org-entry-put nil (cv-jobs--prop (car f)) v)))
       (when-let* ((state (plist-get fields :state)))
         (org-todo state))
@@ -530,7 +541,20 @@ answer it can act on."
           (cv-jobs-lead nil :company company :role role :url url
                         :location location :size size
                         :english english :contact contact)
-          (let ((marker (cv-jobs--lead-at (concat company " — " role))))
+          ;; Locate the entry just inserted by heading regexp rather than through
+          ;; `cv-jobs--lead-at': a lookup miss there is silent (the body is
+          ;; guarded by `when'), which is how CREATED and NOTES went missing on
+          ;; every recorded lead.
+          (let ((marker (with-current-buffer (find-file-noselect cv-jobs-file)
+                          (save-excursion
+                            (goto-char (point-min))
+                            (when (re-search-forward
+                                   (concat "^\\*+ +LEAD +"
+                                           (regexp-quote company) " +— +"
+                                           (regexp-quote role)
+                                           "\\(?:[ \t]\\|$\\)")
+                                   nil t)
+                              (point-marker))))))
             (when marker
               (with-current-buffer (marker-buffer marker)
                 (save-excursion
@@ -587,7 +611,7 @@ property, so `cv-jobs-find-answers' keeps ignoring it."
   (interactive "sQuestion: ")
   (if (not (and cv-jobs--current (marker-buffer cv-jobs--current)))
       "No lead selected; call cv_jobs_next_lead first."
-    (let* ((company (plist-get (cv-jobs-lead cv-jobs--current) :company))
+    (let* ((company (cv-jobs--field (cv-jobs-lead cv-jobs--current) 'company))
            (answers-file (file-name-nondirectory cv-jobs-answers-file)))
       (with-current-buffer (find-file-noselect cv-jobs-answers-file)
         (unless (org-find-exact-headline-in-buffer question)

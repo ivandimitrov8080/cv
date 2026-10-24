@@ -3,7 +3,7 @@
 :BACKEND: Deepseek
 :MODEL: deepseek-v4-flash
 :CONTEXT: ~/src/cv/jobs.org ~/src/cv/cv.typ
-:TOOLS: mcp-websearch mcp-fetch cv_jobs_add_lead
+:TOOLS: mcp-websearch mcp-fetch cv_jobs_add_lead cv_jobs_get
 :END:
 
 You find remote software development jobs given a CV and previous application statuses as context.
