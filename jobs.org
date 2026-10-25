@@ -255,8 +255,8 @@ SCHEDULED: <2026-10-27 Tue>
    :END:
 - Note [2026-10-20 Tue 16:48] Application sent.
 
-** APPLIED CloudLinux — Java Developer (worldwide remote)        :jobsearch:
-SCHEDULED: <2026-10-27 Tue>
+** REJECTED CloudLinux — Java Developer (worldwide remote)     :jobsearch:
+CLOSED: [2026-10-25 Sun 20:19] SCHEDULED: <2026-10-27 Tue>
    :PROPERTIES:
    :URL: https://www.cloudlinux.com/about-us-careers
    :LOCATION: Remote — worldwide ("work anywhere")
@@ -266,6 +266,8 @@ SCHEDULED: <2026-10-27 Tue>
    :CREATED: 2026-10-15
    :APPLIED_ON: 2026-10-20
    :END:
+   - CLOSING NOTE [2026-10-25 Sun 20:19] \\
+     no comment
 - Note [2026-10-20 Tue 16:52] Application sent.
 
 ** APPLIED Volante Technologies — Java Full Stack Developer (React/Angular) :jobsearch:
