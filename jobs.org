@@ -327,8 +327,8 @@ SCHEDULED: <2026-11-06 Fri>
    :END:
 - Note [2026-10-23 Fri 17:12] Application sent.
 
-** APPLIED Feedzai — Software Engineer (Java) — platform / customer engineering :jobsearch:
-SCHEDULED: <2026-11-06 Fri>
+** REJECTED Feedzai — Software Engineer (Java) — platform / customer engineering :jobsearch:
+CLOSED: [2026-10-25 Sun 20:20] SCHEDULED: <2026-11-06 Fri>
    :PROPERTIES:
    :URL: https://careers.feedzai.com/
    :LOCATION: Remote (Portugal) — EU-friendly; verify remote eligibility
@@ -344,6 +344,8 @@ SCHEDULED: <2026-11-06 Fri>
    :ARCHIVE_ITAGS: jobsearch
    :APPLIED_ON: 2026-10-23
    :END:
+   - CLOSING NOTE [2026-10-25 Sun 20:20] \\
+     no comment
 - Note [2026-10-23 Fri 17:15] Application sent.
 
 ** APPLIED Five9 — Software Engineer II — Data Platform (Java / Spring Boot) :jobsearch:
