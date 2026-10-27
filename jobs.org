@@ -482,7 +482,7 @@ SCHEDULED: <2026-11-06 Fri>
    :APPLIED_ON: 2026-10-23
    :END:
 - Note [2026-10-23 Fri 18:04] Application sent.
-** LEAD Taulia (SAP Taulia) — Software Engineer (Full Stack)
+** HOLD Taulia (SAP Taulia) — Software Engineer (Full Stack)
 :PROPERTIES:
 :COMPANY: Taulia (SAP Taulia)
 :ROLE: Software Engineer (Full Stack)
@@ -494,19 +494,10 @@ SCHEDULED: <2026-11-06 Fri>
 :CREATED: 2026-10-24
 :NOTES: SAP supply-chain finance fintech. Backend Java/Spring + MySQL + REST + Spring Security/OAuth2, frontend TypeScript/React (60% FE / 40% BE split). Posted band EUR 37,970-51,860 (local BG). 3+ yrs. Asks about AI-assisted workflows. Verified live, Apply Now present.
 :END:
-** LEAD emerchantpay — Senior Java Developer
-:PROPERTIES:
-:COMPANY: emerchantpay
-:ROLE: Senior Java Developer
-:URL: https://jobs.workable.com/view/wVHpqJy8KCCPuKqZnvEGay/remote-senior-java-developer-in-sofia-at-emerchantpay
-:LOCATION: Remote (Bulgaria) — Workable locations TELECOMMUTE + Sofia; benefits say "Fully distributed and remote"
-:SIZE: mid
-:ENGLISH: yes
-:CONTACT: form only
-:CREATED: 2026-10-24
-:NOTES: Global payments PSP. 9-10+ yrs Java/J2EE + Spring, Hibernate/ORM, MySQL/PostgreSQL, JS/front-end, TDD/JUnit. Expects daily AI coding agents (Claude Code, Kiro, Copilot) and MCP awareness. Published 2026-10-16 via Workable API (state published); human page is JS-rendered.
-:END:
-** LEAD Whitebox — Senior Software Engineer (Java) (m/f/x)
+- Note [2026-10-27 Tue 08:23] On hold, no answer for: Address is required. City is required. ZIP is required. (Taulia/SAP application form, Profile Information section — Country is set to Bulgaria and phone to +447411180797; only the residential address, city and postal code are missing and are not in the CV/profile.)
+
+** APPLIED Whitebox — Senior Software Engineer (Java) (m/f/x)
+SCHEDULED: <2026-11-10 Tue>
 :PROPERTIES:
 :COMPANY: Whitebox
 :ROLE: Senior Software Engineer (Java) (m/f/x)
@@ -517,8 +508,11 @@ SCHEDULED: <2026-11-06 Fri>
 :CONTACT: jobs@whitebox.eu
 :CREATED: 2026-10-24
 :NOTES: EU digital wealth manager (brokerage + robo-advisory); distributed engineering team. Concurrency, distributed transactions/state, TDD/BDD, Docker, secure APIs; FIX/MiFID II/Rust nice-to-have. 7+ yrs. EMAIL channel: CV + earliest start date + salary expectations (a figure must be supplied). Not an ATS.
+:APPLIED_ON: 2026-10-27
 :END:
-** LEAD Graphwise (Ontotext) — Senior Backend Engineer (Sofia / Ruse)
+- Note [2026-10-27 Tue 08:28] Application sent.
+
+** HOLD Graphwise (Ontotext) — Senior Backend Engineer (Sofia / Ruse)
 :PROPERTIES:
 :COMPANY: Graphwise (Ontotext)
 :ROLE: Senior Backend Engineer (Sofia / Ruse)
@@ -530,7 +524,9 @@ SCHEDULED: <2026-11-06 Fri>
 :CREATED: 2026-10-24
 :NOTES: GraphDB is a Java codebase: feature design, peer review, DB concurrency/performance, debugging transactional issues. 4+ yrs Java (or Rust/C++/Go), strong multithreading/algorithms, graph DB internals, gRPC and JFR profiling a plus. 25 days, bonus up to 30%. TRAP: the application form's Address field requires a valid JSON-LD string (name + LinkedIn) or you are auto-filtered.
 :END:
-** LEAD Qualifyze GmbH — Java Backend Engineering Team Lead (remote)
+- Note [2026-10-27 Tue 08:31] On hold, no answer for: Address* / City* / Province* / Postal Code* (required address fields on the Graphwise–Ontotext "Senior Java Backend Engineer" BambooHR application form, https://graphwise.bamboohr.com/careers/90) — no postal address is in the CV; what values should be entered? Note: the posting asks for a JSON-LD string in the Address field, but City, Province and Postal Code are still required.
+
+** HOLD Qualifyze GmbH — Java Backend Engineering Team Lead (remote)
 :PROPERTIES:
 :COMPANY: Qualifyze GmbH
 :ROLE: Java Backend Engineering Team Lead (remote)
@@ -542,6 +538,8 @@ SCHEDULED: <2026-11-06 Fri>
 :CREATED: 2026-10-24
 :NOTES: Supply-chain compliance/audit SaaS for life sciences. Java + Spring Boot + Liquibase + Postgres, architecture ownership, selective PR reviews. EUR 85,000-90,000. CAVEATS: people-management role (1:1s, hiring, perf reviews) which the CV does not evidence; Recruitee screening asks about relocating to Spain and commuting to Barcelona twice a week — confirm Bulgaria eligibility before investing.
 :END:
+- Note [2026-10-27 Tue 08:32] On hold, no answer for: Are you open to relocating to Spain if you are currently based elsewhere?
+
 ** LEAD Hauler Hero — Senior Backend Engineer (Contractor)
 :PROPERTIES:
 :COMPANY: Hauler Hero
@@ -2151,4 +2149,24 @@ Note taken on 2026-10-15 Thu 14:10 \\
    :ARCHIVE_ITAGS: jobsearch
    :END:
 - Note [2026-10-23 Fri 18:06] Target role "Backend Engineer (Kotlin / Java / Scala) — Remote (or NYC in-person)" is no longer open: starbridge.ai/careers redirects to the Ashby board (jobs.ashbyhq.com/starbridge), whose full posting API lists 11 roles with NO backend/remote engineering opening, and the Wellfound ad ("Senior Backend Software Engineer | Java/Kotlin | NYC", wellfound.com/jobs/3182411) returns HTTP 410 Gone. Remaining engineering roles are both NYC on-site only: Senior Product Engineer | NYC (e2e55c8c-2eaf-4349-874d-7c18ebb11228) and Senior Security & Infrastructure Engineer (1490b0d3-b2ee-4bfc-bb67-3aa02e62496e). Its application form has mandatory questions "Are you based in NYC / willing to relocate to NYC?", "Are you able to work onsite five days a week at our Chelsea Piers office?" and "Do you require any form of authorization to work legally in the United States?" — a knowingly ineligible application for a Sofia, Bulgaria-based candidate with EEA/B2B remote-only right to work and no US work authorisation, so it was not submitted. No application/careers email exists on the site (only product support@starbridge.ai); all careers links go to Ashby.
+
+** LEAD emerchantpay — Senior Java Developer                     :jobsearch:
+:PROPERTIES:
+:COMPANY: emerchantpay
+:ROLE: Senior Java Developer
+:URL: https://jobs.workable.com/view/wVHpqJy8KCCPuKqZnvEGay/remote-senior-java-developer-in-sofia-at-emerchantpay
+:LOCATION: Remote (Bulgaria) — Workable locations TELECOMMUTE + Sofia; benefits say "Fully distributed and remote"
+:SIZE: mid
+:ENGLISH: yes
+:CONTACT: form only
+:CREATED: 2026-10-24
+:NOTES: Global payments PSP. 9-10+ yrs Java/J2EE + Spring, Hibernate/ORM, MySQL/PostgreSQL, JS/front-end, TDD/JUnit. Expects daily AI coding agents (Claude Code, Kiro, Copilot) and MCP awareness. Published 2026-10-16 via Workable API (state published); human page is JS-rendered.
+:ARCHIVE_TIME: 2026-10-27 Tue 08:27
+:ARCHIVE_FILE: ~/src/cv/jobs.org
+:ARCHIVE_OLPATH: Pipeline
+:ARCHIVE_CATEGORY: jobs
+:ARCHIVE_TODO: LEAD
+:ARCHIVE_ITAGS: jobsearch
+:END:
+- Note [2026-10-27 Tue 08:27] Workable apply form (jobs.workable.com -> emerchantpay Senior Java Developer) could not be submitted: the "Submit application" button stays disabled because the Cloudflare Turnstile CAPTCHA fails to load (brunhild.challenges.cloudflare.com returns ERR_ADDRESS_UNREACHABLE / challenge 401 in this environment). Form was fully filled (Ivan Dimitrov, ivan@idimitrov.dev, +44 7411 180797, ATS resume uploaded) and submitted twice across two page loads, but no submission request was ever issued. No email application address is given by the posting (form only), so no fallback channel was available. Needs a manual submit in a normal browser.
 

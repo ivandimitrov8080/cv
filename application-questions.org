@@ -175,4 +175,19 @@
 :SOURCE:
 ** If needed, would being employed by an EOR/employer of record be acceptable to you in the future?
 :PROPERTIES:
-:SOURCE:       
+:SOURCE:
+** Address is required. City is required. ZIP is required. (Taulia/SAP application form, Profile Information section — Country is set to Bulgaria and phone to +447411180797; only the residential address, city and postal code are missing and are not in the CV/profile.)
+:PROPERTIES:
+:SOURCE: Taulia (SAP Taulia)
+:END:
+** Address* / City* / Province* / Postal Code* (required address fields on the Graphwise–Ontotext "Senior Java Backend Engineer" BambooHR application form, https://graphwise.bamboohr.com/careers/90) — no postal address is in the CV; what values should be entered? Note: the posting asks for a JSON-LD string in the Address field, but City, Province and Postal Code are still required.
+:PROPERTIES:
+:SOURCE: Graphwise (Ontotext)
+:END:
+** Are you open to relocating to Spain if you are currently based elsewhere?
+:PROPERTIES:
+:SOURCE: Qualifyze GmbH
+:END:
+
+
+       
