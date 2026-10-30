@@ -756,6 +756,58 @@ SCHEDULED: <2026-11-10 Tue>
 :CREATED: 2026-10-24
 :NOTES: Java 17+, Spring Boot, REST API design/versioning, PostgreSQL schema and query performance, microservices, JUnit/Mockito, Git/code review; nice-to-haves Kafka/RabbitMQ, Docker/K8s/OpenShift, OAuth2/Keycloak, Prometheus/Grafana. Senior IC, English only. CAVEATS: posted ~30 Jul 2026 (stale-ish, low ghost score); salary undisclosed and CoorB also hires in EG/PK so expect geo-adjustment — ask for the band first. Zoho Recruit form; page is a JS shell, liveness confirmed by req id + mirror JDs.
 :END:
+** LEAD DataArt — Senior Software Developer with Kotlin
+:PROPERTIES:
+:COMPANY:  DataArt
+:ROLE:     Senior Software Developer with Kotlin
+:URL:      https://dev.bg/company/jobads/dataart-senior-software-developer-with-kotlin/
+:LOCATION: Fully Remote — "Anywhere" (dev.bg); DataArt also runs a Java Solution Architect remote req
+:SIZE:     large
+:ENGLISH:  yes
+:CONTACT:  form only
+:CREATED:  2026-10-30
+:NOTES:    Posted 2026-10-30 (3 hours before this run), verified live, fully remote. DataArt = 3,000+ engineer services firm; JVM/Kotlin backend for client products. STRETCH: Kotlin rather than Java — Java/Spring + JVM depth carries over but there is no Kotlin on the CV, so lead with JVM/concurrency/testing evidence. Salary not published. Sibling remote req "Solution Architect (Java)" (posted 2026-10-16) is also live if the Kotlin one feels too lateral.
+:END:
+** LEAD ICT Strypes — Java Developer
+:PROPERTIES:
+:COMPANY:  ICT Strypes
+:ROLE:     Java Developer
+:URL:      https://dev.bg/company/jobads/ict-strypes-java-developer/
+:LOCATION: Fully Remote — ad location field is "Anywhere"; also posted for Sofia, Plovdiv, Varna, Burgas (pick remote when applying)
+:SIZE:     mid
+:ENGLISH:  yes
+:CONTACT:  form only
+:CREATED:  2026-10-30
+:NOTES:    Posted 2026-10-28, verified live. ICT Strypes is a Bulgarian delivery arm of the Dutch ICT Group — Java/Spring backend work for EU enterprise clients, English working language, Bulgarian employment or B2B plausible. Same ad is opened in five city boards, one of which is Fully Remote, so the role is remote-capable (confirm the remote slot on the call). Salary not published. Low-friction dev.bg form (CV + optional note, no screening essays).
+:END:
+** LEAD Wiser Technology — Cloud Native Java Architect
+:PROPERTIES:
+:COMPANY:  Wiser Technology
+:ROLE:     Cloud Native Java Architect
+:URL:      https://dev.bg/company/jobads/wiser-technology-cloud-native-java-architect/
+:LOCATION: Fully Remote — dev.bg tags it "Fully Remote" / "Anywhere"; offices optional in Sofia, Plovdiv, Stara Zagora and Niš (Serbia)
+:SIZE:     large
+:ENGLISH:  yes
+:CONTACT:  form only
+:CREATED:  2026-10-30
+:NOTES:    Posted 2026-10-29, verified live on dev.bg (also listed on Himalayas, where it shows as hybrid — dev.bg's own tag is Fully Remote, so confirm with the recruiter). Stack: Java + Spring Boot/Cloud/Data, TypeScript, containers (5+ yrs Docker/K8s, Helm), PostgreSQL/SQL Server/MongoDB, CI/CD, AWS/Azure/SAP BTP. STRETCH: 8+ yrs architecture and mentor-the-team scope; SAP CAP/Fiori/SAP Integration Suite and iPaaS experience are wanted and are NOT on the CV. Salary not published. Company = 500+ engineers (ex-Prime Holding); apply form is dev.bg's native form (no salary/essay questions).
+:END:
+** LEAD N-iX — Tech Lead Full-stack (Java+React) Engineer
+:PROPERTIES:
+:COMPANY:  N-iX
+:ROLE:     Tech Lead Full-stack (Java+React) Engineer
+:URL:      https://dev.bg/company/jobads/n-ix-tech-lead-full-stack-java-react-engineer/
+:LOCATION: Fully Remote — "Anywhere" (dev.bg listing); N-iX is a Ukraine-founded global services company
+:SIZE:     large
+:ENGLISH:  yes
+:CONTACT:  form only
+:CREATED:  2026-10-30
+:NOTES:    DIRECT Java+React match and the best pay band found this run: dev.bg states EUR 4,000–5,500 NET/month, fully remote, ad live and re-confirmed 2026-10-30 (published ~2026-10-16). N-iX: 2,400+ engineers, services/outsourcing, English working language. CAVEAT: "Tech Lead" — expects technical leadership (design ownership, mentoring) rather than pure IC; CV shows senior IC + code-review leadership, no formal team lead. dev.bg apply form is a plain web form (no salary/essay questions), so it can be submitted end-to-end.
+:END:
+
+
+
+
 * Archive
 :PROPERTIES:
 :NOTES: no jobs available matching profile so did not apply
