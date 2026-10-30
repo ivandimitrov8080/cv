@@ -402,8 +402,8 @@ SCHEDULED: <2026-11-06 Fri>
 - Note [2026-10-23 Fri 17:34] Application sent.
 
 
-** APPLIED Bloomreach — Staff Software Engineer (Python, Java/Spring or Go)
-SCHEDULED: <2026-11-06 Fri>
+** REJECTED Bloomreach — Staff Software Engineer (Python, Java/Spring or Go)
+CLOSED: [2026-10-30 Fri 18:51] SCHEDULED: <2026-11-06 Fri>
    :PROPERTIES:
    :URL: https://job-boards.greenhouse.io/bloomreach
    :LOCATION: Remote/hybrid — Czechia / Slovakia (also UK, India)
@@ -413,6 +413,8 @@ SCHEDULED: <2026-11-06 Fri>
    :CREATED: 2026-10-15
    :APPLIED_ON: 2026-10-23
    :END:
+   - CLOSING NOTE [2026-10-30 Fri 18:51] \\
+     no comment
 - Note [2026-10-23 Fri 17:48] Application sent.
 
 
