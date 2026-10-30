@@ -367,8 +367,8 @@ SCHEDULED: <2026-11-06 Fri>
    :END:
 - Note [2026-10-23 Fri 17:20] Application sent.
 
-** APPLIED Playson — Senior Backend Engineer                   :jobsearch:
-SCHEDULED: <2026-11-06 Fri>
+** REJECTED Playson — Senior Backend Engineer                  :jobsearch:
+CLOSED: [2026-10-30 Fri 18:50] SCHEDULED: <2026-11-06 Fri>
    :PROPERTIES:
    :URL: https://playson.com/careers/
    :LOCATION: Remote — Europe
@@ -384,6 +384,8 @@ SCHEDULED: <2026-11-06 Fri>
    :ARCHIVE_ITAGS: jobsearch
    :APPLIED_ON: 2026-10-23
    :END:
+   - CLOSING NOTE [2026-10-30 Fri 18:50] \\
+     no comment
 - Note [2026-10-23 Fri 17:29] Application sent.
 
 ** APPLIED Timefold — Platform Backend Engineer / Optimization Model Engineer (Java)
