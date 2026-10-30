@@ -442,8 +442,8 @@ SCHEDULED: <2026-11-06 Fri>
 - Note [2026-10-23 Fri 17:54] Application sent.
 
 
-** APPLIED Aiven — Software Engineer / Senior Software Engineer (data platform)
-SCHEDULED: <2026-11-06 Fri>
+** REJECTED Aiven — Software Engineer / Senior Software Engineer (data platform)
+CLOSED: [2026-10-30 Fri 18:48] SCHEDULED: <2026-11-06 Fri>
    :PROPERTIES:
    :URL: https://aiven.io/careers/job
    :LOCATION: Remote-first (Finland HQ) — EMEA + US offices
@@ -453,6 +453,8 @@ SCHEDULED: <2026-11-06 Fri>
    :CREATED: 2026-10-15
    :APPLIED_ON: 2026-10-23
    :END:
+   - CLOSING NOTE [2026-10-30 Fri 18:48] \\
+     no comment
 - Note [2026-10-23 Fri 17:59] Application sent.
 
 
