@@ -348,8 +348,8 @@ CLOSED: [2026-10-25 Sun 20:20] SCHEDULED: <2026-11-06 Fri>
      no comment
 - Note [2026-10-23 Fri 17:15] Application sent.
 
-** APPLIED Five9 — Software Engineer II — Data Platform (Java / Spring Boot) :jobsearch:
-SCHEDULED: <2026-11-06 Fri>
+** REJECTED Five9 — Software Engineer II — Data Platform (Java / Spring Boot) :jobsearch:
+CLOSED: [2026-10-31 Sat 08:36] SCHEDULED: <2026-11-06 Fri>
    :PROPERTIES:
    :URL: https://www.five9.com/company/careers
    :LOCATION: Remote (Portugal) — fully remote for candidates outside the Porto metro area
@@ -365,6 +365,8 @@ SCHEDULED: <2026-11-06 Fri>
    :ARCHIVE_ITAGS: jobsearch
    :APPLIED_ON: 2026-10-23
    :END:
+   - CLOSING NOTE [2026-10-31 Sat 08:36] \\
+     they have other openings and this position that I applied for is  already closed.
 - Note [2026-10-23 Fri 17:20] Application sent.
 
 ** REJECTED Playson — Senior Backend Engineer                  :jobsearch:
