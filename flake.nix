@@ -8,6 +8,7 @@
   };
   outputs =
     inputs@{
+      self,
       nixpkgs,
       systems,
       devenv,
@@ -16,6 +17,84 @@
     }:
     let
       eachSystem = nixpkgs.lib.genAttrs (import systems);
+
+      # ---------------------------------------------------------------------
+      # Python side of the repo (py/): the itempipe port.
+      #
+      # Dependencies are named, then filtered against the pinned nixpkgs,
+      # because some of them (langchain-mcp-adapters, ddgs) land in nixpkgs
+      # later than the rest.  Anything missing is printed by the dev shell;
+      # `uv sync` in py/ covers those from PyPI.
+      # ---------------------------------------------------------------------
+      pyRuntimeDeps = [
+        "langchain"
+        "langchain-core"
+        "langchain-openai"
+        "langgraph"
+        "langchain-mcp-adapters"
+        "mcp"
+        "pydantic"
+        "pydantic-settings"
+        "httpx"
+        "trafilatura"
+        "ddgs"
+      ];
+      pyDevDeps = [
+        "pytest"
+        "pytest-asyncio"
+        "ruff"
+      ];
+      pyPick =
+        ps: names:
+        map (name: ps.${name}) (builtins.filter (name: builtins.hasAttr name ps) names);
+      pyMissing =
+        ps: names: builtins.filter (name: !(builtins.hasAttr name ps)) names;
+
+      # Runtime environment: what the CLI actually imports.
+      pyRuntime =
+        pkgs:
+        pkgs.python3.withPackages (
+          ps: pyPick ps pyRuntimeDeps
+        );
+      # Dev environment: runtime + tests + linter, and the whole toolchain.
+      pyDev =
+        pkgs:
+        pkgs.python3.withPackages (
+          ps: pyPick ps pyRuntimeDeps ++ pyPick ps pyDevDeps
+        );
+
+      # A plain install of py/ as `bin/itempipe`.  Deliberately not built with
+      # buildPythonApplication: this keeps one source of truth (the tree in py/)
+      # for prompts/, schema.sql and tests, and does not depend on the
+      # pyproject build backend being available in the pinned nixpkgs.
+      mkItempipe =
+        pkgs:
+        let
+          python = pyRuntime pkgs;
+        in
+        pkgs.stdenv.mkDerivation {
+          pname = "itempipe";
+          version = "0.1.0";
+
+          src = ./py;
+
+          nativeBuildInputs = [ pkgs.makeWrapper ];
+
+          installPhase = ''
+            runHook preInstall
+            mkdir -p $out/lib/itempipe $out/bin
+            cp -r . $out/lib/itempipe/src
+            makeWrapper ${python}/bin/python $out/bin/itempipe \
+              --add-flags "-m itempipe" \
+              --prefix PYTHONPATH : "$out/lib/itempipe/src"
+            runHook postInstall
+          '';
+
+          meta = {
+            description = "N stateless workers, one SQLite database (TODO: rename)";
+            mainProgram = "itempipe";
+          };
+        };
     in
     {
       packages = eachSystem (
@@ -26,6 +105,8 @@
           };
         in
         {
+          itempipe = mkItempipe pkgs;
+
           default = pkgs.stdenv.mkDerivation {
             name = "cv";
             version = "1.0";
@@ -50,12 +131,49 @@
           };
         }
       );
+      apps = eachSystem (
+        system:
+        let
+          itempipe = self.packages.${system}.itempipe;
+        in
+        {
+          itempipe = {
+            type = "app";
+            program = "${itempipe}/bin/itempipe";
+          };
+          default = {
+            type = "app";
+            program = "${itempipe}/bin/itempipe";
+          };
+        }
+      );
+      checks = eachSystem (
+        system:
+        let
+          pkgs = import nixpkgs { inherit system; };
+          python = pyDev pkgs;
+        in
+        nixpkgs.lib.optionalAttrs (builtins.hasAttr "pytest" pkgs.python3.pkgs) {
+          itempipe-tests = pkgs.runCommand "itempipe-tests" { nativeBuildInputs = [ python ]; } ''
+            cp -r ${./py} source
+            chmod -R u+w source
+            cd source
+            export PYTHONPATH=$PWD
+            export PYTHONDONTWRITEBYTECODE=1
+            export ITEMPIPE_DB=$TMPDIR/itempipe-test.db
+            python -m pytest -q -p no:cacheprovider tests
+            touch $out
+          '';
+        }
+      );
       devShells = eachSystem (
         system:
         let
           pkgs = import nixpkgs {
             inherit system;
           };
+          pythonEnv = pyDev pkgs;
+          pyNotPackaged = pyMissing pkgs.python3.pkgs (pyRuntimeDeps ++ pyDevDeps);
           chromium-sandboxed = (
             pkgs.writers.writeNuBin "chromium-sandboxed"
               {
@@ -98,7 +216,26 @@
                   pdfminer
                   playwright-mcp
                   chromium-sandboxed
+                  sqlite
+                  msmtp
+                  uv
+                  pythonEnv
                 ];
+                env = {
+                  # `python -m itempipe` works from the repo root.
+                  PYTHONPATH = "/home/ivand/src/cv/py";
+                  ITEMPIPE_DB = "/home/ivand/src/cv/py/itempipe.db";
+                };
+                enterShell = ''
+                  itempipe() { python -m itempipe "$@"; }
+                  export -f itempipe
+                  itempipe-tests() { (cd /home/ivand/src/cv/py && python -m pytest -q "$@"); }
+                  export -f itempipe-tests
+                  ${pkgs.lib.optionalString (pyNotPackaged != [ ]) ''
+                    echo "itempipe: not packaged by this nixpkgs: ${builtins.concatStringsSep " " pyNotPackaged}" >&2
+                    echo "itempipe: run 'uv sync' in py/ if you need them from PyPI" >&2
+                  ''}
+                '';
               }
             ];
           };

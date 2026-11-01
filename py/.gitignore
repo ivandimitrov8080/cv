@@ -1,0 +1,11 @@
+__pycache__/
+*.pyc
+.pytest_cache/
+.ruff_cache/
+.trash/
+itempipe.db
+itempipe.db-wal
+itempipe.db-shm
+.playwright-profiles/
+.env
+.venv/
