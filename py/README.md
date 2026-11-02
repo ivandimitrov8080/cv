@@ -7,14 +7,40 @@ as many parallel workers as you ask for.
 ```sh
 nix develop
 python -m itempipe init                        # create/upgrade the db, show the queue
-python -m itempipe search "remote Python, EU timezones" -n 4
+python -m itempipe search -n 4                 # until Ctrl-C; see itempipe/search.toml
 python -m itempipe apply -n 2
 itempipe-check                     # queue tests, no model or network needed
 ```
 
 That is the whole interface. The program is `itempipe/__init__.py` — one peewee model,
-six tools, two coroutines — plus the two prompts in `itempipe/prompts/`, and
-`itempipe/status.py`, the progress board.
+six tools, two coroutines — plus the two prompts in `itempipe/prompts/`,
+`itempipe/status.py`, the progress board, and `itempipe/search.toml`, which holds
+**everything about the job market**. The module knows how to search, never what to look
+for: no stack, country, site or job title appears in the Python.
+
+## What to look for is a file
+
+`itempipe/search.toml` (override with `ITEMPIPE_CONFIG`) is the whole brief:
+
+| key | what it does |
+| --- | --- |
+| `[search] roles` | phrases to search for. Add as many as you like — this *is* the width of the search |
+| `[search] domains` | industries crossed with every role (`crypto`, `fintech`, …); empty by default |
+| `[search] seniority` | prefixes tried in front of each role |
+| `[search] phrases` / `contract_phrases` | how postings are announced, for permanent and contract work |
+| `[search] sites` | hosts swept with `site:` — the ATSs where small companies post, plus regional boards |
+| `[search.regions]` / `[search.cities]` | where; each group is interleaved, never walked in order |
+| `[search] notes` | handed to the agent verbatim: who you are, what you will and will not take |
+| `[vars]` + `[[boards]]` | the default task queue, with `{var}` substitution in the URLs |
+
+A Java developer who also wants crypto work adds `"crypto"` to `domains` (or a
+`"crypto backend"` phrase to `roles`) and nothing else — no code changes. Two files, two
+hunts: `ITEMPIPE_CONFIG=~/crypto.toml itempipe search`, `ITEMPIPE_CONFIG=~/java.toml …`.
+With no config the search is empty rather than invented, and `itempipe search` says so.
+
+The agent's prompt (`itempipe/prompts/search.md`) is likewise free of stacks and
+countries; the `{{NOTES}}` placeholder is filled from `[search] notes` and `{{CV}}` from
+the CV, so all the context about the person and the target lives in data.
 
 ## Why it is safe to run several
 
@@ -43,29 +69,35 @@ fresh agent with an empty message list that is asked to verify one posting, call
 `ITEMPIPE_TOOL_BUDGET` (12) calls, its graph limit `ITEMPIPE_SESSION_STEPS` (26), and
 there is `ITEMPIPE_PAUSE` (2s) between sessions.
 
-Each session gets a **plan**, built by `plan_for`:
+Each session gets a **plan** from a shared queue, `next_tasks`:
 
-1. boards from `ANGLE_BOARDS` this angle has not read in `ITEMPIPE_BOARD_DAYS` (3) days —
-   a board gains postings, so it comes back; a posting is re-checked at most once;
-2. then queries from `query_space(angle)`, a fixed ~2,300-entry walk over
-   level × tech × place × phrasing, plus `site:` sweeps of the ATS hosts (Ashby, Lever,
-   Greenhouse, Workable, Personio, join.com, Teamtailor, Recruitee, Breezy,
-   SmartRecruiters) and city-by-city searches. That is the part that keeps producing
-   new places to look after the hardcoded boards are read out, and it is how companies
-   that only ever post on their own ATS get found.
+1. boards from the `[[boards]]` queue that nobody has read in `ITEMPIPE_BOARD_DAYS` (3)
+   days — they are claimed from `seen` by whichever worker asks first, so the default list
+   is consumed by the pool and then left behind; no worker is tied to one board or one
+   subject;
+2. then queries from `query_space()`, built from the config: roles × seniority × regions ×
+   phrasing, domains crossed with every role, `site:` sweeps of the configured hosts, and
+   city by city. That is the part that keeps producing new places to look after the queued
+   boards are read out, and it is how companies that only ever post on their own ATS get
+   found.
 
-Each worker starts at its own point in that space (`starting_cursor`), so ten workers do
-not all run the same query. When a worker's space is exhausted it says so on the board,
-sleeps `ITEMPIPE_IDLE` (300s) and looks again for boards that have aged past their TTL —
-it does not exit.
+Nothing is pinned to a region: the configured groups are **interleaved** (`interleave`)
+so adjacent queries come from different parts of the world.
 
-Boards are config, not code: point `ITEMPIPE_BOARDS` at a JSON file and its angles/URLs
-are merged into `ANGLE_BOARDS`, with unknown angle names added to the rotation. Adding
-LinkedIn or a regional board is a file, not a patch:
+The queue is the scheduler, so `-n 10` no longer means "ten copies of the same six ideas".
+A task claimed at plan time and never used is released by `reconcile` at the end of the
+session, so a crashed session costs nothing. When the queue is genuinely empty — every
+board recently read and every query run within `ITEMPIPE_QUERY_DAYS` (30) — a worker says
+so on the board, sleeps `ITEMPIPE_IDLE` (300s) and looks again; it does not exit.
 
-```json
-{"LinkedIn": ["https://www.linkedin.com/jobs/search/?keywords=Java%20Spring&f_WT=2"],
- "niche boards": ["https://jobs.example-board.de/java"]}
+Boards are config too: add a `[[boards]]` entry with a `label` and `urls` (see the shipped
+`search.toml`), and point `ITEMPIPE_CONFIG` at your file. Adding LinkedIn or a regional
+board is a line in that file, not a patch:
+
+```toml
+[[boards]]
+label = "LinkedIn"
+urls = ["https://www.linkedin.com/jobs/search/?keywords=Java%20Spring&f_WT=2"]
 ```
 
 What survives a session reset is the `seen` table: one row per normalised URL or query,
@@ -77,11 +109,11 @@ first sessions re-finding its own leads.
 
 | verdict | meaning | looked at again |
 | --- | --- | --- |
-| `claimed` | a worker is on it | after the 30-minute lease |
+| `claimed` | a worker is on it | at once if it is your own, else after the 30-minute lease |
 | `open` | fetched, not recorded | next session |
 | `board` | a board page, not a posting | after `ITEMPIPE_BOARD_DAYS` |
 | `dead` | 4xx/5xx | after a week |
-| `searched` / `noresults` | a query's outcome | next session / after a week |
+| `searched` / `noresults` | a query's outcome | after `ITEMPIPE_QUERY_DAYS` |
 | `skipped` | opened, nothing recorded | next session |
 | `duplicate` | `create_item` refused the name | next session |
 | `recorded` | it became a lead | never |

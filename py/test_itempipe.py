@@ -116,6 +116,14 @@ class SeenTest(unittest.TestCase):
         self.assertFalse(ip.claim_seen(key, session="s1")[0])   # not twice in one session
         self.assertTrue(ip.claim_seen(key, session="s2")[0])    # a new one may look again
 
+    def test_existing_leads_are_remembered_as_recorded(self):
+        ip.Item.create(name="Acme", name_key="acme", title="T", url="https://a.com/1")
+        self.assertEqual(ip.remember_leads(), 1)
+        self.assertEqual(ip.Seen.get(ip.Seen.key == ip.url_key("https://a.com/1")).verdict,
+                         ip.RECORDED)
+        self.assertEqual(ip.remember_leads(), 0)     # idempotent
+        self.assertFalse(ip.claim_seen(ip.url_key("https://a.com/1"), session="s2")[0])
+
     def test_a_dead_page_waits_a_week_and_a_recorded_one_never_returns(self):
         dead, kept = ip.url_key("https://a.com/dead"), ip.url_key("https://a.com/kept")
         ip.claim_seen(dead, session="s1")
@@ -131,7 +139,7 @@ class SeenTest(unittest.TestCase):
         self.assertFalse(ip.claim_seen(kept, session="s2")[0])
 
     def test_a_session_hands_its_unrecorded_pages_to_the_next_one(self):
-        sess = ip.Session(angle="x")
+        sess = ip.Session()
         key = ip.url_key("https://a.com/1")
         ip.claim_seen(key, session=sess.token)
         ip.settle(key, ip.OPEN, "HTTP 200", sess.token)
@@ -139,70 +147,120 @@ class SeenTest(unittest.TestCase):
         self.assertEqual(ip.Seen.get(ip.Seen.key == key).verdict, ip.SKIPPED)
         self.assertTrue(ip.claim_seen(key, session="another")[0])
 
-    def test_the_frontier_moves_on_once_a_board_is_opened(self):
-        with mock.patch.dict(ip.ANGLE_BOARDS, {"x": ["https://a.com", "https://b.com"]}):
-            self.assertEqual(ip.frontier("x", offset=1), ["https://b.com", "https://a.com"])
-            ip.claim_seen(ip.url_key("https://b.com"), session="s1")
-            self.assertEqual(ip.frontier("x"), ["https://a.com"])
+    def test_a_run_with_no_default_boards_falls_back_to_queries(self):
+        with mock.patch.object(ip, "SEED_TASKS", ()):
+            tasks = ip.next_tasks(ip.Session(tag="w1"))
+            self.assertTrue(tasks)
+            self.assertTrue(all(task.kind == ip.QUERY for task in tasks))
 
-    def test_an_angle_with_no_boards_is_left_to_the_model(self):
-        with mock.patch.dict(ip.ANGLE_BOARDS, {"x": []}):
-            self.assertEqual(ip.frontier("x"), [])
-            boards, queries, _ = ip.plan_for("x", 0, 1, 0)
-            self.assertEqual(boards, [])
-            self.assertEqual(len(queries), 3)    # the query space keeps it going
+    def test_the_query_space_is_built_only_from_the_config(self):
+        with mock.patch.object(ip, "ROLES", ("quantum welder",)), \
+             mock.patch.object(ip, "SENIORITY", ("",)), \
+             mock.patch.object(ip, "PLACES", ("mars",)), \
+             mock.patch.object(ip, "PHRASES", ("hiring",)), \
+             mock.patch.object(ip, "CONTRACT", ()), \
+             mock.patch.object(ip, "DOMAINS", ()), \
+             mock.patch.object(ip, "SITES", ()), \
+             mock.patch.object(ip, "CITIES", ()):
+            self.assertEqual(list(ip.query_space()), ["quantum welder mars hiring"])
 
-    def test_the_contract_angle_searches_for_contracts(self):
-        self.assertIn("contract", " ".join(ip.space_for("freelance / contract")[:8]))
+    def test_domains_widen_the_roles_without_editing_code(self):
+        with mock.patch.object(ip, "ROLES", ("backend engineer",)), \
+             mock.patch.object(ip, "DOMAINS", ("crypto",)), \
+             mock.patch.object(ip, "SENIORITY", ("",)), \
+             mock.patch.object(ip, "PLACES", ("remote europe",)), \
+             mock.patch.object(ip, "PHRASES", ("hiring",)), \
+             mock.patch.object(ip, "CONTRACT", ()), \
+             mock.patch.object(ip, "SITES", ()), \
+             mock.patch.object(ip, "CITIES", ()):
+            space = list(ip.query_space())
+        self.assertIn("backend engineer crypto remote europe hiring", space)
+        self.assertIn("backend engineer remote europe hiring", space)
+
+    def test_the_config_is_a_file_and_says_what_it_holds(self):
+        path = Path(self.tmp.name) / "search.toml"
+        path.write_text(
+            "[vars]\nhn = '42'\n\n"
+            "[search]\nroles = ['quantum welder']\nnotes = 'mars only'\n"
+            "phrases = ['hiring']\n\n"
+            "[search.regions]\nremote = ['mars']\n\n"
+            "[[boards]]\nlabel = 'HN'\nurls = ['https://a.com/{hn}']\n",
+            encoding="utf-8")
+        cfg = ip.load_config(path)
+        self.assertEqual(cfg.roles, ("quantum welder",))
+        self.assertEqual(cfg.places, ("mars",))
+        self.assertEqual(cfg.notes, "mars only")
+        self.assertEqual(cfg.boards, (ip.Task(ip.BOARD, "https://a.com/42", "HN"),))
+
+    def test_a_missing_config_is_empty_rather_than_invented(self):
+        with contextlib.redirect_stderr(io.StringIO()) as err:
+            cfg = ip.load_config(Path(self.tmp.name) / "absent.toml")
+        self.assertEqual((cfg.roles, cfg.places, cfg.boards), ((), (), ()))
+        self.assertIn("no search config", err.getvalue())
+
+    def test_the_contract_option_is_in_the_query_space(self):
+        space = ip.space_for()
+        self.assertTrue(any("contract" in query for query in space))
+        self.assertTrue(any("remote europe" in query for query in space))
+
+    def test_the_query_space_covers_more_than_one_region(self):
+        space = ip.space_for()
+        for place in ("germany", "united kingdom", "united states", "singapore",
+                      "bulgaria", "remote worldwide"):
+            self.assertTrue(any(place in query for query in space), place)
+        # and the regions alternate rather than arriving in one block
+        self.assertGreater(len(set(ip.PLACES[:12])), 8)
+
+    def test_a_board_task_is_not_repeated_by_the_next_session(self):
+        with mock.patch.object(ip, "SEED_TASKS",
+                               (ip.Task(ip.BOARD, "https://a.com/board", "x"),)):
+            first, second = ip.Session(tag="w1"), ip.Session(tag="w2")
+            tasks = ip.next_tasks(first, boards=1)
+            key = ip.url_key("https://a.com/board")
+            ip.settle(key, ip.OPEN, "HTTP 200", first.token, kind=ip.BOARD)
+            self.assertIn(ip.BOARD, [t.kind for t in tasks])
+            self.assertNotIn(ip.BOARD, [t.kind for t in ip.next_tasks(second, boards=1)])
+
+    def test_a_board_task_is_taken_by_one_worker_only(self):
+        with mock.patch.object(ip, "SEED_TASKS",
+                               (ip.Task(ip.BOARD, "https://a.com/board", "x"),)):
+            one, two = ip.Session(tag="w1"), ip.Session(tag="w2")
+            self.assertIn(ip.BOARD, [t.kind for t in ip.next_tasks(one, boards=1)])
+            self.assertNotIn(ip.BOARD, [t.kind for t in ip.next_tasks(two, boards=1)])
+
+    def test_a_task_claimed_but_never_used_is_handed_back(self):
+        sess = ip.Session(tag="w1")
+        key = ip.url_key("https://a.com/board")
+        ip.claim_seen(key, kind=ip.BOARD, url="https://a.com/board", session=sess.token)
+        self.assertEqual(ip.reconcile(sess), 1)          # released, not left claimed
+        self.assertIsNone(ip.Seen.get_or_none(ip.Seen.key == key))
 
     def test_a_board_comes_back_after_its_ttl(self):
-        with mock.patch.dict(ip.ANGLE_BOARDS, {"x": ["https://a.com/board"]}):
-            key = ip.url_key("https://a.com/board")
-            self.assertTrue(ip.is_board("https://a.com/board"))
-            self.assertFalse(ip.is_board("https://a.com/posting"))
-            ip.claim_seen(key, kind=ip.BOARD, session="s1")
-            ip.settle(key, ip.SKIPPED, "read", "s1", kind=ip.BOARD)
-            self.assertEqual(ip.frontier("x"), [])
-            ip.Seen.update(checked_at=ip.now() - ip.BOARD_TTL - timedelta(minutes=1)).execute()
-            self.assertEqual(ip.frontier("x"), ["https://a.com/board"])
+        key = ip.url_key("https://a.com/board")
+        ip.claim_seen(key, kind=ip.BOARD, url="https://a.com/board", session="s1")
+        ip.settle(key, ip.SKIPPED, "read", "s1", kind=ip.BOARD)
+        self.assertFalse(ip.claim_seen(key, session="s2")[0])
+        ip.Seen.update(checked_at=ip.now() - ip.BOARD_TTL - timedelta(minutes=1)).execute()
+        self.assertTrue(ip.claim_seen(key, session="s2")[0])
 
-    def test_the_query_space_never_runs_out_of_new_queries(self):
-        self.assertGreater(len(ip.space_for("x")), 500)
-        first, cursor = ip.next_queries("x", 0, 2)
-        self.assertEqual(len(first), 2)
-        for query in first:                 # once run, they are in `seen`
-            ip.claim_seen(ip.query_key(query), kind="query", url=query, session="s1")
-        second, _ = ip.next_queries("x", cursor, 2)
-        self.assertFalse(set(first) & set(second))
-
-    def test_workers_start_at_different_queries(self):
-        starts = {ip.starting_cursor(i, 10, "x") for i in range(10)}
-        self.assertEqual(len(starts), 10)
-
-    def test_a_plan_prefers_boards_then_fills_with_queries(self):
-        with mock.patch.dict(ip.ANGLE_BOARDS, {"x": ["https://a.com/board"]}):
-            boards, queries, _ = ip.plan_for("x", 0, 1, 0)
-            self.assertEqual(boards, ["https://a.com/board"])
-            self.assertEqual(len(queries), 2)
-
-    def test_existing_leads_are_remembered_as_recorded(self):
-        ip.Item.create(name="Acme", name_key="acme", title="T", url="https://a.com/1")
-        self.assertEqual(ip.remember_leads(), 1)
-        self.assertEqual(ip.Seen.get(ip.Seen.key == ip.url_key("https://a.com/1")).verdict,
-                         ip.RECORDED)
-        self.assertEqual(ip.remember_leads(), 0)     # idempotent
-        self.assertFalse(ip.claim_seen(ip.url_key("https://a.com/1"), session="s2")[0])
+    def test_a_query_comes_back_after_its_ttl(self):
+        key = ip.query_key("java remote")
+        ip.claim_seen(key, kind=ip.QUERY, url="java remote", session="s1")
+        ip.settle(key, ip.SEARCHED, "8 hits", "s1", kind=ip.QUERY)
+        self.assertFalse(ip.claim_seen(key, session="s2")[0])
+        ip.Seen.update(checked_at=ip.now() - ip.QUERY_TTL - timedelta(minutes=1)).execute()
+        self.assertTrue(ip.claim_seen(key, session="s2")[0])
 
     def test_a_recorded_url_cannot_come_back_under_another_name(self):
         def create_item(sess):
             return next(t for t in ip.tools_for(sess=sess) if t.name == "create_item")
-        self.assertIn("Recorded", create_item(ip.Session(angle="x")).invoke(
+        self.assertIn("Recorded", create_item(ip.Session()).invoke(
             {"name": "Acme", "title": "T", "url": "https://a.com/1"}))
-        self.assertIn("Already recorded", create_item(ip.Session(angle="x")).invoke(
+        self.assertIn("Already recorded", create_item(ip.Session()).invoke(
             {"name": "Acme Two", "title": "T", "url": "https://a.com/1/"}))
 
     def test_a_session_stops_after_its_one_lead(self):
-        sess = ip.Session(angle="x")
+        sess = ip.Session()
         tools = {t.name: t for t in ip.tools_for(sess=sess)}
         tools["create_item"].invoke(
             {"name": "Acme", "title": "T", "url": "https://a.com/1"})

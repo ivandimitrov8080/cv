@@ -27,4 +27,4 @@ itempipe = "itempipe:main"
 packages = ["itempipe"]
 
 [tool.setuptools.package-data]
-itempipe = ["prompts/*.md"]
+itempipe = ["prompts/*.md", "search.toml"]

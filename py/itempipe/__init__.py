@@ -9,17 +9,17 @@ lead and then ends, so no worker ever drags a 60-step transcript around. What ou
 is the `seen` table: every URL and query a worker has looked at and how it turned out. A
 clean session therefore starts blind to the conversation but not blind to the work.
 
-`search` does not finish. A worker walks an endless, deterministic space of queries —
-including `site:` sweeps of the ATSs thousands of small companies use as their only job
-page — and `seen` keeps it from ever repeating one. Stop it with Ctrl-C; what it found so
-far is printed.
+`search` does not finish. Workers are interchangeable: each takes a session's work off a
+shared queue — the configured boards first, then queries the config describes — and `seen`
+keeps any of it from being done twice. Stop it with Ctrl-C; what it found so far is
+printed. What to look for, and how widely, is `search.toml`; this module has no opinion
+about stacks, countries or companies.
 """
 
-import argparse, asyncio, contextlib, json, os, re, shutil, sys, time, uuid
+import argparse, asyncio, contextlib, os, re, shutil, sys, time, tomllib, uuid
 from dataclasses import dataclass, field
 from datetime import datetime, timedelta, timezone
 from functools import lru_cache
-from itertools import chain
 from pathlib import Path
 from urllib.parse import urlsplit
 
@@ -33,10 +33,11 @@ ROOT = Path(__file__).resolve().parents[2]
 NEW, WORKING, ACTIVE, REVIEW = "NEW", "WORKING", "ACTIVE", "NEEDS_REVIEW"
 FENCED = "This lead is no longer yours; stop."
 LEASE = timedelta(minutes=30)
-RETRY = timedelta(days=7)           # dead page / empty query: one more look after a week
+RETRY = timedelta(days=7)           # a dead posting may be a bad deploy: look once more
 RETENTION = timedelta(days=int(os.environ.get("ITEMPIPE_SEEN_DAYS", "365")))
 DB = Path(os.environ.get("ITEMPIPE_DB", ROOT / "py/itempipe.db"))
 PROMPTS, CV = Path(__file__).with_name("prompts"), ROOT / "cv.typ"
+CONFIG = Path(os.environ.get("ITEMPIPE_CONFIG") or Path(__file__).with_name("search.toml"))
 CDP_PORT = int(os.environ.get("ITEMPIPE_CDP_PORT", "9222"))
 CHROME = shutil.which("chromium-sandboxed") or shutil.which("chromium")
 PROFILE = Path(os.environ.get("ITEMPIPE_PROFILE", "/tmp/itempipe-chromium"))
@@ -45,69 +46,106 @@ SEARCH_TRIES = int(os.environ.get("ITEMPIPE_SEARCH_TRIES", "3"))
 SESSIONS = int(os.environ.get("ITEMPIPE_SESSIONS", "0"))        # 0 = until you stop it
 STEPS = int(os.environ.get("ITEMPIPE_SESSION_STEPS", "26"))     # graph steps per session
 BUDGET = int(os.environ.get("ITEMPIPE_TOOL_BUDGET", "12"))      # tool calls per session
-SEEDS = int(os.environ.get("ITEMPIPE_BOARD_SEEDS", "2"))        # boards handed to a session
+SEEDS = int(os.environ.get("ITEMPIPE_BOARD_SEEDS", "2"))        # board tasks per session
 PAUSE = float(os.environ.get("ITEMPIPE_PAUSE", "2"))            # breather between sessions
 IDLE = float(os.environ.get("ITEMPIPE_IDLE", "300"))            # wait when no query is left
 BOARD_TTL = timedelta(days=float(os.environ.get("ITEMPIPE_BOARD_DAYS", "3")))
-HN_THREAD = os.environ.get("ITEMPIPE_HN_THREAD", "49922569")    # this month's who-is-hiring
+QUERY_TTL = timedelta(days=float(os.environ.get("ITEMPIPE_QUERY_DAYS", "30")))
 
-ANGLES = ('HN "Who is hiring?"', "YC Work at a Startup", "niche boards", "company careers",
-          "practitioner communities", "freelance / contract")
 
-# Where each angle starts. A session is handed the first few boards this angle has not
-# read in ITEMPIPE_BOARD_DAYS. An empty list means the angle is search-driven (find a
-# company, then its own careers page); the query space in `query_space` fills in either
-# way, which is what keeps a run going after these are read.
-ANGLE_BOARDS = {
-    'HN "Who is hiring?"': [
-        f"https://news.ycombinator.com/item?id={HN_THREAD}",
-        "https://hnhiring.com/technologies/java",
-        "https://hnhiring.com/technologies/spring",
-        "https://hnhiring.com/technologies/react",
-    ],
-    "YC Work at a Startup": [
-        "https://www.ycombinator.com/jobs/role/software-engineer/remote",
-        "https://www.ycombinator.com/jobs/role/back-end-engineer/remote",
-        "https://www.ycombinator.com/jobs/role/full-stack/remote",
-    ],
-    "niche boards": [
-        "https://weworkremotely.com/categories/remote-programming-jobs",
-        "https://remoteok.com/remote-java-jobs",
-        "https://remotive.com/remote-jobs/software-dev",
-        "https://justjoin.it/all/java",
-    ],
-    "company careers": [],
-    "practitioner communities": [
-        "https://lobste.rs/t/jobs",
-        "https://old.reddit.com/r/forhire/new/",
-    ],
-    "freelance / contract": [
-        "https://weworkremotely.com/categories/remote-contract-jobs",
-        "https://old.reddit.com/r/forhire/search?q=java&restrict_sr=on&sort=new",
-    ],
-}
+@dataclass(frozen=True)
+class Task:
+    """One unit of queued work: a board to read, or a query to run."""
+    kind: str       # board | query
+    value: str      # the URL or the query text
+    label: str      # where it came from, for the brief
+
 
 # A `seen` verdict: what one check of one URL or query came to.
 CLAIMED, OPEN, DEAD = "claimed", "open", "dead"           # a URL
 BOARD = "board"                                          # a URL that is a board, not a posting
 SEARCHED, NOQUERY = "searched", "noresults"              # a query
 SKIPPED, DUPLICATE, RECORDED = "skipped", "duplicate", "recorded"
+QUERY = "query"
 
-# More boards from a JSON file: {"angle name": ["url", ...]}. A name that is not an
-# angle yet is added to the rotation, so a new site (LinkedIn, a regional board) is
-# configuration, not a patch.
-extra = {}
-if config_file := os.environ.get("ITEMPIPE_BOARDS", "").strip():
+
+def interleave(*groups):
+    """Round-robin several tuples into one, so adjacent entries differ in origin.
+
+    Used for regions and cities: a worker walking the result never sees one country twice
+    in a row, so it cannot drift into one local market because it started there.
+    """
+    groups = [tuple(group) for group in groups if group]
+    out, i = [], 0
+    while any(i < len(group) for group in groups):
+        out += [group[i] for group in groups if i < len(group)]
+        i += 1
+    return tuple(out)
+
+
+def expand(url, variables):
+    """Fill {name} in a board URL from the config's [vars]; leave it alone if it cannot."""
     try:
-        data = json.loads(Path(config_file).expanduser().read_text(encoding="utf-8"))
-        extra = {str(k): [str(u) for u in v] for k, v in data.items() if isinstance(v, list)}
-    except (OSError, ValueError) as exc:
-        print(f"itempipe: ignoring ITEMPIPE_BOARDS={config_file}: {exc}", file=sys.stderr)
-for name, urls in extra.items():
-    ANGLE_BOARDS.setdefault(name, [])
-    ANGLE_BOARDS[name] = ANGLE_BOARDS[name] + [u for u in urls
-                                               if u not in ANGLE_BOARDS[name]]
-ANGLES = ANGLES + tuple(name for name in extra if name not in ANGLES)
+        return url.format(**variables)
+    except (KeyError, IndexError, ValueError):
+        return url
+
+
+@dataclass(frozen=True)
+class SearchConfig:
+    """What to look for and where: all of it comes from a TOML file.
+
+    Nothing about the job market is in this module — no stack, no country, no site. With
+    no config the search is simply empty, and `itempipe search` says so instead of
+    inventing a market to look in.
+    """
+    roles: tuple = ()
+    seniority: tuple = ("",)
+    domains: tuple = ()
+    places: tuple = ()
+    cities: tuple = ()
+    sites: tuple = ()
+    phrases: tuple = ()
+    contracts: tuple = ()
+    boards: tuple = ()
+    notes: str = ""
+
+
+def load_config(path=None):
+    """Read the search config; a missing or broken file leaves an empty one and says why."""
+    path = Path(path or CONFIG)
+    try:
+        raw = tomllib.loads(path.read_text(encoding="utf-8"))
+    except FileNotFoundError:
+        print(f"itempipe: no search config at {path}. Nothing to look for; see the "
+              "shipped search.toml for the shape.", file=sys.stderr)
+        return SearchConfig()
+    except (OSError, tomllib.TOMLDecodeError) as exc:
+        print(f"itempipe: cannot read {path}: {exc}", file=sys.stderr)
+        return SearchConfig()
+    search, variables = raw.get("search", {}), raw.get("vars", {})
+    boards = [Task(BOARD, expand(url, variables), board.get("label", "board"))
+              for board in raw.get("boards", []) for url in board.get("urls", [])]
+    return SearchConfig(
+        roles=tuple(search.get("roles", ())),
+        seniority=tuple(search.get("seniority", ("",))),
+        domains=tuple(search.get("domains", ())),
+        places=interleave(*search.get("regions", {}).values()),
+        cities=interleave(*search.get("cities", {}).values()),
+        sites=tuple(search.get("sites", ())),
+        phrases=tuple(search.get("phrases", ())),
+        contracts=tuple(search.get("contract_phrases", ())),
+        boards=tuple(boards),
+        notes=" ".join(search.get("notes", "").split()),
+    )
+
+
+CFG = load_config()
+ROLES, SENIORITY = CFG.roles, CFG.seniority or ("",)
+DOMAINS = CFG.domains
+PLACES, CITIES, SITES = CFG.places, CFG.cities, CFG.sites
+PHRASES, CONTRACT = CFG.phrases, CFG.contracts
+NOTES, SEED_TASKS = CFG.notes, CFG.boards
 
 CANNED = re.compile(r"need more steps to process|sorry, i (?:can'?t|cannot)", re.I)
 
@@ -154,11 +192,11 @@ class Seen(Model):
     read it.
     """
     key = CharField(unique=True)            # normalised URL or query: the dedupe key
-    kind = CharField(default="url")         # url | query
+    kind = CharField(default="url")         # url | query | board
     url = TextField(null=True)              # as first written, for the brief
     verdict = CharField(default=CLAIMED)
     note = CharField(null=True)             # HTTP status, hit count, or the company
-    angle = CharField(null=True)
+    label = CharField(null=True)            # which task queue entry wrote it
     session = CharField(null=True)          # the session that last wrote the verdict
     checked_at = DateTimeField(default=now)
 
@@ -175,6 +213,13 @@ def clean(value):
     return re.sub(r"\s+", " ", str(value or "")).strip()
 
 
+def migrate():
+    """`seen.angle` is now `seen.label`; rename it in place on older databases."""
+    columns = {row[1] for row in db.execute_sql("PRAGMA table_info(seen)")}
+    if columns and "angle" in columns and "label" not in columns:
+        db.execute_sql("ALTER TABLE seen RENAME COLUMN angle TO label")
+
+
 def open_db(path=DB):
     """Point peewee at `path` and make sure both tables exist."""
     path = Path(path)
@@ -185,6 +230,7 @@ def open_db(path=DB):
     db.connect()
     Item.create_table(safe=True)
     Seen.create_table(safe=True)
+    migrate()
     return path
 
 
@@ -266,8 +312,8 @@ def search_failure(reason, query, tries):
     """The message the agent gets instead of an exception: what happened, what to do."""
     if "rate" in reason.lower() or "429" in reason:
         return (f"NOT searched: the search backends are rate limiting us ({reason}). Do not "
-                "retry straight away. Use fetch_page on a URL you already have, or work "
-                "another angle, and leave this query for later.")
+                "retry straight away. Use fetch_page on a URL you already have, or run a "
+                "different query, and leave this one for later.")
     return (f"NOT searched: no results for {query!r} after {tries} tries ({reason}). Try a "
             "shorter or differently worded query, a company name, or site: a specific "
             "board. Do not repeat the same query. Finding nothing here is not a failure.")
@@ -292,24 +338,28 @@ def query_key(query):
 def retryable(row, session=None):
     """May this row be looked at again?
 
-    `claimed` is a lease, because a worker can die mid-fetch. A board is worth re-reading
-    after BOARD_TTL — boards gain postings, individual postings do not come back — and a
-    dead posting or empty query gets one more look after a week, because a 404 can be a
-    bad deploy. Everything else is fair game in the *next* session, which is what makes a
-    clean session per lead cheap. A recorded lead is never revisited.
+    `claimed` is a lease, and a session may always continue what it claimed itself. After
+    that it depends on what the row is: a board gains postings, so it comes back after
+    BOARD_TTL; a query comes back after QUERY_TTL because the results have moved on; a
+    dead posting gets one more look after a week, since a 404 can be a bad deploy; a
+    recorded lead never comes back.
     """
     if row.verdict == RECORDED:
         return False
+    if row.verdict == CLAIMED:
+        return row.session == session or row.checked_at < now() - LEASE
+    if row.session == session:
+        return False
     if row.kind == BOARD:
         return row.checked_at < now() - BOARD_TTL
-    if row.verdict == CLAIMED:
-        return row.checked_at < now() - LEASE
-    if row.verdict in (DEAD, NOQUERY):
+    if row.kind == QUERY:
+        return row.checked_at < now() - QUERY_TTL
+    if row.verdict == DEAD:
         return row.checked_at < now() - RETRY
-    return row.session != session
+    return True
 
 
-def claim_seen(key, kind="url", url=None, angle=None, session=None):
+def claim_seen(key, kind="url", url=None, label=None, session=None):
     """Try to be the one who checks `key`. Returns (won, row).
 
     won=True means go ahead: nobody holds it, or the holder's verdict has gone stale.
@@ -317,7 +367,7 @@ def claim_seen(key, kind="url", url=None, angle=None, session=None):
     """
     for _ in range(2):
         try:
-            Seen.create(key=key, kind=kind, url=clean(url) or None, angle=angle,
+            Seen.create(key=key, kind=kind, url=clean(url) or None, label=label,
                         session=session)
             return True, None
         except IntegrityError:
@@ -327,21 +377,21 @@ def claim_seen(key, kind="url", url=None, angle=None, session=None):
             if not retryable(row, session):
                 return False, row
             if (Seen.update(verdict=CLAIMED, note=None, checked_at=now(), session=session,
-                            angle=angle)
+                            label=label)
                     .where(Seen.key == key, Seen.verdict == row.verdict).execute()):
                 return True, None
             return False, Seen.get_or_none(Seen.key == key)
     return False, None
 
 
-def settle(key, verdict, note=None, session=None, kind="url", url=None):
+def settle(key, verdict, note=None, session=None, kind="url", url=None, label=None):
     """Write what the check learned, so a later session reads it instead of retrying."""
     fields = dict(verdict=verdict, note=clean(note)[:250] or None, session=session,
                   checked_at=now())
     if Seen.update(**fields).where(Seen.key == key).execute():
         return True
     try:                # create_item may be the first thing to touch this URL
-        Seen.create(key=key, kind=kind, url=clean(url) or None, **fields)
+        Seen.create(key=key, kind=kind, url=clean(url) or None, label=label, **fields)
     except IntegrityError:      # another worker won the insert; its verdict stands
         pass
     return False
@@ -357,122 +407,92 @@ def seen_refusal(row, action):
             "or query, and record whatever you have already verified.")
 
 
-def recent_rows(angle, k=12):
-    """What this angle has settled, newest first: the clean session's memory."""
-    return (Seen.select().where(Seen.angle == angle)
-            .order_by(Seen.checked_at.desc()).limit(k))
+def recent_rows(k=10):
+    """What the run has settled lately, newest first: the clean session's memory."""
+    return Seen.select().where(Seen.kind != QUERY).order_by(Seen.checked_at.desc()).limit(k)
 
 
-def frontier(angle, offset=0, k=SEEDS):
-    """The boards this angle can usefully open now: never read, or read longer ago than
-    BOARD_TTL. Rotated by `offset` so two workers sharing an angle start elsewhere."""
-    boards = []
-    for url in ANGLE_BOARDS.get(angle, ()):
-        row = Seen.get_or_none(Seen.key == url_key(url))
-        if row is None or (row.kind == BOARD and retryable(row)):
-            boards.append(url)
-    return (boards[offset:] + boards[:offset])[:k] if boards else []
+def query_space():
+    """Every query this config would ever make, in a fixed order.
 
-
-def is_board(url):
-    """A URL the configuration calls a board, which is re-readable unlike a posting."""
-    key = url_key(url)
-    return any(key == url_key(u) for u in chain.from_iterable(ANGLE_BOARDS.values()))
-
-
-TECHS = ("java spring boot", "java spring", "java backend", "java developer",
-         "kotlin spring boot", "jvm backend")
-LEVELS = ("", "senior ", "staff ", "lead ")
-PLACES = ("remote europe", "remote eu", "remote worldwide", "europe remote",
-          "bulgaria", "czechia", "poland", "romania", "germany", "netherlands",
-          "portugal", "spain", "estonia", "lithuania", "croatia", "slovakia")
-PHRASES = ("hiring", "open role", "jobs", "careers")
-CONTRACT = ("contract", "b2b", "freelance", "day rate")
-CITIES = ("sofia", "plovdiv", "varna", "prague", "brno", "warsaw", "krakow",
-          "wroclaw", "bucharest", "cluj", "timisoara", "berlin", "munich", "hamburg",
-          "amsterdam", "rotterdam", "lisbon", "porto", "barcelona", "madrid",
-          "tallinn", "vilnius", "riga", "budapest", "bratislava", "ljubljana",
-          "zagreb", "athens", "thessaloniki", "dublin", "vienna", "zurich",
-          "stockholm", "copenhagen", "helsinki", "oslo")
-# Hosts thousands of small companies use as their only job page, so a `site:` sweep of
-# them is how the companies that never touch a job board get found.
-ATS = ("jobs.ashbyhq.com", "jobs.lever.co", "boards.greenhouse.io", "apply.workable.com",
-       "jobs.personio.de", "job-boards.greenhouse.io", "join.com", "careers.teamtailor.com",
-       "recruitee.com", "breezy.hr", "jobs.smartrecruiters.com", "jobs.eu.lever.co")
-
-
-def query_space(angle=""):
-    """Every query this angle would ever run, in a fixed order.
-
-    Deliberately not a list of sites: this is the part that keeps producing new places to
-    look after the hardcoded boards are read out, and it is wide enough (a few thousand
-    queries) that a run does not come back to the same place.
+    Built entirely from the config — roles × seniority × places × phrasing, industries
+    crossed with every role, the sites small companies post on, and city by city. This is
+    what keeps a run going long after the queued boards are read, without the module
+    knowing what a job is.
     """
-    tails = CONTRACT if any(w in angle.lower() for w in ("contract", "freelance")) else PHRASES
-    for level in LEVELS:
-        for tech in TECHS:
+    for level in SENIORITY:
+        for role in ROLES:
             for place in PLACES:
-                for tail in tails:
-                    yield f"{level}{tech} {place} {tail}"
-    for host in ATS:
-        for level in LEVELS:
-            for tech in TECHS:
-                yield f"site:{host} {level}{tech} remote"
+                for tail in PHRASES:
+                    yield f"{level}{role} {place} {tail}"
+                for tail in CONTRACT:
+                    yield f"{level}{role} {place} {tail}"
+    for domain in DOMAINS:
+        for role in ROLES:
+            for place in PLACES:
+                for tail in PHRASES:
+                    yield f"{role} {domain} {place} {tail}"
+    for host in SITES:
+        for level in SENIORITY:
+            for role in ROLES:
+                yield f"site:{host} {level}{role} remote"
         for place in PLACES:
-            yield f"site:{host} java spring {place}"
-    for tech in TECHS:
+            for role in ROLES:
+                yield f"site:{host} {role} {place}"
+    for role in ROLES:
         for city in CITIES:
-            yield f'"{tech}" "{city}" careers'
+            yield f'"{role}" "{city}" careers'
 
 
 @lru_cache(maxsize=None)
-def space_for(angle=""):
-    return tuple(query_space(angle))
+def space_for():
+    return tuple(query_space())
 
 
-def next_queries(angle, cursor, k=2):
-    """Up to `k` queries from this worker's position that nobody has run yet.
+def next_tasks(sess, boards=SEEDS, queries=3):
+    """Claim this session's work from the shared queue.
 
-    Returns the queries and the cursor to continue from, so two workers walk different
-    parts of the same space and `seen` absorbs any overlap.
+    Board tasks first, then queries nobody has run inside QUERY_TTL. Claiming is the same
+    compare-and-swap as everywhere else, so two workers planning at the same moment cannot
+    come away with the same entry, and a worker is never tied to one board or one region.
     """
-    space = space_for(angle)
-    if not space:
-        return [], cursor
-    used = {row.key for row in Seen.select(Seen.key).where(Seen.kind == "query")}
-    out = []
-    for step in range(len(space)):
-        pos = (cursor + step) % len(space)
-        query = space[pos]
-        if query_key(query) in used:
+    tasks = []
+    for task in SEED_TASKS:
+        if sum(t.kind == BOARD for t in tasks) >= boards:
+            break
+        won, _ = claim_seen(url_key(task.value), kind=BOARD, url=task.value,
+                            label=task.label, session=sess.token)
+        if won:
+            tasks.append(task)
+    settled = {row.key for row in
+               Seen.select(Seen.key, Seen.kind, Seen.verdict, Seen.session, Seen.checked_at)
+               .where(Seen.kind == QUERY) if not retryable(row, sess.token)}
+    wanted = max(1, queries - len(tasks))
+    for query in space_for():
+        if wanted == 0:
+            break
+        if query_key(query) in settled:
             continue
-        out.append(query)
-        if len(out) == k:
-            return out, (pos + 1) % len(space)
-    return [], (cursor + len(space)) % len(space)
-
-
-def starting_cursor(i, workers, angle):
-    """Spread the workers over the query space instead of starting them on one query."""
-    space = space_for(angle)
-    return (i * len(space) // max(workers, 1)) if space else 0
-
-
-def plan_for(angle, i, workers, cursor):
-    """One session's work: boards worth re-reading, then queries nobody has run."""
-    boards = frontier(angle, i // max(len(ANGLES), 1))
-    queries, cursor = next_queries(angle, cursor, k=2 if boards else 3)
-    return boards, queries, cursor
+        won, _ = claim_seen(query_key(query), kind=QUERY, url=query, label=sess.tag,
+                            session=sess.token)
+        if won:
+            tasks.append(Task(QUERY, query, "search"))
+            wanted -= 1
+    return tasks
 
 
 def reconcile(sess):
-    """Settle what the session touched and did not finish.
+    """Hand back what the session claimed and never resolved, and settle what it read.
 
-    A page it opened and did not record was judged, not forgotten, and a claim left
-    hanging by a session that died is handed back at once instead of after the lease.
+    A task claimed at plan time and never touched is released outright — the row is
+    deleted, so the next session can have it — and a page it opened without recording was
+    judged, so it becomes SKIPPED and comes back on that kind's own schedule.
     """
-    return (Seen.update(verdict=SKIPPED, note="not recorded", checked_at=now())
-            .where(Seen.session == sess.token, Seen.verdict.in_((OPEN, CLAIMED))).execute())
+    released = (Seen.delete().where(Seen.session == sess.token,
+                                    Seen.verdict == CLAIMED).execute())
+    settled = (Seen.update(verdict=SKIPPED, note="not recorded", checked_at=now())
+               .where(Seen.session == sess.token, Seen.verdict == OPEN).execute())
+    return released + settled
 
 
 def prune(older=RETENTION):
@@ -506,9 +526,8 @@ class Session:
     """One search conversation.
 
     All of its memory is in `seen`; this is only the bookkeeping it needs while it runs:
-    which angle, which lead it recorded, and how much of its tool budget it has spent.
+    which worker it belongs to, what it recorded, and how much of its budget it has spent.
     """
-    angle: str
     tag: str = "·"
     token: str = ""
     recorded: list = field(default_factory=list)
@@ -549,7 +568,7 @@ def tools_for(w=None, sess=None):
     No search tool raises, and every URL or query one touches is written to `seen`, so the
     memory of where a worker has been outlives the conversation it was written in.
     """
-    sess = sess or Session(angle="·")
+    sess = sess or Session()
 
     @tool
     def create_item(name: str, title: str, url: str, notes: str = "") -> str:
@@ -587,8 +606,7 @@ def tools_for(w=None, sess=None):
             return stop
         sess.spend()
         text, key = clean(query), query_key(query)
-        won, row = claim_seen(key, kind="query", url=text, angle=sess.angle,
-                              session=sess.token)
+        won, row = claim_seen(key, kind=QUERY, url=text, label=sess.tag, session=sess.token)
         if not won:
             return seen_refusal(row, "searched") + budget_note(sess)
         reason = "no engine answered"
@@ -602,12 +620,12 @@ def tools_for(w=None, sess=None):
                 reason = f"{type(exc).__name__}: {clean(exc)}"
             else:
                 if found:
-                    settle(key, SEARCHED, f"{len(found)} hits", sess.token, kind="query")
+                    settle(key, SEARCHED, f"{len(found)} hits", sess.token, kind=QUERY)
                     return hits_text(found)[:6000] + budget_note(sess)
                 reason = "no results"
             if attempt + 1 < SEARCH_TRIES:
                 await asyncio.sleep(1.5 * (attempt + 1))
-        settle(key, NOQUERY, reason, sess.token, kind="query")
+        settle(key, NOQUERY, reason, sess.token, kind=QUERY)
         return search_failure(reason, text, SEARCH_TRIES) + budget_note(sess)
 
     @tool
@@ -620,10 +638,12 @@ def tools_for(w=None, sess=None):
         if not url.startswith(("http://", "https://")):
             return "NOT fetched: need an http(s) URL."
         sess.spend()
-        key, kind = url_key(url), BOARD if is_board(url) else "url"
-        won, row = claim_seen(key, kind=kind, url=url, angle=sess.angle, session=sess.token)
+        key = url_key(url)
+        row = Seen.get_or_none(Seen.key == key)
+        kind = row.kind if row is not None else "url"     # boards stay boards
+        won, held = claim_seen(key, kind=kind, url=url, label=sess.tag, session=sess.token)
         if not won:
-            return seen_refusal(row, "fetched") + budget_note(sess)
+            return seen_refusal(held, "fetched") + budget_note(sess)
         try:
             async with httpx.AsyncClient(follow_redirects=True, timeout=25) as client:
                 response = await client.get(url)
@@ -690,7 +710,8 @@ def agent(role, tool_list):
     model = ChatOpenAI(model=os.environ.get("ITEMPIPE_MODEL", "deepseek-chat"),
                        base_url=os.environ.get("ITEMPIPE_BASE_URL", "https://api.deepseek.com/v1"),
                        api_key=os.environ.get("DEEPSEEK_API_KEY", "missing"), timeout=180)
-    prompt = (PROMPTS / f"{role}.md").read_text(encoding="utf-8").replace("{{CV}}", CV.read_text())
+    prompt = (PROMPTS / f"{role}.md").read_text(encoding="utf-8")
+    prompt = prompt.replace("{{CV}}", CV.read_text()).replace("{{NOTES}}", NOTES)
     return create_react_agent(model, tool_list, prompt=prompt)
 
 
@@ -723,21 +744,23 @@ async def run(agent_, text, tag="·", finish=True, limit=60):
     return answer.strip()
 
 
-def session_brief(brief, i, workers, n, angle, boards, queries, recorded):
-    """What one clean session is told: the angle, its plan, and what is already settled."""
-    plan = [f"- fetch {url} and read it for postings that fit" for url in boards]
-    plan += [f'- search "{query}" and open the postings it turns up' for query in queries]
+def session_brief(brief, i, workers, n, tasks, recorded):
+    """What one clean session is told: its tasks, and what is already settled."""
+    plan = [f"- fetch {task.value} and read it for postings that fit" if task.kind == BOARD
+            else f'- search "{task.value}" and open the postings it turns up'
+            for task in tasks]
+    source = ", ".join(sorted({t.label for t in tasks if t.kind == BOARD})) or "the search space"
     settled = "\n".join(
         f"- {row.url}{f' ({row.note})' if row.note else ''} — {row.verdict}"
-        for row in recent_rows(angle)) or "- nothing yet"
-    return f"""You are search worker {i + 1} of {workers}, session {n} on angle: {angle}.
+        for row in recent_rows()) or "- nothing yet"
+    return f"""You are search worker {i + 1} of {workers}, session {n}.
 
 This session is one lead long: verify one posting, call create_item once, then stop and
 write your report. A fresh session starts immediately after you with a clean memory, so
 do not survey a whole board and do not save findings up.
 
-Do these, in order, and stop:
-{chr(10).join(plan) or '- search for this angle yourself, then open the posting'}
+Your work, taken from the shared queue ({source}):
+{chr(10).join(plan)}
 
 Already settled, by this run or an earlier one. A tool that answers "already checked" is
 pointing you elsewhere, not failing:
@@ -751,34 +774,33 @@ Recorded by this worker so far: {', '.join(recorded) or 'nothing'}
 async def search(brief, workers=4, sessions=SESSIONS, progress=None):
     """Search until you stop it.
 
-    Each worker is an endless rotation of clean sessions. A session gets a plan — boards
-    this angle has not read lately, then queries nobody has run — records at most one
-    lead, and hands what it learned to `seen`. Because `seen` remembers every URL and
-    query, the rotation keeps converging on *new* work instead of re-finding the same
+    The workers are interchangeable: each takes a session's work off the shared queue
+    (`next_tasks`) — the default boards first, then queries from the space nobody has run
+    lately — records at most one lead, and hands what it learned to `seen`. Because `seen`
+    remembers every URL and query, the queue keeps moving instead of re-finding the same
     postings, which is what lets it run for hours. Ctrl-C stops it and prints the log.
     """
     progress = progress if progress is not None else []
     remember_leads()
 
     async def one(i):
-        tag, angle = f"w{i + 1}", ANGLES[i % len(ANGLES)]
-        cursor, total, fails, n = starting_cursor(i, workers, angle), [], 0, 0
-        status.worker(tag, "state", f"angle: {angle}", state="searching")
+        tag, total, fails, n = f"w{i + 1}", [], 0, 0
+        status.worker(tag, "state", "waiting for tasks", state="searching")
         while sessions <= 0 or n < sessions:
             n += 1
-            sess = Session(angle=angle, tag=tag)
+            sess = Session(tag=tag)
             try:
-                boards, queries, cursor = plan_for(angle, i, workers, cursor)
-                if not boards and not queries:
-                    status.worker(tag, "state", "no new query: waiting for the boards "
-                                  "to refresh", state="idle")
+                tasks = next_tasks(sess)
+                if not tasks:
+                    status.worker(tag, "state", "queue empty: waiting for boards to "
+                                  "refresh", state="idle")
                     await asyncio.sleep(IDLE)
                     continue
-                status.worker(tag, "state", f"{angle}: session {n}, {len(boards)} board(s), "
-                              f"{len(queries)} search(es)", state="searching")
+                boards = sum(task.kind == BOARD for task in tasks)
+                status.worker(tag, "state", f"session {n}: {boards} board(s), "
+                              f"{len(tasks) - boards} search(es)", state="searching")
                 report = await run(agent("search", tools_for(sess=sess)),
-                                   session_brief(brief, i, workers, n, angle, boards,
-                                                 queries, total),
+                                   session_brief(brief, i, workers, n, tasks, total),
                                    tag=tag, finish=False, limit=STEPS)
                 total += sess.recorded
                 progress.append(f"[{tag}] session {n}: "
@@ -793,9 +815,9 @@ async def search(brief, workers=4, sessions=SESSIONS, progress=None):
                               state="searching")
                 await asyncio.sleep(min(60.0, PAUSE * 2 ** min(fails, 5)))
             finally:
-                reconcile(sess)         # pages opened but not recorded were judged
+                reconcile(sess)         # unused claims handed back, opened pages judged
             await asyncio.sleep(PAUSE)
-        progress.append(f"[{tag}] {angle} — stopped after {n} session(s): "
+        progress.append(f"[{tag}] stopped after {n} session(s): "
                         f"{len(total)} recorded: {', '.join(total) or 'none'}")
 
     results = await asyncio.gather(*(one(i) for i in range(workers)),
@@ -959,11 +981,19 @@ def main(argv=None):
     path = open_db(args.db)
     if args.command == "init":
         forgotten, learned = prune(), remember_leads()
+        unread = sum(1 for task in SEED_TASKS
+                     if Seen.get_or_none(Seen.key == url_key(task.value)) is None)
         print(f"{path}: {Item.select().count()} lead(s), {queued()} queued, "
-              f"{Seen.select().count()} seen row(s)"
+              f"{Seen.select().count()} seen row(s), "
+              f"{unread}/{len(SEED_TASKS)} queued board(s) unread, "
+              f"{len(space_for())} quer(y/ies) in the config"
               + (f", {forgotten} old one(s) forgotten" if forgotten else "")
               + (f", {learned} lead(s) marked recorded" if learned else ""))
         return 0
+    if args.command == "search" and not (SEED_TASKS or space_for()):
+        print(f"itempipe: {CONFIG} has no roles, regions or boards to search for. "
+              "Add some, or point ITEMPIPE_CONFIG at another file.", file=sys.stderr)
+        return 1
 
     status.open_board(f"itempipe {args.command}" +
                       (" — Ctrl-C to stop" if args.command == "search" else ""), tally)
