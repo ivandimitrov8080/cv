@@ -154,10 +154,10 @@ NOTES, SEED_TASKS = CFG.notes, CFG.boards
 CANNED = re.compile(r"need more steps to process|sorry, i (?:can'?t|cannot)", re.I)
 
 APPLY = ("Claim one lead with claim_next_item, look answers up with lookup_answer before "
-         "filling a form, work it to a final state with finish_item, then stop. If a tool "
-         "says the lead is no longer yours, stop immediately. You share one browser with the "
-         "other workers: work only in the tab your own tools are on, and never switch, open "
-         "or close tabs.")
+         "filling a form, save anything it cannot answer with save_question, work the lead "
+         "to a final state with finish_item, then stop. If a tool says the lead is no "
+         "longer yours, stop immediately. You share one browser with the other workers: "
+         "work only in the tab your own tools are on, and never switch, open or close tabs.")
 
 db = SqliteDatabase(None, pragmas={"journal_mode": "wal", "busy_timeout": 10000})
 
@@ -178,7 +178,6 @@ class Item(Model):
     url = CharField()
     notes = TextField(null=True)
     state = CharField(default=NEW)
-    question = TextField(null=True)         # what a HOLD is waiting for an answer to
     submitting = BooleanField(default=False)
     advanced_on = DateTimeField(null=True)
     archived_at = DateTimeField(null=True)
@@ -220,13 +219,20 @@ def clean(value):
 
 
 def migrate():
-    """`seen.angle` is now `seen.label`; rename it in place on older databases."""
+    """Bring an older database up to this schema, in place.
+
+    `seen.angle` became `seen.label`, and a lead no longer remembers a single question:
+    questions are general Q/A in `application-questions.org`, and several of them can wait
+    on one lead. The old column is dropped where SQLite allows it, and is simply unused
+    where it does not (an extra column breaks nothing, the model has no field for it).
+    """
     columns = {row[1] for row in db.execute_sql("PRAGMA table_info(seen)")}
     if columns and "angle" in columns and "label" not in columns:
         db.execute_sql("ALTER TABLE seen RENAME COLUMN angle TO label")
     lead = {row[1] for row in db.execute_sql("PRAGMA table_info(items)")}
-    if lead and "question" not in lead:      # a hold needs somewhere to keep its question
-        db.execute_sql("ALTER TABLE items ADD COLUMN question TEXT")
+    if "question" in lead:
+        with contextlib.suppress(Exception):    # DROP COLUMN needs sqlite >= 3.35
+            db.execute_sql("ALTER TABLE items DROP COLUMN question")
 
 
 def open_db(path=DB):
@@ -533,17 +539,19 @@ def remember_leads():
 # -- the questions file ------------------------------------------------------
 #
 # `application-questions.org` is the answer store, and it belongs to the human: one heading
-# per question, the answer in an `:ANSWER:` property. The agent reads it through
-# `lookup_answer` and writes to it when it has to hold a lead, so the file is both the
-# memory and the inbox. A heading without `:ANSWER:` is a question waiting to be answered.
+# per question, the answer in an `:ANSWER:` property. Nothing about a question is stored on
+# a lead — the file is plain Q/A, one answer serving every form that asks it — so a lead can
+# wait on several of them at once. `lookup_answer` reads the file; `save_question` and
+# `unhold` write to it, which makes it both the memory and the inbox.
 
 QUESTIONS_HEAD = """#+TITLE: Application Questions and Answers
 
 # One entry per question, with the answer in an :ANSWER: property.
 # Questions are phrased generically (<Company>, <N> days, ...) so the same
 # answer serves every application. :SOURCE: lists the forms that asked it.
-# A heading with no :ANSWER: was written by `itempipe apply` and is still open:
-# fill it in and the lead it blocked goes back in the queue on the next run.
+# A heading with no :ANSWER: is still open: `itempipe apply` adds it when a form
+# asks something this file cannot answer, and holds the lead until you fill it in.
+# Answer it and the next run releases every lead whose name is in its :SOURCE:.
 """
 
 HEADING = re.compile(r"^\*+\s+(.*?)\s*$")
@@ -652,22 +660,79 @@ def answer_text(query="", limit=5):
                 block += f"\n   Note: {entry.note}"
             blocks.append(block)
         return "\n\n".join(blocks)
-    hint = ('Do not invent one: call finish_item("hold", "<the form\'s question, verbatim>") '
-            "so it is saved for the user and the lead waits instead of being abandoned.")
+    hint = ('Do not invent one: call save_question with the form\'s question verbatim, '
+            'then finish_item("hold") so the lead waits for the user instead of being '
+            "abandoned.")
     if not any(entry.answer for entry in questions()):
         return f"No stored answers yet. {hint}"
     return f"No stored answer matches {clean(query)!r}. {hint}"
 
 
-def ask(question, source=""):
-    """Write an unanswered question to the file. Returns (entry, was_new).
+def open_questions():
+    """The headings the file has no answer for: the user's to-do list."""
+    return [entry for entry in questions() if not entry.answer]
 
-    Idempotent by wording: a question already in the file comes back unchanged, so two
-    workers stopping on the same field leave one heading for the user, not two.
+
+def asks_of(entry, company):
+    """Was this question asked by that company? Its `:SOURCE:` line is the only link.
+
+    Nothing about a question is stored on a lead: the file is general Q/A, and a lead is
+    named in `:SOURCE:` only so the file says who is waiting on the answer.
     """
-    question = clean(question)
+    company = clean(company).lower()
+    return bool(company) and company in (entry.source or "").lower()
+
+
+def annotate(key, source):
+    """Add `source` to an existing heading's `:SOURCE:` property, in place.
+
+    Two leads that stop on the same question must not leave two headings for the user to
+    answer, but the second company still deserves to be named in the first one's source.
+    """
+    source = clean(source)
+    path = Path(QUESTIONS)
+    try:
+        lines = path.read_text(encoding="utf-8").splitlines()
+    except OSError:
+        return False
+    inside, end = False, None
+    for index, line in enumerate(lines):
+        if match := HEADING.match(line):
+            if inside:
+                break
+            inside = question_key(clean(match.group(1))) == key
+            continue
+        if not inside or not (match := PROPERTY.match(line)):
+            continue
+        name, value = match.group(1).upper(), match.group(2)
+        if name == "SOURCE":
+            if source.lower() in value.lower():
+                return False
+            indent = line[:len(line) - len(line.lstrip())]
+            lines[index] = f"{indent}:SOURCE: {', '.join(filter(None, (value, source)))}"
+            path.write_text("\n".join(lines) + "\n", encoding="utf-8")
+            return True
+        if name == "END":
+            end = index
+    if end is None:                 # no drawer to write into; leave the file alone
+        return False
+    lines.insert(end, f":SOURCE: {source}")
+    path.write_text("\n".join(lines) + "\n", encoding="utf-8")
+    return True
+
+
+def ask(question, source=""):
+    """Record an unanswered question in the file. Returns (entry, was_new).
+
+    Idempotent by wording: a question already in the file comes back unchanged (only its
+    `:SOURCE:` gains the new company), so two workers stopping on the same field leave one
+    heading for the user, not two.
+    """
+    question, source = clean(question), clean(source)
     known = {entry.key: entry for entry in questions()}
     if (found := known.get(question_key(question))) is not None:
+        if source:
+            annotate(found.key, source)
         return found, False
     path = Path(QUESTIONS)
     path.parent.mkdir(parents=True, exist_ok=True)
@@ -678,26 +743,25 @@ def ask(question, source=""):
     if text and not text.endswith("\n"):
         text += "\n"
     block = (f"\n** {question}\n:PROPERTIES:\n"
-             f":SOURCE:{f' {clean(source)}' if clean(source) else ''}\n:END:\n")
+             f":SOURCE:{f' {source}' if source else ''}\n:END:\n")
     path.write_text(text + block, encoding="utf-8")
-    return Question(question, source=clean(source)), True
+    return Question(question, source=source), True
 
 
 def unhold():
-    """Put held leads back in the queue once the file answers what held them there.
+    """Release every held lead that no open question in the file still names.
 
-    Matched on the question's own words, then on any answer that covers all of them, so
-    a heading the user reworded still releases the lead. Called at startup: the loop is
-    "hold, you answer, run again".
+    The file, not the lead, is what ties the two together: a lead waits while some heading
+    is still unanswered and says in `:SOURCE:` that its form asked it. Answer it and the
+    next run puts the lead back in the queue; a lead held on two questions waits for both.
     """
-    keys = {entry.key for entry in questions() if entry.answer}
+    open_now = open_questions()
     back = 0
     for item in list(Item.select().where(Item.state == HOLD)):
-        if not item.question:
+        if any(asks_of(entry, item.name) for entry in open_now):
             continue
-        if question_key(item.question) in keys or best_answer(item.question):
-            back += (Item.update(state=NEW, question=None)
-                     .where(Item.id == item.id, Item.state == HOLD).execute())
+        back += (Item.update(state=NEW)
+                 .where(Item.id == item.id, Item.state == HOLD).execute())
     return back
 
 
@@ -878,6 +942,33 @@ def tools_for(w=None, sess=None):
         sentences do not. Use the answer as written, filling in <Company> or <N>."""
         return answer_text(query)
 
+    def remember(question, item):
+        """Save one unanswered question, named after the lead whose form asked it.
+
+        Returns (saved, message): `saved` is False when the file already answers it, in
+        which case the model is told to use that answer rather than hold the lead.
+        """
+        question = clean(question)
+        if not question_key(question):
+            return False, "NOT saved: give the form's question verbatim, as it is worded."
+        if found := best_answer(question):
+            return False, (f"Already answered in {QUESTIONS.name} — {found.title}: "
+                           f"{found.answer}. Use it; do not hold for this one.")
+        entry, new = ask(question, f"{item.name} ({item.title})")
+        return True, (f"{'Saved' if new else 'Already open'}: {entry.title!r} in "
+                      f"{QUESTIONS.name}. The user answers it once, for every application.")
+
+    @tool
+    def save_question(question: str) -> str:
+        """Save one required form question that the stored answers do not cover, so the
+        user can answer it once for every application. Call it for each such question, then
+        finish_item("hold") — a lead may be waiting on several of them. Never invent an
+        answer, and never archive a lead over a question the user can answer."""
+        item = w.mine()
+        if item is None:
+            return FENCED
+        return remember(question, item)[1]
+
     @tool
     def begin_submission() -> str:
         """Call immediately before the final submit, so a crash goes to review, not a retry."""
@@ -891,9 +982,9 @@ def tools_for(w=None, sess=None):
     @tool
     def finish_item(outcome: str, reason: str = "") -> str:
         """End the claimed lead: "applied" (after begin_submission), "retry" (site down,
-        timeout), "hold" (a required field asks something lookup_answer cannot answer — put
-        the form's question verbatim in reason; the lead waits for the user instead of
-        being lost) or "archive" (the lead cannot be applied to at all)."""
+        timeout), "hold" (required fields ask what the stored answers cannot answer — save
+        each one with save_question first; the lead waits for the user instead of being
+        lost) or "archive" (the lead cannot be applied to at all)."""
         item = w.mine()
         if item is None:
             return FENCED
@@ -904,28 +995,32 @@ def tools_for(w=None, sess=None):
         elif outcome == "retry":
             w.end(state=REVIEW if item.submitting else NEW, submitting=False)
         elif outcome == "hold":
-            question = clean(reason)
-            if not question_key(question):
-                return ("NOT done: put the form's unanswered question verbatim in reason, "
-                        "so the user can answer it once for every application.")
-            if found := best_answer(question):
-                return (f"NOT held: {QUESTIONS.name} already answers that — "
-                        f"{found.title}: {found.answer}. Use it and finish the application.")
+            if clean(reason):
+                saved, note = remember(reason, item)
+                if not saved:
+                    return note          # an answer exists: finish the form instead
+            open_now = [entry for entry in open_questions() if asks_of(entry, item.name)]
+            if not open_now:
+                return ("NOT held: no unanswered question is saved for this lead. Call "
+                        "save_question for each one the form asks, then finish_item(\"hold\").")
             if item.submitting:
-                w.end(state=REVIEW, submitting=False, question=question)
+                w.end(state=REVIEW, submitting=False)
                 return (f"{item.name}: the submission had already started, so it needs "
-                        f"review; the question is saved in {QUESTIONS.name}.")
-            entry, _ = ask(question, f"{item.name} ({item.title})")
-            w.end(state=HOLD, submitting=False, question=question)
-            return (f"{item.name}: on hold until you answer {entry.title!r} in "
-                    f"{QUESTIONS.name}. It goes back in the queue on the next run.")
-        else:
+                        f"review; its question(s) are in {QUESTIONS.name}.")
+            w.end(state=HOLD, submitting=False)
+            return (f"{item.name}: on hold until the user answers {len(open_now)} "
+                    f"question(s) in {QUESTIONS.name}. It goes back in the queue on the "
+                    "next run, once every question naming it is answered.")
+        elif outcome == "archive":
             w.end(archived_at=now(), submitting=False,
                   archive_reason=clean(reason) or "abandoned")
+        else:                   # a typo must not archive a lead
+            return ('NOT done: outcome must be "applied", "retry", "hold" or "archive"; '
+                    "nothing was changed and the lead is still yours.")
         return f"{item.name}: {outcome} ({clean(reason) or 'no reason'})."
 
-    return [claim_next_item, lookup_answer, begin_submission, finish_item] if w else [
-        create_item, web_search, fetch_page]
+    return ([claim_next_item, lookup_answer, save_question, begin_submission, finish_item]
+            if w else [create_item, web_search, fetch_page])
 
 
 def agent(role, tool_list):

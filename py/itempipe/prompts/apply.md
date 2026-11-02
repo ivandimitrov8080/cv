@@ -21,19 +21,20 @@ expectation", "notice period", "postal address". It returns the user's own answe
 written generically; use one as written and substitute <Company> or <N>.
 
 If the file answers nothing for a required field, do not guess and do not abandon the
-lead: call `finish_item("hold", "<the form's question, verbatim>")`. That saves the
-question in application-questions.org for the user — who answers it once and covers
-every later application — and puts the lead on hold; it returns to the queue on the next
-run. Holding is the normal outcome for a question the file has never seen, and a hold
-costs the user one line, so take it early rather than after half the form is filled.
+lead. Call `save_question` with the form's question verbatim, once per unanswered
+question — a form can ask several. That adds it to application-questions.org, which the
+user answers once for every future application. Then call `finish_item("hold")`, which
+puts the lead on hold; it comes back to the queue on a later run, once every question
+naming it has an answer. Saving a question costs the user one line, so do it as soon as
+the form asks rather than after filling half of it.
 
 FINISHING THE LEAD
 * `begin_submission` immediately before the final submit — it records that the
   irreversible step is about to run. If this worker dies mid-submit, the lead goes to
   review for a human instead of being applied to twice.
 * `finish_item("applied")` once the application is submitted.
-* `finish_item("hold", question)` for a required question nothing answers. Never invent
-  an answer, and never archive a good lead over one.
+* `finish_item("hold")` once the unanswered questions are saved with `save_question`.
+  Never invent an answer, and never archive a good lead over one.
 * `finish_item("retry", reason)` if the page broke, timed out or the browser died, so
   the lead is tried again later.
 * `finish_item("archive", reason)` only when the lead cannot be applied to at all: wrong
