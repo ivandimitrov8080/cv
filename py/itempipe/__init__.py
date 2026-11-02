@@ -22,10 +22,14 @@ FENCED = "This lead is no longer yours; stop."
 LEASE = timedelta(minutes=30)
 DB = Path(os.environ.get("ITEMPIPE_DB", ROOT / "py/itempipe.db"))
 PROMPTS, CV = Path(__file__).with_name("prompts"), ROOT / "cv.typ"
+CDP_PORT = int(os.environ.get("ITEMPIPE_CDP_PORT", "9222"))
+CHROME = shutil.which("chromium-sandboxed") or shutil.which("chromium")
 ANGLES = ('HN "Who is hiring?"', "YC Work at a Startup", "niche boards", "company careers",
           "practitioner communities", "freelance / contract")
 APPLY = ("Claim one lead with claim_next_item, work it to a final state with finish_item, then "
-         "stop. If a tool says the lead is no longer yours, stop immediately.")
+         "stop. If a tool says the lead is no longer yours, stop immediately. You share one "
+         "browser with the other workers: work only in the tab your own tools are on, and "
+         "never switch, open or close tabs.")
 
 db = SqliteDatabase(None, pragmas={"journal_mode": "wal", "busy_timeout": 10000})
 
@@ -246,34 +250,85 @@ async def search(brief, workers=4):
     return list(await asyncio.gather(*(one(i) for i in range(workers))))
 
 
-async def browser(i):
+def cdp_endpoint(port=CDP_PORT):
+    return f"http://127.0.0.1:{port}"
+
+
+async def _listening(endpoint):
+    """True if something is already answering CDP there."""
+    import httpx
+    try:
+        async with httpx.AsyncClient(timeout=1.0) as client:
+            return (await client.get(f"{endpoint}/json/version")).is_success
+    except Exception:
+        return False
+
+
+async def chromium(port=CDP_PORT):
+    """Start one headless Chromium that every worker's playwright-mcp attaches to.
+
+    Returns the process when we started it, or None when a Chromium was already
+    listening (a previous run, or one you started yourself): in that case it is not
+    ours to kill. Every worker gets its own MCP session against this browser, so each
+    holds its own tab; nothing else is shared but the process and its profile.
+    """
+    endpoint = cdp_endpoint(port)
+    if await _listening(endpoint):
+        return None
+    profile = Path(os.environ.get("ITEMPIPE_PROFILE", "/tmp/itempipe-chromium"))
+    profile.mkdir(parents=True, exist_ok=True)
+    proc = await asyncio.create_subprocess_exec(
+        CHROME or "chromium", "--headless", f"--remote-debugging-port={port}",
+        "--user-data-dir", str(profile), "--no-first-run", "--no-default-browser-check",
+        "about:blank",
+        stdout=asyncio.subprocess.DEVNULL, stderr=asyncio.subprocess.DEVNULL)
+    for _ in range(80):                     # ~20s for the port to start answering
+        if await _listening(endpoint):
+            return proc
+        if proc.returncode is not None:
+            break
+        await asyncio.sleep(0.25)
+    proc.kill()
+    raise RuntimeError(f"chromium never opened {endpoint}")
+
+
+def mcp_config(endpoint):
+    """One worker's MCP server: no browser of its own, a CDP seat in the shared one."""
+    return {"command": "playwright-mcp",
+            "args": ["--cdp-endpoint", endpoint, "--cdp-timeout", "30000"],
+            "transport": "stdio"}
+
+
+async def browser(endpoint):
     from langchain_mcp_adapters.client import MultiServerMCPClient
-    args = ["--headless", "--user-data-dir", str(ROOT / "py/.playwright-profiles" / f"apply-{i}")]
-    if chrome := shutil.which("chromium-sandboxed") or shutil.which("chromium"):
-        args += ["--executable-path", chrome]
-    client = MultiServerMCPClient({"playwright": {"command": "playwright-mcp", "args": args,
-                                                 "transport": "stdio"}})
+    client = MultiServerMCPClient({"playwright": mcp_config(endpoint)})
     return list(await client.get_tools())
 
 
 async def apply(workers=2):
     slots, reports = asyncio.Semaphore(2), []
+    proc = await chromium()
+    try:
+        async def one(i):
+            tag, w = f"w{i + 1}", Worker()
+            async with slots:
+                status.worker(tag, "state", "attaching to browser", state="browser")
+                a = agent("apply", tools_for(w) + await browser(cdp_endpoint()))
+                while before := queued():
+                    try:
+                        reports.append(await run(a, APPLY, tag=tag))
+                    finally:        # a worker that stopped mid-claim must not hold a lock
+                        if item := w.mine():
+                            w.end(state=REVIEW if item.submitting else NEW, submitting=False)
+                    if queued() >= before:
+                        return      # no progress: that lead is stuck, do not spin
 
-    async def one(i):
-        tag, w = f"w{i + 1}", Worker()
-        async with slots:
-            status.worker(tag, "state", "starting browser", state="browser")
-            a = agent("apply", tools_for(w) + await browser(i))
-            while before := queued():
-                try:
-                    reports.append(await run(a, APPLY, tag=tag))
-                finally:            # a worker that stopped mid-claim must not hold a lock
-                    if item := w.mine():
-                        w.end(state=REVIEW if item.submitting else NEW, submitting=False)
-                if queued() >= before:
-                    return          # no progress: that lead is stuck, do not spin
-
-    await asyncio.gather(*(one(i) for i in range(workers)))
+        await asyncio.gather(*(one(i) for i in range(workers)))
+    finally:
+        if proc is not None and proc.returncode is None:
+            status.worker("··", "state", "closing browser")
+            proc.terminate()
+            await proc.wait()
     return reports
 
 

@@ -30,7 +30,8 @@ FINISHING THE LEAD
 * `finish_item("archive", reason)` when it cannot be applied to at all.
 
 WORKING ALONGSIDE OTHER WORKERS
-Several apply workers run at once. Never act on a lead you did not claim, and stop as
-soon as a tool says the lead is no longer yours.
+Several apply workers run at once, sharing one browser. Your tools are already pointed at
+your own tab: work only in it. Never list, switch, open or close tabs, and never act on a
+lead you did not claim. Stop as soon as a tool says the lead is no longer yours.
 
 End with a short report naming the company and the state you left the lead in.

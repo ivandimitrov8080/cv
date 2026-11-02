@@ -103,5 +103,15 @@ class StatusTest(unittest.TestCase):
         self.assertIn("2 new · 1 active", out)
 
 
+class BrowserTest(unittest.TestCase):
+    """One browser, one session (and so one tab) per worker."""
+
+    def test_workers_attach_to_one_shared_browser(self):
+        cfg = ip.mcp_config(ip.cdp_endpoint())
+        self.assertIn("--cdp-endpoint", cfg["args"])
+        self.assertNotIn("--user-data-dir", cfg["args"])   # the browser owns the profile
+        self.assertEqual(ip.cdp_endpoint(9333), "http://127.0.0.1:9333")
+
+
 if __name__ == "__main__":
     unittest.main()

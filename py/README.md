@@ -30,6 +30,23 @@ six tools, two coroutines — plus the two prompts in `itempipe/prompts/`, and
 
 Inspect the queue with `sqlite3 py/itempipe.db 'select id, state, name from items'`.
 
+## The browser
+
+`apply` starts **one** headless Chromium with `--remote-debugging-port` (9222 by default,
+`ITEMPIPE_CDP_PORT` to change it) and then gives each worker its own `playwright-mcp`
+process attached to it with `--cdp-endpoint`. So there is one browser, one profile, one
+set of logins, and one tab per worker: a worker's tools only ever see its own page.
+
+* A Chromium already listening on that port is adopted and left running; one we started
+  is terminated when `apply` exits.
+* The profile is `/tmp/itempipe-chromium` (`ITEMPIPE_PROFILE` to change it). Under
+  `chromium-sandboxed` that is inside the sandbox's tmpfs, so logins do not survive a
+  reboot; bind-mount a profile path into the wrapper if you want them to.
+* Playwright's MCP server is documented as giving each client its own browser context
+  unless `--shared-browser-context` is passed (that flag is HTTP-only). Tab isolation is
+  what we rely on; if you need one cookie jar across all workers, verify it rather than
+  assume it.
+
 ## Progress
 
 While workers run, `rich` draws a board on **stderr**: a row per worker (spinner, tool
