@@ -6,6 +6,7 @@ as many parallel workers as you ask for.
 
 ```sh
 nix develop
+python -m itempipe init                        # create/upgrade the db, show the queue
 python -m itempipe search "remote Python, EU timezones" -n 4
 python -m itempipe apply -n 2
 itempipe-check                     # queue tests, no model or network needed

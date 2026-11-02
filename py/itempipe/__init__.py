@@ -56,17 +56,22 @@ def clean(value):
 
 
 def open_db(path=DB):
-    Path(path).parent.mkdir(parents=True, exist_ok=True)
-    db.init(path)
-    db.connect(reuse_if_open=True)
-    db.create_tables([Item])
-    old = {c.name for c in db.get_columns("items")}
-    if old - set(Item._meta.fields):      # one-off: a tracker from the pre-peewee schema
-        shared = ", ".join(n for n in Item._meta.fields if n in old)
+    """Point peewee at `path`, create the table, and migrate an older tracker in place."""
+    path = Path(path)
+    path.parent.mkdir(parents=True, exist_ok=True)
+    if not db.is_closed():
+        db.close()                       # a different --db must not reuse the old connection
+    db.init(str(path))
+    db.connect()
+    Item.create_table(safe=True)
+    existing = {c.name for c in db.get_columns("items")}
+    if existing != set(Item._meta.fields):      # schema drift: keep the rows, rebuild the table
+        shared = ", ".join(n for n in Item._meta.fields if n in existing)
         db.execute_sql("ALTER TABLE items RENAME TO items_legacy")
         Item.create_table()
         db.execute_sql(f"INSERT INTO items ({shared}) SELECT {shared} FROM items_legacy")
         db.execute_sql("DROP TABLE items_legacy")
+    return path
 
 
 def queued():
@@ -78,6 +83,9 @@ def free():
     return Item.select().where(Item.archived_at.is_null(),
                                (Item.state == NEW) |
                                ((Item.state == WORKING) & (Item.claimed_until < now())))
+
+
+open_db()   # importing prepares the store; the CLI re-points it when --db is given
 
 
 @dataclass
@@ -251,10 +259,13 @@ async def apply(workers=2):
 def main(argv=None):
     p = argparse.ArgumentParser(prog="itempipe", description=__doc__.splitlines()[0])
     p.add_argument("--db", default=str(DB))
-    p.add_argument("command", choices=["search", "apply"])
+    p.add_argument("command", choices=["init", "search", "apply"])
     p.add_argument("brief", nargs="?", default="")
     p.add_argument("-n", type=int, default=2, help="parallel workers")
     args = p.parse_args(argv)
-    open_db(args.db)
+    path = open_db(args.db)
+    if args.command == "init":
+        print(f"{path}: {Item.select().count()} lead(s), {queued()} queued")
+        return 0
     fn, brief = (search, (args.brief,)) if args.command == "search" else (apply, ())
     print("\n---\n".join(asyncio.run(fn(*brief, workers=args.n))))
