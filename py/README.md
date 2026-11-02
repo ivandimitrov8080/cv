@@ -9,7 +9,7 @@ nix develop
 python -m itempipe init                        # create/upgrade the db, show the queue
 python -m itempipe search -n 4                 # until Ctrl-C; see itempipe/search.toml
 python -m itempipe apply -n 2
-itempipe-check                     # queue tests, no model or network needed
+(cd py && python -m unittest -v test_itempipe)  # queue tests, no model or network needed
 ```
 
 That is the whole interface. The program is `itempipe/__init__.py` — one peewee model,
@@ -153,6 +153,22 @@ worker's tools only ever see its own page.
   unless `--shared-browser-context` is passed (that flag is HTTP-only). Tab isolation is
   what we rely on; if you need one cookie jar across all workers, verify it rather than
   assume it.
+* The MCP connection itself is twenty lines in `browser()`: the official `mcp` SDK's
+  `Client(StdioServerParameters(command="playwright-mcp", args=["--cdp-endpoint", …]))`
+  spawns the server over stdio, handshakes and lists its tools, and each tool is wrapped in
+  a LangChain `StructuredTool` whose `args_schema` is the tool's own JSON Schema dict —
+  passed through, not rebuilt, so the model sees exactly what the server declared.
+  The connection is held open for as long as the worker runs, because those tools call back
+  through it. LangChain 1 can do the same conversion via `langchain.mcp.MCPAdapter`, but
+  that namespace is FastMCP underneath (`fastmcp>=4`), so it is not used and neither
+  `fastmcp` nor the old `langchain-mcp-adapters` is a dependency. `search` never touches MCP.
+* playwright-mcp's own stderr goes to `/tmp/itempipe-mcp-9222.log` (`ITEMPIPE_MCP_LOG`)
+  rather than the terminal, which the progress board is drawing on. Each tool result is
+  capped at `ITEMPIPE_MCP_OUTPUT` (20000) characters, because a page snapshot can be
+  longer than the context it is about to land in.
+* Tools coming from playwright-mcp answer like the others: a failed call, an `isError`
+  result or a dead subprocess comes back as `NOT done: …` rather than an exception, so a
+  worker is never killed mid-node by the browser.
 
 ## When a tool cannot answer
 

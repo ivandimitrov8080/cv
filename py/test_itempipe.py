@@ -3,6 +3,7 @@
 import asyncio, contextlib, io, sys, tempfile, unittest
 from datetime import timedelta
 from pathlib import Path
+from types import SimpleNamespace
 from unittest import mock
 
 import itempipe as ip
@@ -297,13 +298,32 @@ class StatusTest(unittest.TestCase):
 
 
 class BrowserTest(unittest.TestCase):
-    """One browser, one session (and so one tab) per worker."""
+    """One browser, one session (and so one tab) per worker.
+
+    Unit level only: these read the data handed to the MCP client and the error paths.
+    Nothing starts chromium, spawns playwright-mcp or speaks MCP — `itempipe apply` is
+    how those get exercised, by hand.
+    """
 
     def test_workers_attach_to_one_shared_browser(self):
+        # `mcp_config` is data only: the fields `mcp.StdioServerParameters` wants, so a
+        # worker's playwright-mcp attaches to the shared CDP browser and owns no profile
+        # of its own. Nothing here starts a browser or speaks MCP.
         cfg = ip.mcp_config(ip.cdp_endpoint())
+        self.assertEqual(cfg["command"], "playwright-mcp")
         self.assertIn("--cdp-endpoint", cfg["args"])
+        self.assertIn(ip.cdp_endpoint(), cfg["args"])
         self.assertNotIn("--user-data-dir", cfg["args"])   # the browser owns the profile
         self.assertEqual(ip.cdp_endpoint(9333), "http://127.0.0.1:9333")
+
+    def test_a_missing_mcp_client_is_a_sentence_not_a_traceback(self):
+        async def enter():
+            with mock.patch.dict(sys.modules, {"mcp": None}):
+                async with ip.browser(ip.cdp_endpoint()):
+                    pass
+        with self.assertRaises(ip.Startup) as caught:
+            asyncio.run(enter())
+        self.assertIn("mcp", str(caught.exception))
 
     def test_stopping_a_dead_process_is_not_an_error(self):
         # The old code called kill() on a browser that had already exited, which raised
@@ -323,6 +343,57 @@ class BrowserTest(unittest.TestCase):
         self.assertIn("display", ip.chrome_hint("Missing X server or $DISPLAY"))
         self.assertIn("9222", ip.chrome_hint("Address already in use"))
         self.assertIn("No recognised cause", ip.chrome_hint(""))
+
+
+class McpTest(unittest.TestCase):
+    """MCP tools as LangChain tools: the adaptation only, with a stand-in client."""
+
+    def tool(self):
+        return SimpleNamespace(
+            name="browser_navigate", description="Go to a URL",
+            inputSchema={"type": "object", "required": ["url"],
+                         "properties": {"url": {"type": "string", "description": "where"}}})
+
+    def test_an_mcp_tool_keeps_its_name_and_schema(self):
+        made = ip.mcp_tool(self.tool(), mock.Mock())
+        self.assertEqual(made.name, "browser_navigate")
+        self.assertEqual(made.description, "Go to a URL")
+        # The server's schema is passed through as-is: no pydantic model to keep in step.
+        self.assertEqual(made.tool_call_schema["required"], ["url"])
+        self.assertEqual(set(made.tool_call_schema["properties"]), {"url"})
+
+    def test_a_call_reaches_the_client_and_returns_its_text(self):
+        async def call_tool(name, arguments):
+            return SimpleNamespace(content=[SimpleNamespace(text=f"{name} {arguments['url']}")],
+                                   isError=False)
+        made = ip.mcp_tool(self.tool(), mock.Mock(call_tool=call_tool))
+        self.assertEqual(asyncio.run(made.ainvoke({"url": "https://a"})),
+                         "browser_navigate https://a")
+
+    def test_a_failing_call_is_a_sentence_not_an_exception(self):
+        async def call_tool(name, arguments):
+            raise RuntimeError("Connection closed")
+        made = ip.mcp_tool(self.tool(), mock.Mock(call_tool=call_tool))
+        out = asyncio.run(made.ainvoke({"url": "https://a"}))
+        self.assertIn("NOT done", out)
+        self.assertIn("Connection closed", out)
+
+    def test_an_error_result_is_reported_as_such(self):
+        async def call_tool(name, arguments):
+            return SimpleNamespace(content=[SimpleNamespace(text="no such element")],
+                                   is_error=True)      # the SDK's own field name
+        out = asyncio.run(ip.mcp_tool(self.tool(), mock.Mock(call_tool=call_tool))
+                          .ainvoke({"url": "https://a"}))
+        self.assertIn("NOT done", out)
+        self.assertIn("no such element", out)
+
+    def test_a_long_page_snapshot_is_truncated(self):
+        async def call_tool(name, arguments):
+            return SimpleNamespace(content=[SimpleNamespace(text="x" * 50_000)], is_error=False)
+        out = asyncio.run(ip.mcp_tool(self.tool(), mock.Mock(call_tool=call_tool))
+                          .ainvoke({"url": "https://a"}))
+        self.assertLess(len(out), 50_000)
+        self.assertIn("truncated", out)
 
 
 class WebTest(unittest.TestCase):

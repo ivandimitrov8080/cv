@@ -22,16 +22,21 @@
       # Python side of the repo (py/): the itempipe port.
       #
       # Dependencies are named, then filtered against the pinned nixpkgs,
-      # because some of them (langchain-mcp-adapters, ddgs) land in nixpkgs
-      # later than the rest.  Anything missing is printed by the dev shell;
-      # `uv sync` in py/ covers those from PyPI.
+      # because some of them (ddgs) land in nixpkgs later than the rest.
+      # Anything missing is printed by the dev shell; `uv sync` in py/ covers
+      # those from PyPI.
+      #
+      # `mcp` is the official Model Context Protocol SDK, which `apply` uses to
+      # spawn playwright-mcp over stdio and adapt its tools to LangChain (see
+      # `browser()` in itempipe/__init__.py).  Nothing here needs fastmcp or
+      # langchain-mcp-adapters: LangChain 1's optional `langchain.mcp` would
+      # pull fastmcp>=4, which this nixpkgs does not have.
       # ---------------------------------------------------------------------
       pyRuntimeDeps = [
         "langchain"
         "langchain-core"
         "langchain-openai"
         "langgraph"
-        "langchain-mcp-adapters"
         "mcp"
         "pydantic"
         "httpx"
@@ -211,16 +216,6 @@
                   PYTHONPATH = "/home/ivand/src/cv/py";
                   ITEMPIPE_DB = "/home/ivand/src/cv/py/itempipe.db";
                 };
-                enterShell = ''
-                  itempipe() { python -m itempipe "$@"; }
-                  export -f itempipe
-                  itempipe-check() { (cd /home/ivand/src/cv/py && python -m unittest -v test_itempipe); }
-                  export -f itempipe-check
-                  ${pkgs.lib.optionalString (pyNotPackaged != [ ]) ''
-                    echo "itempipe: not packaged by this nixpkgs: ${builtins.concatStringsSep " " pyNotPackaged}" >&2
-                    echo "itempipe: run 'uv sync' in py/ if you need them from PyPI" >&2
-                  ''}
-                '';
               }
             ];
           };

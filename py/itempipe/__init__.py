@@ -23,7 +23,7 @@ from functools import lru_cache
 from pathlib import Path
 from urllib.parse import urlsplit
 
-from langchain_core.tools import tool
+from langchain_core.tools import StructuredTool, tool
 from peewee import (BooleanField, CharField, DateTimeField, IntegrityError, Model,
                     SqliteDatabase, TextField, fn)
 
@@ -42,6 +42,8 @@ CDP_PORT = int(os.environ.get("ITEMPIPE_CDP_PORT", "9222"))
 CHROME = shutil.which("chromium-sandboxed") or shutil.which("chromium")
 PROFILE = Path(os.environ.get("ITEMPIPE_PROFILE", "/tmp/itempipe-chromium"))
 CHROME_LOG = Path(os.environ.get("ITEMPIPE_CHROME_LOG", f"/tmp/itempipe-chromium-{CDP_PORT}.log"))
+MCP_LOG = Path(os.environ.get("ITEMPIPE_MCP_LOG", f"/tmp/itempipe-mcp-{CDP_PORT}.log"))
+MCP_OUTPUT = int(os.environ.get("ITEMPIPE_MCP_OUTPUT", "20000"))  # chars kept per tool call
 SEARCH_TRIES = int(os.environ.get("ITEMPIPE_SEARCH_TRIES", "3"))
 SESSIONS = int(os.environ.get("ITEMPIPE_SESSIONS", "0"))        # 0 = until you stop it
 STEPS = int(os.environ.get("ITEMPIPE_SESSION_STEPS", "26"))     # graph steps per session
@@ -553,6 +555,24 @@ def budget_note(sess):
     return ""
 
 
+def field_of(message, name, default=None):
+    """Read one field off a message that may be a LangChain object or a plain dict."""
+    if isinstance(message, dict):
+        return message.get(name, default)
+    return getattr(message, name, default)
+
+
+def text_of(content):
+    """Message content as one string: a tool result may be a list of content blocks."""
+    if isinstance(content, str):
+        return content
+    if isinstance(content, list):
+        parts = (block if isinstance(block, str) else str(field_of(block, "text", "") or "")
+                 for block in content)
+        return "\n".join(part for part in parts if part)
+    return str(content or "")
+
+
 def spent(sess):
     """A session is one lead long: after the first one, every tool says so."""
     if sess.recorded:
@@ -705,18 +725,27 @@ def tools_for(w=None, sess=None):
 
 
 def agent(role, tool_list):
+    """One agent: LangChain 1's `create_agent`, which takes the prompt as a system message.
+
+    `create_agent(model, tools, *, system_prompt=...)` replaces LangGraph's
+    `create_react_agent`, whose `prompt=` keyword became `system_prompt=`.
+    """
+    from langchain.agents import create_agent
     from langchain_openai import ChatOpenAI
-    from langgraph.prebuilt import create_react_agent
     model = ChatOpenAI(model=os.environ.get("ITEMPIPE_MODEL", "deepseek-chat"),
                        base_url=os.environ.get("ITEMPIPE_BASE_URL", "https://api.deepseek.com/v1"),
                        api_key=os.environ.get("DEEPSEEK_API_KEY", "missing"), timeout=180)
     prompt = (PROMPTS / f"{role}.md").read_text(encoding="utf-8")
     prompt = prompt.replace("{{CV}}", CV.read_text()).replace("{{NOTES}}", NOTES)
-    return create_react_agent(model, tool_list, prompt=prompt)
+    return create_agent(model, tool_list, system_prompt=prompt)
 
 
 async def run(agent_, text, tag="·", finish=True, limit=60):
     """Stream the graph's node updates, so every tool call shows up while it happens.
+
+    LangChain 1 agents stream the same shape as before — one mapping per node, holding
+    that node's `messages` — but a tool result is now a list of content blocks rather
+    than a bare string, so the text is flattened before it reaches the board.
 
     A model that stops with a canned "need more steps" sentence instead of a report is
     named as such: the old code promoted that sentence to "the report" and marked the row
@@ -728,14 +757,15 @@ async def run(agent_, text, tag="·", finish=True, limit=60):
                                        stream_mode="updates"):
         for payload in update.values():
             for message in (payload or {}).get("messages", []):
-                if message.type == "tool":
-                    status.worker(tag, "result", message.content)
-                elif calls := getattr(message, "tool_calls", None):
+                content = text_of(field_of(message, "content"))
+                if field_of(message, "type") == "tool":
+                    status.worker(tag, "result", content)
+                elif calls := field_of(message, "tool_calls"):
                     made += len(calls)
                     for call in calls:
                         status.worker(tag, "call", f"{call['name']} {call['args']}")
-                elif message.content:
-                    answer = str(message.content)
+                elif content:
+                    answer = content
     if not answer.strip() or CANNED.search(answer):
         answer = (f"[no report: the model stopped without one after {made} tool call(s); "
                   "see the items in the tracker]")
@@ -938,16 +968,84 @@ async def chromium(port=CDP_PORT, timeout=20.0):
 
 
 def mcp_config(endpoint):
-    """One worker's MCP server: no browser of its own, a CDP seat in the shared one."""
+    """One worker's MCP server: no browser of its own, a CDP seat in the shared one.
+
+    Exactly the fields `mcp.StdioServerParameters` takes, so it can be passed straight to
+    it. The environment is inherited whole because playwright-mcp needs more of it than
+    the SDK's safe default (HOME, PATH): a display, a runtime dir, the sandbox binds.
+    """
     return {"command": "playwright-mcp",
             "args": ["--cdp-endpoint", endpoint, "--cdp-timeout", "30000"],
-            "transport": "stdio"}
+            "env": dict(os.environ)}
 
 
+def mcp_tool(tool, client):
+    """One MCP tool as a LangChain tool that calls back through the worker's session.
+
+    The server's own JSON Schema is handed straight over as `args_schema`: LangChain takes
+    a plain schema dict and gives it to the model verbatim, so there is no pydantic model
+    to build and nothing that can drift from what the server declared.
+
+    Like every other tool here it answers instead of raising: a tool that fails, or a
+    server that has gone away, comes back as a `NOT done: …` sentence the model can act
+    on, not an exception that ends the worker mid-node.
+    """
+    name = field_of(tool, "name")
+    # `inputSchema` is what the protocol calls it; the snake_case spelling covers SDK
+    # models that expose the field by its python name instead of its wire alias.
+    schema = (field_of(tool, "input_schema") or field_of(tool, "inputSchema")
+              or {"type": "object", "properties": {}})
+
+    async def call(**arguments):
+        try:
+            result = await client.call_tool(name, arguments)
+        except Exception as exc:        # a dead subprocess must not kill the worker
+            return f"NOT done: {type(exc).__name__}: {clean(exc)}. The browser may be gone."
+        parts = []
+        for block in field_of(result, "content") or ():
+            if (text := field_of(block, "text")) is not None:
+                parts.append(text_of(text))
+            else:               # a screenshot or a resource: name it, never inline it
+                parts.append(f"[{field_of(block, 'type', 'other')} content]")
+        text = "\n".join(part for part in parts if part).strip()
+        if field_of(result, "is_error") or field_of(result, "isError"):
+            return f"NOT done: {text or 'the tool reported an error without saying why.'}"
+        if len(text) > MCP_OUTPUT:      # a page snapshot can outgrow the context it lands in
+            text = text[:MCP_OUTPUT] + "\n[truncated]"
+        return text or "The tool ran but returned no text."
+
+    return StructuredTool(name=name, description=field_of(tool, "description") or name,
+                          args_schema=schema, coroutine=call)
+
+
+@contextlib.asynccontextmanager
 async def browser(endpoint):
-    from langchain_mcp_adapters.client import MultiServerMCPClient
-    client = MultiServerMCPClient({"playwright": mcp_config(endpoint)})
-    return list(await client.get_tools())
+    """A worker's own playwright-mcp subprocess, held open while that worker runs.
+
+    The client is the official `mcp` SDK — `mcp.Client` spawns the server over stdio,
+    does the initialize handshake and lists its tools — and each tool is converted to a
+    LangChain tool here. LangChain 1's `langchain.mcp` would do the same conversion, but
+    it is FastMCP underneath (`fastmcp>=4`), which this environment does not have and
+    does not need: the protocol is the SDK's, the adaptation is twenty lines.
+
+    The subprocess has to outlive the loop that uses the tools, so this is a context
+    manager rather than a function returning a list. Server stderr goes to MCP_LOG
+    instead of the terminal, which the progress board is busy drawing on.
+    """
+    try:
+        from mcp import Client, StdioServerParameters, stdio_client
+    except ImportError as exc:      # no MCP client here: a sentence, not a traceback
+        raise Startup(f"the MCP client is missing ({exc}). `itempipe apply` needs the "
+                      "official `mcp` SDK (`uv pip install mcp`); `itempipe search` "
+                      "does not.") from exc
+    params = StdioServerParameters(**mcp_config(endpoint))
+    MCP_LOG.parent.mkdir(parents=True, exist_ok=True)
+    with open(MCP_LOG, "a", encoding="utf-8", errors="replace") as errlog:
+        # Building the transport here is the only way to move the server's own stderr
+        # aside; `Client(params)` would send it to our stderr, over the board.
+        async with Client(stdio_client(params, errlog=errlog)) as client:
+            remote = await client.list_tools()
+            yield [mcp_tool(tool, client) for tool in remote.tools]
 
 
 async def apply(workers=2):
@@ -958,15 +1056,17 @@ async def apply(workers=2):
             tag, w = f"w{i + 1}", Worker()
             async with slots:
                 status.worker(tag, "state", "attaching to browser", state="browser")
-                a = agent("apply", tools_for(w) + await browser(cdp_endpoint()))
-                while before := queued():
-                    try:
-                        reports.append(await run(a, APPLY, tag=tag))
-                    finally:        # a worker that stopped mid-claim must not hold a lock
-                        if item := w.mine():
-                            w.end(state=REVIEW if item.submitting else NEW, submitting=False)
-                    if queued() >= before:
-                        return      # no progress: that lead is stuck, do not spin
+                async with browser(cdp_endpoint()) as mcp_tools:
+                    a = agent("apply", tools_for(w) + mcp_tools)
+                    while before := queued():
+                        try:
+                            reports.append(await run(a, APPLY, tag=tag))
+                        finally:    # a worker that stopped mid-claim must not hold a lock
+                            if item := w.mine():
+                                w.end(state=REVIEW if item.submitting else NEW,
+                                      submitting=False)
+                        if queued() >= before:
+                            return  # no progress: that lead is stuck, do not spin
 
         await asyncio.gather(*(one(i) for i in range(workers)))
     finally:
