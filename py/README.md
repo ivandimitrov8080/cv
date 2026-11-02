@@ -30,6 +30,46 @@ six tools, two coroutines — plus the two prompts in `itempipe/prompts/`, and
 
 Inspect the queue with `sqlite3 py/itempipe.db 'select id, state, name from items'`.
 
+## Search is many small sessions
+
+A search worker is not one conversation. It is up to `ITEMPIPE_SESSIONS` (6) sessions in a
+row, each of them a fresh agent with an empty message list that is asked to verify one
+posting, call `create_item` once, and stop. Once a session records a lead every tool
+answers `SESSION OVER`, and the worker starts the next one; the tool budget per session
+is `ITEMPIPE_TOOL_BUDGET` (12) calls and its graph limit `ITEMPIPE_SESSION_STEPS` (26).
+
+What survives the reset is the `seen` table: one row per normalised URL or query, with the
+verdict of the last check and the session that wrote it. So the tenth worker does not open
+the page the first one read, and a session that ends cannot forget where it had been.
+
+| verdict | meaning | looked at again |
+| --- | --- | --- |
+| `claimed` | a worker is on it | after the 30-minute lease |
+| `open` | fetched, not recorded | next session |
+| `dead` | 4xx/5xx | after a week |
+| `searched` / `noresults` | a query's outcome | next session / after a week |
+| `skipped` | opened, nothing recorded | next session |
+| `duplicate` | `create_item` refused the name | next session |
+| `recorded` | it became a lead | never |
+
+The insert *is* the lock, exactly like `claim_next_item`: two sessions cannot fetch the
+same URL at once, and the loser is told so instead of retrying.
+
+Where to look is code, not vibes: `ANGLE_BOARDS` gives each angle a few starting boards,
+`frontier` hands a session the first ones this run has not opened yet (rotated, so two
+workers sharing one angle start on different pages), and a session ends when the angle's
+boards are used up or two sessions in a row record nothing. Set `ITEMPIPE_HN_THREAD` to
+this month's who-is-hiring id — the default is a frozen one.
+
+`reconcile` runs when a session ends: a page it opened and did not record becomes
+`skipped` rather than being forgotten or left claimed. `itempipe init` forgets `seen` rows
+older than a year (`ITEMPIPE_SEEN_DAYS`) and prints how many.
+
+When one worker out of ten dies, the other nine still report: the workers are gathered
+with `return_exceptions=True`, and a worker's report is `<tag> — N recorded: …` plus the
+longest thing it said, so a model that stops with a canned sentence is visible as
+`[no report: …]` instead of being passed off as a summary.
+
 ## The browser
 
 `apply` starts **one** headless Chromium with `--remote-debugging-port` (9222 by default,

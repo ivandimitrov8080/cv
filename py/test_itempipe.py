@@ -1,6 +1,7 @@
 """Queue mechanics only: no model, no browser, no network."""
 
 import asyncio, contextlib, io, sys, tempfile, unittest
+from datetime import timedelta
 from pathlib import Path
 from unittest import mock
 
@@ -79,6 +80,95 @@ class QueueTest(unittest.TestCase):
         self.assertEqual((ip.Item.get().archive_reason, ip.queued()), ("closed", 0))
 
 
+class SeenTest(unittest.TestCase):
+    """The browsing memory a clean session starts from."""
+
+    def setUp(self):
+        self.tmp = tempfile.TemporaryDirectory()
+        ip.open_db(Path(self.tmp.name) / "t.db")
+        ip.Item.delete().execute()
+        ip.Seen.delete().execute()
+
+    def tearDown(self):
+        ip.db.close()
+        self.tmp.cleanup()
+
+    def test_one_page_has_one_identity(self):
+        self.assertEqual(ip.url_key("https://www.Example.com/jobs/42/?utm_source=hn"),
+                         ip.url_key("http://example.com/jobs/42"))
+        self.assertNotEqual(ip.url_key("https://a.com/jobs/42"),
+                            ip.url_key("https://a.com/jobs/43"))
+
+    def test_one_query_has_one_identity(self):
+        self.assertEqual(ip.query_key("  Remote Java "), ip.query_key("remote  java!"))
+
+    def test_two_sessions_cannot_check_one_page_at_once(self):
+        key = ip.url_key("https://a.com/1")
+        self.assertTrue(ip.claim_seen(key, session="s1")[0])
+        won, row = ip.claim_seen(key, session="s2")
+        self.assertFalse(won)
+        self.assertEqual(row.verdict, ip.CLAIMED)
+
+    def test_a_settled_page_comes_back_in_the_next_session(self):
+        key = ip.url_key("https://a.com/1")
+        ip.claim_seen(key, session="s1")
+        ip.settle(key, ip.OPEN, "HTTP 200", "s1")
+        self.assertFalse(ip.claim_seen(key, session="s1")[0])   # not twice in one session
+        self.assertTrue(ip.claim_seen(key, session="s2")[0])    # a new one may look again
+
+    def test_a_dead_page_waits_a_week_and_a_recorded_one_never_returns(self):
+        dead, kept = ip.url_key("https://a.com/dead"), ip.url_key("https://a.com/kept")
+        ip.claim_seen(dead, session="s1")
+        ip.settle(dead, ip.DEAD, "HTTP 404", "s1")
+        ip.claim_seen(kept, session="s1")
+        ip.settle(kept, ip.RECORDED, "Acme", "s1")
+        self.assertFalse(ip.claim_seen(dead, session="s2")[0])
+        ip.Seen.update(checked_at=ip.now() - ip.RETRY - timedelta(minutes=1)).where(
+            ip.Seen.key == dead).execute()
+        self.assertTrue(ip.claim_seen(dead, session="s2")[0])
+        ip.Seen.update(checked_at=ip.now() - timedelta(days=500)).where(
+            ip.Seen.key == kept).execute()
+        self.assertFalse(ip.claim_seen(kept, session="s2")[0])
+
+    def test_a_session_hands_its_unrecorded_pages_to_the_next_one(self):
+        sess = ip.Session(angle="x")
+        key = ip.url_key("https://a.com/1")
+        ip.claim_seen(key, session=sess.token)
+        ip.settle(key, ip.OPEN, "HTTP 200", sess.token)
+        self.assertEqual(ip.reconcile(sess), 1)
+        self.assertEqual(ip.Seen.get(ip.Seen.key == key).verdict, ip.SKIPPED)
+        self.assertTrue(ip.claim_seen(key, session="another")[0])
+
+    def test_the_frontier_moves_on_once_a_board_is_opened(self):
+        with mock.patch.dict(ip.ANGLE_BOARDS, {"x": ["https://a.com", "https://b.com"]}):
+            self.assertEqual(ip.frontier("x", offset=1), ["https://b.com", "https://a.com"])
+            ip.claim_seen(ip.url_key("https://b.com"), session="s1")
+            self.assertEqual(ip.frontier("x"), ["https://a.com"])
+
+    def test_an_angle_with_no_boards_is_left_to_the_model(self):
+        with mock.patch.dict(ip.ANGLE_BOARDS, {"x": []}):
+            self.assertEqual(ip.frontier("x"), [])
+
+    def test_a_recorded_url_cannot_come_back_under_another_name(self):
+        def create_item(sess):
+            return next(t for t in ip.tools_for(sess=sess) if t.name == "create_item")
+        self.assertIn("Recorded", create_item(ip.Session(angle="x")).invoke(
+            {"name": "Acme", "title": "T", "url": "https://a.com/1"}))
+        self.assertIn("Already recorded", create_item(ip.Session(angle="x")).invoke(
+            {"name": "Acme Two", "title": "T", "url": "https://a.com/1/"}))
+
+    def test_a_session_stops_after_its_one_lead(self):
+        sess = ip.Session(angle="x")
+        tools = {t.name: t for t in ip.tools_for(sess=sess)}
+        tools["create_item"].invoke(
+            {"name": "Acme", "title": "T", "url": "https://a.com/1"})
+        self.assertEqual(sess.recorded, ["Acme"])
+        self.assertIn("SESSION OVER", tools["create_item"].invoke(
+            {"name": "Other", "title": "T", "url": "https://b.com/2"}))
+        self.assertIn("SESSION OVER", asyncio.run(
+            tools["fetch_page"].ainvoke({"url": "https://b.com/2"})))
+
+
 class StatusTest(unittest.TestCase):
     """The board must be inert before open_board and plain off a tty."""
 
@@ -136,6 +226,15 @@ class BrowserTest(unittest.TestCase):
 class WebTest(unittest.TestCase):
     """A dead search must come back as a sentence the agent can act on, not an exception."""
 
+    def setUp(self):
+        self.tmp = tempfile.TemporaryDirectory()
+        ip.open_db(Path(self.tmp.name) / "t.db")
+        ip.Seen.delete().execute()
+
+    def tearDown(self):
+        ip.db.close()
+        self.tmp.cleanup()
+
     def tool(self, name):
         return next(t for t in ip.tools_for() if t.name == name)
 
@@ -165,6 +264,15 @@ class WebTest(unittest.TestCase):
     def test_hits_text_renders_rows(self):
         rows = [{"title": "T", "href": "https://a", "body": "B"}]
         self.assertEqual(ip.hits_text(rows), "T\nhttps://a\nB")
+
+    def test_the_same_query_is_not_repeated_in_one_session(self):
+        tool = self.tool("web_search")
+        with mock.patch.object(ip, "SEARCH_TRIES", 1), mock.patch("ddgs.DDGS") as fake:
+            fake.return_value.text.return_value = [
+                {"title": "T", "href": "https://a", "body": "B"}]
+            self.assertIn("https://a", asyncio.run(tool.ainvoke({"query": "java remote"})))
+            self.assertIn("already checked",
+                          asyncio.run(tool.ainvoke({"query": "Java,  remote!"})))
 
 
 if __name__ == "__main__":
