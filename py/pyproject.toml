@@ -15,21 +15,15 @@ dependencies = [
   "langchain-mcp-adapters>=0.0.5",
   "langchain-openai>=0.2",
   "langgraph>=0.2",
+  "peewee>=3.17",
   "trafilatura>=1.9",
 ]
 
 [project.scripts]
-itempipe = "itempipe.cli:main"
+itempipe = "itempipe:main"
 
 [tool.setuptools]
 packages = ["itempipe"]
 
 [tool.setuptools.package-data]
-itempipe = ["schema.sql", "prompts/*.md"]
-
-[tool.ruff]
-line-length = 100
-target-version = "py311"
-
-[tool.ruff.lint]
-select = ["E", "F", "I", "UP", "B"]
+itempipe = ["prompts/*.md"]

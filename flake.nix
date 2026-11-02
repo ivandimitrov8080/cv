@@ -35,6 +35,7 @@
         "mcp"
         "pydantic"
         "httpx"
+        "peewee"
         "trafilatura"
         "ddgs"
       ];
@@ -139,14 +140,14 @@
           pkgs = import nixpkgs { inherit system; };
           python = pyDev pkgs;
         in
-        nixpkgs.lib.optionalAttrs (builtins.hasAttr "langchain-core" pkgs.python3.pkgs) {
-          itempipe-imports = pkgs.runCommand "itempipe-imports" { nativeBuildInputs = [ python ]; } ''
+        nixpkgs.lib.optionalAttrs (builtins.hasAttr "peewee" pkgs.python3.pkgs) {
+          itempipe-tests = pkgs.runCommand "itempipe-tests" { nativeBuildInputs = [ python ]; } ''
             cp -r ${./py} source
             chmod -R u+w source
             cd source
             export PYTHONPATH=$PWD
             export PYTHONDONTWRITEBYTECODE=1
-            python -c "import itempipe.cli, itempipe.agents"
+            python -m unittest -v test_itempipe
             touch $out
           '';
         }
@@ -212,7 +213,7 @@
                 enterShell = ''
                   itempipe() { python -m itempipe "$@"; }
                   export -f itempipe
-                  itempipe-check() { (cd /home/ivand/src/cv/py && python -c "import itempipe.cli, itempipe.agents"); }
+                  itempipe-check() { (cd /home/ivand/src/cv/py && python -m unittest -v test_itempipe); }
                   export -f itempipe-check
                   ${pkgs.lib.optionalString (pyNotPackaged != [ ]) ''
                     echo "itempipe: not packaged by this nixpkgs: ${builtins.concatStringsSep " " pyNotPackaged}" >&2

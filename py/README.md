@@ -1,44 +1,35 @@
 # itempipe
 
-Two agents against one SQLite file: one finds job leads, one applies to them.
-Each can run in as many parallel workers as you like; the database is the queue.
+Two agents against one SQLite file. `search` finds job leads and records them; `apply`
+claims leads from the same queue and drives a browser through the application. Each runs in
+as many parallel workers as you ask for.
 
 ```sh
 nix develop
-python -m itempipe search "remote Go, EU timezone" -n 4
+python -m itempipe search "remote Python, EU timezones" -n 4
 python -m itempipe apply -n 2
-python -m itempipe run "remote Python infra" -n 4 -k 2   # search, then apply
-python -m itempipe ls --state NEW
-python -m itempipe answer 3 "one month"
-python -m itempipe reap
+itempipe-check                     # queue tests, no model or network needed
 ```
 
-`search` records leads with `create_item`; duplicates, archived included, are
-refused. `apply` workers atomically claim a lead, drive a browser through the
-application, and end it in exactly one way: `advance_item` (applied),
-`pause_item_for_answer` (a human must answer), `archive_item` (dead end) or
-`release_item` (retry later).
+That is the whole interface. The whole program is `itempipe/__init__.py` — one peewee model,
+six tools, two coroutines — plus the two prompts in `itempipe/prompts/`. Opening an older
+tracker migrates its `items` rows into the current schema once, in place.
 
 ## Why it is safe to run several
 
-- `claim_next_item` is one `UPDATE ... RETURNING`; the database is the lock.
-- Every later mutation is fenced by the claim token. An expired lease can never
-  finish someone else's item.
-- `begin_submission` is written before the irreversible submit. A worker that
-  dies mid-submit leaves `NEEDS_REVIEW`, never a second application.
-- `reap` requeues expired claims and unpauses items whose question has been
-  answered.
+* `claim_next_item` is a compare-and-swap: read the next free row, then claim it with one
+  conditional `UPDATE` guarded by the token it had. The database is the lock; a lost race
+  just means looking again.
+* Every later write is fenced by the claim token, so a worker whose lease expired can never
+  finish someone else's lead.
+* `begin_submission` is written *before* the irreversible submit. A worker that dies
+  mid-submit leaves the lead in `NEEDS_REVIEW` on the next claim, never in a second
+  application.
+* Claiming also picks up rows whose lease expired, so a killed worker costs nothing.
 
-## Layout
+Inspect the queue with `sqlite3 py/itempipe.db 'select id, state, name from items'`.
 
-```
-itempipe/
-  config.py     env + defaults
-  db.py         connection, schema, transaction
-  schema.sql    items + questions
-  store.py      all SQL and the state machine
-  tools.py      web, email, item tools
-  agents.py     prompts, model, search() and apply()
-  cli.py        search | apply | run | ls | answer | reap
-  prompts/      search.md, apply.md
-```
+## State
+
+`NEW` → claimed as `WORKING` → `ACTIVE` (applied) or archived with a reason.
+`NEEDS_REVIEW` means a submit was interrupted; a human should look at it.
