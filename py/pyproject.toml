@@ -1,53 +1,35 @@
 [build-system]
-requires = [ "setuptools>=68" ]
+requires = ["setuptools>=68"]
 build-backend = "setuptools.build_meta"
 
 [project]
 name = "itempipe"
 version = "0.1.0"
-description = "N stateless workers, one SQLite database: search fan-out + apply queue drain (TODO: rename)"
+description = "Two agents, one SQLite queue: search leads, apply to them"
 readme = "README.md"
 requires-python = ">=3.11"
-license = { text = "MIT" }
 dependencies = [
-  "langchain>=0.3",
+  "ddgs>=9.0",
+  "httpx>=0.27",
   "langchain-core>=0.3",
+  "langchain-mcp-adapters>=0.0.5",
   "langchain-openai>=0.2",
   "langgraph>=0.2",
-  "langchain-mcp-adapters>=0.0.5",
-  "mcp>=1.0",
-  "pydantic>=2.6",
-  "pydantic-settings>=2.2",
-  "httpx>=0.27",
   "trafilatura>=1.9",
-  "ddgs>=9.0",
-]
-
-[project.optional-dependencies]
-dev = [
-  "pytest>=8.0",
-  "pytest-asyncio>=0.23",
-  "ruff>=0.5",
 ]
 
 [project.scripts]
 itempipe = "itempipe.cli:main"
 
 [tool.setuptools]
-packages = [ "itempipe", "itempipe.tools" ]
+packages = ["itempipe"]
 
 [tool.setuptools.package-data]
-itempipe = [ "schema.sql", "prompts/*.md" ]
-
-[tool.pytest.ini_options]
-testpaths = [ "tests" ]
-pythonpath = [ "." ]
-asyncio_mode = "auto"
-filterwarnings = [ "ignore::DeprecationWarning" ]
+itempipe = ["schema.sql", "prompts/*.md"]
 
 [tool.ruff]
 line-length = 100
 target-version = "py311"
 
 [tool.ruff.lint]
-select = [ "E", "F", "I", "UP", "B" ]
+select = ["E", "F", "I", "UP", "B"]

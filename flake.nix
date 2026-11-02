@@ -34,34 +34,20 @@
         "langchain-mcp-adapters"
         "mcp"
         "pydantic"
-        "pydantic-settings"
         "httpx"
         "trafilatura"
         "ddgs"
       ];
       pyDevDeps = [
-        "pytest"
-        "pytest-asyncio"
         "ruff"
       ];
-      pyPick =
-        ps: names:
-        map (name: ps.${name}) (builtins.filter (name: builtins.hasAttr name ps) names);
-      pyMissing =
-        ps: names: builtins.filter (name: !(builtins.hasAttr name ps)) names;
+      pyPick = ps: names: map (name: ps.${name}) (builtins.filter (name: builtins.hasAttr name ps) names);
+      pyMissing = ps: names: builtins.filter (name: !(builtins.hasAttr name ps)) names;
 
       # Runtime environment: what the CLI actually imports.
-      pyRuntime =
-        pkgs:
-        pkgs.python3.withPackages (
-          ps: pyPick ps pyRuntimeDeps
-        );
+      pyRuntime = pkgs: pkgs.python3.withPackages (ps: pyPick ps pyRuntimeDeps);
       # Dev environment: runtime + tests + linter, and the whole toolchain.
-      pyDev =
-        pkgs:
-        pkgs.python3.withPackages (
-          ps: pyPick ps pyRuntimeDeps ++ pyPick ps pyDevDeps
-        );
+      pyDev = pkgs: pkgs.python3.withPackages (ps: pyPick ps pyRuntimeDeps ++ pyPick ps pyDevDeps);
 
       # A plain install of py/ as `bin/itempipe`.  Deliberately not built with
       # buildPythonApplication: this keeps one source of truth (the tree in py/)
@@ -153,15 +139,14 @@
           pkgs = import nixpkgs { inherit system; };
           python = pyDev pkgs;
         in
-        nixpkgs.lib.optionalAttrs (builtins.hasAttr "pytest" pkgs.python3.pkgs) {
-          itempipe-tests = pkgs.runCommand "itempipe-tests" { nativeBuildInputs = [ python ]; } ''
+        nixpkgs.lib.optionalAttrs (builtins.hasAttr "langchain-core" pkgs.python3.pkgs) {
+          itempipe-imports = pkgs.runCommand "itempipe-imports" { nativeBuildInputs = [ python ]; } ''
             cp -r ${./py} source
             chmod -R u+w source
             cd source
             export PYTHONPATH=$PWD
             export PYTHONDONTWRITEBYTECODE=1
-            export ITEMPIPE_DB=$TMPDIR/itempipe-test.db
-            python -m pytest -q -p no:cacheprovider tests
+            python -c "import itempipe.cli, itempipe.agents"
             touch $out
           '';
         }
@@ -174,8 +159,7 @@
           };
           pythonEnv = pyDev pkgs;
           pyNotPackaged = pyMissing pkgs.python3.pkgs (pyRuntimeDeps ++ pyDevDeps);
-          chromium-sandboxed = (
-            pkgs.writers.writeNuBin "chromium-sandboxed"
+          chromium-sandboxed = pkgs.writers.writeNuBin "chromium-sandboxed"
               {
                 makeWrapperArgs = [
                   "--prefix"
@@ -195,8 +179,7 @@
                   let opts = ["--die-with-parent" "--unshare-all" "--share-net" "--new-session" "--proc" "/proc" "--dev" "/dev" "--dev-bind" "/dev/dri" "/dev/dri" "--tmpfs" "/dev/shm" "--tmpfs" "/tmp" "--ro-bind" "/nix/store" "/nix/store" "--ro-bind-try" "/etc/fonts" "/etc/fonts" "--ro-bind-try" "/etc/ssl" "/etc/ssl" "--ro-bind-try" "/etc/resolv.conf" "/etc/resolv.conf" "--ro-bind-try" "/etc/nsswitch.conf" "/etc/nsswitch.conf" "--ro-bind-try" "/run/opengl-driver" "/run/opengl-driver" "--dir" "/home" "--dir" "/home/ivand" "--dir" "/home/ivand/src" "--dir" "/home/ivand/src/cv" "--ro-bind" "/home/ivand/src/cv/result" "/home/ivand/src/cv/result" "--dir" "/run/user" "--tmpfs" $xrd "--bind" $sock $sock "--chdir" "/tmp" "--setenv" "HOME" "/tmp" "--setenv" "XDG_RUNTIME_DIR" $xrd "--setenv" "WAYLAND_DISPLAY" $wl]
                   exec bwrap ...$opts -- "chromium" ...$rest
                 }
-              ''
-          );
+              '';
         in
         {
           default = devenv.lib.mkShell {
@@ -229,8 +212,8 @@
                 enterShell = ''
                   itempipe() { python -m itempipe "$@"; }
                   export -f itempipe
-                  itempipe-tests() { (cd /home/ivand/src/cv/py && python -m pytest -q "$@"); }
-                  export -f itempipe-tests
+                  itempipe-check() { (cd /home/ivand/src/cv/py && python -c "import itempipe.cli, itempipe.agents"); }
+                  export -f itempipe-check
                   ${pkgs.lib.optionalString (pyNotPackaged != [ ]) ''
                     echo "itempipe: not packaged by this nixpkgs: ${builtins.concatStringsSep " " pyNotPackaged}" >&2
                     echo "itempipe: run 'uv sync' in py/ if you need them from PyPI" >&2

@@ -20,7 +20,7 @@ about:
 2. Verbs for the operations: `create`, `claim`, `advance`, `pause`, `release`,
    `archive`, `lookup`, `send`, `list`.
 3. State **values** are data, not identifiers: they live in `config.state_vocab`
-   (a list of strings), and code refers to *roles* — `initial_state`,
+   (a list of strings), and code refers to _roles_ — `initial_state`,
    `working_state`, `success_state`, `paused_state`, `review_state`,
    `terminal_states`. Renaming the domain changes a config list, not code.
 4. Domain wording survives in exactly two places: `prompts/*.md` (the agent
@@ -29,39 +29,39 @@ about:
 
 ### Rename map (Emacs → Python)
 
-| Emacs | Python |
-|---|---|
+| Emacs                                                                    | Python                                                            |
+| ------------------------------------------------------------------------ | ----------------------------------------------------------------- |
 | `cv-jobs-lead-fields` (`company role url location size english contact`) | `items` columns (`name title url location size language contact`) |
-| `jobs.org` / Org TODO keyword | `items.state` + `items.archived_at` |
-| `cv-jobs-lead` / `cv-jobs-add` / `cv-jobs-get` / `cv-jobs-update` | `ItemStore.create()`, `.get()`, `.update()` |
-| `cv-jobs--lead-put` (APPLIED + schedule) | `advance()` side effect on `success_state` |
-| `cv-jobs--archive`, `cv-jobs-archive` | `ItemStore.archive(id, reason)` |
-| `cv-jobs--find-existing` | `ItemStore.find_by_name_key()` (no archive filter) |
-| `cv-jobs--note` | `ItemStore.add_note(id, kind, body)` |
-| `cv-jobs-next-lead` | tool `claim_next_item` → `ItemStore.claim_next(worker)` |
-| `cv-jobs-mark-applied` | tool `advance_item` |
-| `cv-jobs-archive-lead` | tool `archive_item` |
-| `cv-jobs-hold-for-question` | tool `pause_item_for_answer` |
-| `cv-jobs-find-answers` | tool `lookup_answer` → `ItemStore.search_answers()` |
-| `cv-jobs-record-lead` | tool `create_item` |
-| `cv-jobs-send-application-email` | tool `send_templated_email` |
-| (`jobs.org` inlined in prompt) | tools `list_items`, `claim_research_target` |
-| `application-questions.org` | `questions` table |
-| `cv-jobs--current` (`defvar` marker) | `WorkerContext.item_id` + `claim_token` |
+| `jobs.org` / Org TODO keyword                                            | `items.state` + `items.archived_at`                               |
+| `cv-jobs-lead` / `cv-jobs-add` / `cv-jobs-get` / `cv-jobs-update`        | `ItemStore.create()`, `.get()`, `.update()`                       |
+| `cv-jobs--lead-put` (APPLIED + schedule)                                 | `advance()` side effect on `success_state`                        |
+| `cv-jobs--archive`, `cv-jobs-archive`                                    | `ItemStore.archive(id, reason)`                                   |
+| `cv-jobs--find-existing`                                                 | `ItemStore.find_by_name_key()` (no archive filter)                |
+| `cv-jobs--note`                                                          | `ItemStore.add_note(id, kind, body)`                              |
+| `cv-jobs-next-lead`                                                      | tool `claim_next_item` → `ItemStore.claim_next(worker)`           |
+| `cv-jobs-mark-applied`                                                   | tool `advance_item`                                               |
+| `cv-jobs-archive-lead`                                                   | tool `archive_item`                                               |
+| `cv-jobs-hold-for-question`                                              | tool `pause_item_for_answer`                                      |
+| `cv-jobs-find-answers`                                                   | tool `lookup_answer` → `ItemStore.search_answers()`               |
+| `cv-jobs-record-lead`                                                    | tool `create_item`                                                |
+| `cv-jobs-send-application-email`                                         | tool `send_templated_email`                                       |
+| (`jobs.org` inlined in prompt)                                           | tools `list_items`, `claim_research_target`                       |
+| `application-questions.org`                                              | `questions` table                                                 |
+| `cv-jobs--current` (`defvar` marker)                                     | `WorkerContext.item_id` + `claim_token`                           |
 
 ---
 
 ## 1. What is being ported
 
-| Piece | Emacs (now) | Python (target) |
-|---|---|---|
-| `job-search` prompt | `agents/job-search.org` (Deepseek, ctx `jobs.org` + `cv.typ`, tools: websearch, fetch, `cv_jobs_add_lead`) | same body → `prompts/search.md`, instantiated **once per search worker** |
-| `job-apply` prompt | `agents/job-apply.org` (Playwright MCP + 6 tools) | same body → `prompts/apply.md`, instantiated **once per apply worker** |
-| supervisor | `gptel-make-preset 'job` (one `Agent` tool, sequential) | `prompts/supervisor.md` + fan-out/queue drain (§9) |
-| `cv-jobs--current` | mutable global marker | per-worker `WorkerContext` with a **fencing token** |
-| `cv-jobs-find-answers` (orderless) | completion matching | token scoring over `questions` (§7) |
-| `cv-jobs-send-application-email` | `mail-send` → msmtp | `EmailMessage` → `msmtp -t` (§8) |
-| `~/src/cv/result/*.pdf` | attachments | `config.attachments` |
+| Piece                              | Emacs (now)                                                                                                | Python (target)                                                          |
+| ---------------------------------- | ---------------------------------------------------------------------------------------------------------- | ------------------------------------------------------------------------ |
+| `job-search` prompt                | `agents/job-search.org` (Deepseek, ctx `jobs.org` + `cv.typ`, tools: websearch, fetch, `cv_jobs_add_lead`) | same body → `prompts/search.md`, instantiated **once per search worker** |
+| `job-apply` prompt                 | `agents/job-apply.org` (Playwright MCP + 6 tools)                                                          | same body → `prompts/apply.md`, instantiated **once per apply worker**   |
+| supervisor                         | `gptel-make-preset 'job` (one `Agent` tool, sequential)                                                    | `prompts/supervisor.md` + fan-out/queue drain (§9)                       |
+| `cv-jobs--current`                 | mutable global marker                                                                                      | per-worker `WorkerContext` with a **fencing token**                      |
+| `cv-jobs-find-answers` (orderless) | completion matching                                                                                        | token scoring over `questions` (§7)                                      |
+| `cv-jobs-send-application-email`   | `mail-send` → msmtp                                                                                        | `EmailMessage` → `msmtp -t` (§8)                                         |
+| `~/src/cv/result/*.pdf`            | attachments                                                                                                | `config.attachments`                                                     |
 
 Tool signatures are the contract, so the prompt port is a mechanical rename
 (§0 map) plus deleting the `:PROPERTIES:` front matter. The anti-fabrication
@@ -98,13 +98,13 @@ port splits **orchestration** from **execution**:
 
 Properties this buys:
 
-* **Workers are stateless and disposable.** All state is in the DB; a worker
+- **Workers are stateless and disposable.** All state is in the DB; a worker
   can be killed at any moment and restarted (see §6 at-most-once for the one
   caveat around irreversible actions).
-* **Same binary, two roles.** `itempipe work --role search --count 4` and
+- **Same binary, two roles.** `itempipe work --role search --count 4` and
   `itempipe work --role apply --count 3` can be separate processes on separate
   machines. It also runs as one process with an internal asyncio pool (§9).
-* **The DB *is* the lock.** Claiming is a single atomic `UPDATE ... RETURNING`;
+- **The DB _is_ the lock.** Claiming is a single atomic `UPDATE ... RETURNING`;
   no message broker, no in-memory queue, nothing to lose on crash.
 
 Why not a task queue (Celery/RQ/Redis)? The workload is 5–20 items per run, not
@@ -114,13 +114,13 @@ PostgreSQL (`FOR UPDATE SKIP LOCKED`).
 
 ### Concurrency budget (why K is small)
 
-| Resource | Limit | Mitigation |
-|---|---|---|
+| Resource          | Limit                                                                | Mitigation                                                                    |
+| ----------------- | -------------------------------------------------------------------- | ----------------------------------------------------------------------------- |
 | Browser instances | **2–3** — each Playwright MCP is a Chromium with its own profile dir | `browser_slots` cap; per-worker `--user-data-dir`; one MCP process per worker |
-| LLM API | ~4–6 concurrent requests | `asyncio.Semaphore(max_llm_concurrency)` + retry on 429 with jitter |
-| Target hosts | 1 request at a time per host | host lease (§6) so two workers never hit the same origin |
-| SQLite writes | 1 writer at a time | WAL + `busy_timeout=5000` + short `BEGIN IMMEDIATE` transactions |
-| Outgoing email | 1 per few seconds | `email_min_interval`, staggered by worker index |
+| LLM API           | ~4–6 concurrent requests                                             | `asyncio.Semaphore(max_llm_concurrency)` + retry on 429 with jitter           |
+| Target hosts      | 1 request at a time per host                                         | host lease (§6) so two workers never hit the same origin                      |
+| SQLite writes     | 1 writer at a time                                                   | WAL + `busy_timeout=5000` + short `BEGIN IMMEDIATE` transactions              |
+| Outgoing email    | 1 per few seconds                                                    | `email_min_interval`, staggered by worker index                               |
 
 Search workers are cheap and can run at 4–8; apply workers are expensive, so K
 defaults to 2. Both are config, not code.
@@ -392,14 +392,14 @@ means a crash can leave "did it send or not?" ambiguity. The rule:
 
 Implementation, both paths:
 
-* **Email** — `send_templated_email` writes an `attempts` row with
-  `status='submitting'` *before* invoking msmtp, then `status='sent'` after.
+- **Email** — `send_templated_email` writes an `attempts` row with
+  `status='submitting'` _before_ invoking msmtp, then `status='sent'` after.
   `reap` sees a stuck `submitting` and moves the item to `review_state`.
-* **Browser** — the submit click happens inside an agent-driven browser, so it
+- **Browser** — the submit click happens inside an agent-driven browser, so it
   cannot be wrapped by a tool. Hence one added tool, `begin_submission()`,
   which writes `status='submitting'`. `prompts/apply.md` gains a single
-  sentence: *"Immediately before the final submit action, call
-  `begin_submission`."* This is the only deliberate prompt deviation in the
+  sentence: _"Immediately before the final submit action, call
+  `begin_submission`."_ This is the only deliberate prompt deviation in the
   port and it is the price of at-most-once; the alternative is occasionally
   double-applying to a company.
 
@@ -419,13 +419,13 @@ Emacs used `completion-styles '(orderless)`. Dependency-free port:
 score(q, tokens) = 3 * sum(tok in q for tok in tokens) + 1 * (all tokens present)
 ```
 
-* tokenize the query on non-alphanumerics, lowercase;
-* rank `SELECT * FROM questions WHERE answer IS NOT NULL`;
-* tie-break on `answered_at DESC`, cap at `ITEMPIPE_ANSWERS_LIMIT` (default 3);
-* empty/`None` query → every answered question (still capped);
-* output format identical to Emacs (`"1. <question>\n- <answer>"`, blank-line
+- tokenize the query on non-alphanumerics, lowercase;
+- rank `SELECT * FROM questions WHERE answer IS NOT NULL`;
+- tie-break on `answered_at DESC`, cap at `ITEMPIPE_ANSWERS_LIMIT` (default 3);
+- empty/`None` query → every answered question (still capped);
+- output format identical to Emacs (`"1. <question>\n- <answer>"`, blank-line
   joined) because the apply prompt documents how to read it;
-* carry `note`/format hints with the answer — those are why answers survive
+- carry `note`/format hints with the answer — those are why answers survive
   real forms (salary units, placeholder conventions).
 
 Read-only, so it is safe under any concurrency. Upgrade path if scoring proves
@@ -463,12 +463,12 @@ Never generates body text. `--dry-run` renders the MIME message, sends nothing.
 Search and apply are not the same problem, so they get different dispatch
 logic rather than one generic fan-out:
 
-* **Search is a fan-out over *queries***. The supervisor slices the brief into
+- **Search is a fan-out over _queries_**. The supervisor slices the brief into
   N distinct angles (different channels/boards/keyword clusters — the
   `strategies/no-hr-strategy.org` channel map is the natural source), runs one
   search worker per slice, and merges the reports. LangGraph's `Send` API does
   this directly.
-* **Apply is a *queue drain*, not a fan-out**, because the item count is
+- **Apply is a _queue drain_, not a fan-out**, because the item count is
   unknown and each unit is expensive. A bounded pool of K workers loops
   `claim → work → record` until the queue is empty or `--max` is hit. This is
   plain `asyncio.TaskGroup` in `dispatch.py`; wrapping it in graph nodes adds
@@ -506,30 +506,30 @@ graph = (
 )
 ```
 
-* `run_to_completion` = `await agent.ainvoke({"messages": [...]},
-  config={"recursion_limit": 60})` returning only the last `AIMessage` content
+- `run_to_completion` = `await agent.ainvoke({"messages": [...]},
+config={"recursion_limit": 60})` returning only the last `AIMessage` content
   — sub-agents "cannot ask questions, final message is the only thing that
   comes back", as the prompts require.
-* Prompts load from `prompts/*.md` at import; front matter (`backend`, `model`,
+- Prompts load from `prompts/*.md` at import; front matter (`backend`, `model`,
   `tools`) is parsed into `init_chat_model(...)`, so each role can use a
   different model (cheap model for search fan-out, stronger one for apply).
-* `search.md` gets the CV text inlined (~4.5 KB) and must **not** get the whole
+- `search.md` gets the CV text inlined (~4.5 KB) and must **not** get the whole
   tracker inlined; it gets `list_items` + `claim_research_target`.
-* `--dry-run` swaps `advance_item`/`send_templated_email`/`begin_submission`
+- `--dry-run` swaps `advance_item`/`send_templated_email`/`begin_submission`
   for stubs that report intent and skips the MCP client.
-* Model-free tests: `FakeMessagesListChatModel` + a scripted tool-call sequence
+- Model-free tests: `FakeMessagesListChatModel` + a scripted tool-call sequence
   proves wiring, arg parsing and string returns per worker.
 
 ### Prompt changes forced by parallelism
 
 Small but necessary (each is one sentence, added to `search.md`/`apply.md`):
 
-* *"Another worker may be handling a different item right now. Never act on an
+- _"Another worker may be handling a different item right now. Never act on an
   item you did not claim, and stop as soon as a tool tells you the item is no
-  longer yours."*
-* *"Call `claim_research_target` before researching a subject; if it returns
-  nothing, pick another one."*
-* *"Immediately before the final submit action, call `begin_submission`."*
+  longer yours."_
+- _"Call `claim_research_target` before researching a subject; if it returns
+  nothing, pick another one."_
+- _"Immediately before the final submit action, call `begin_submission`."_
 
 ---
 
@@ -546,23 +546,23 @@ K workers can share a process. The model still sees the original parameterless
 signatures (`claim_next_item()`, `advance_item()`) — the token is supplied by
 the closure, never by the model.
 
-| Tool | Args | Returns / notes |
-|---|---|---|
-| `create_item` | `name, title, url, location=None, contact=None, notes=None, size=None, language=None` | recorded / duplicate / rejected report; race-safe via `name_key` UNIQUE + `ON CONFLICT DO NOTHING` then re-read |
-| `claim_next_item` | — | multi-line item report, or `"No NEW items left in the pipeline."`; sets `ctx.item_id`/`ctx.claim_token` |
-| `advance_item` | — | fenced; `"Marked <name> — <title> as ACTIVE and scheduled a follow-up."` |
-| `release_item` | `reason` | fenced; returns item to `initial_state` for a retryable failure (browser died, page timed out) |
-| `archive_item` | `reason=None` | fenced; `"Archived <name>: <reason>"` |
-| `pause_item_for_answer` | `question` | saves question unanswered, `state → paused_state`, note `"On hold, no answer for: <q>"` |
-| `begin_submission` | — | writes `attempts.status='submitting'` (§6) |
-| `lookup_answer` | `query=None` | numbered Q/A text |
-| `send_templated_email` | `email, name, title, subject_override=None` | `"… sent …"` / `"… NOT sent (<step>): <err>"` |
-| `list_items` | `states=None, limit=200` | `Name — STATE` lines (replaces inlining the org file) |
-| `claim_research_target` | `name` | atomically marks a subject as being researched, so N searchers don't duplicate |
-| `mark_target_unusable` | `name, reason` | dead posting/not-hiring, so other searchers skip it |
-| `web_search` | `query` | titles + urls + snippets (`ddgs`) |
-| `fetch_page` | `url` | extracted text, `max_chars` cap (`httpx` + `trafilatura`) |
-| browser | — | per-worker `MultiServerMCPClient({"playwright": {...}}).get_tools()` |
+| Tool                    | Args                                                                                  | Returns / notes                                                                                                 |
+| ----------------------- | ------------------------------------------------------------------------------------- | --------------------------------------------------------------------------------------------------------------- |
+| `create_item`           | `name, title, url, location=None, contact=None, notes=None, size=None, language=None` | recorded / duplicate / rejected report; race-safe via `name_key` UNIQUE + `ON CONFLICT DO NOTHING` then re-read |
+| `claim_next_item`       | —                                                                                     | multi-line item report, or `"No NEW items left in the pipeline."`; sets `ctx.item_id`/`ctx.claim_token`         |
+| `advance_item`          | —                                                                                     | fenced; `"Marked <name> — <title> as ACTIVE and scheduled a follow-up."`                                        |
+| `release_item`          | `reason`                                                                              | fenced; returns item to `initial_state` for a retryable failure (browser died, page timed out)                  |
+| `archive_item`          | `reason=None`                                                                         | fenced; `"Archived <name>: <reason>"`                                                                           |
+| `pause_item_for_answer` | `question`                                                                            | saves question unanswered, `state → paused_state`, note `"On hold, no answer for: <q>"`                         |
+| `begin_submission`      | —                                                                                     | writes `attempts.status='submitting'` (§6)                                                                      |
+| `lookup_answer`         | `query=None`                                                                          | numbered Q/A text                                                                                               |
+| `send_templated_email`  | `email, name, title, subject_override=None`                                           | `"… sent …"` / `"… NOT sent (<step>): <err>"`                                                                   |
+| `list_items`            | `states=None, limit=200`                                                              | `Name — STATE` lines (replaces inlining the org file)                                                           |
+| `claim_research_target` | `name`                                                                                | atomically marks a subject as being researched, so N searchers don't duplicate                                  |
+| `mark_target_unusable`  | `name, reason`                                                                        | dead posting/not-hiring, so other searchers skip it                                                             |
+| `web_search`            | `query`                                                                               | titles + urls + snippets (`ddgs`)                                                                               |
+| `fetch_page`            | `url`                                                                                 | extracted text, `max_chars` cap (`httpx` + `trafilatura`)                                                       |
+| browser                 | —                                                                                     | per-worker `MultiServerMCPClient({"playwright": {...}}).get_tools()`                                            |
 
 `contact` stays documented as `"form only"`, and `create_item`'s description
 repeats "never a search-results page, never a board front page" verbatim.
@@ -602,7 +602,7 @@ on `name_key`):
 
 1. parse headings `^\*+ +(TODO )?(Name) — (Title)( +:tags:)?$`;
 2. property drawer → columns (`URL LOCATION NATION SIZE ENGLISH CONTACT CREATED
-   APPLIED_ON NOTES`) plus `meta_json` for the rest (`INTERVIEW` included);
+APPLIED_ON NOTES`) plus `meta_json` for the rest (`INTERVIEW` included);
 3. `- NOTE: …` body lines → `notes`;
 4. entries under `* Archive` → `archived_at` / `archive_reason` from
    `:ARCHIVE_TIME:` / `:ARCHIVE_OLPATH:`;
@@ -623,32 +623,32 @@ different files drift immediately).
 
 ## 13. Phases (each ends with something runnable)
 
-| # | Deliverable | Done when |
-|---|---|---|
-| 0 | `pyproject.toml`, `config.py` (vocab + limits), `.env.example`, `itempipe --help` | `uv run itempipe --help` works |
-| 1 | `schema.sql`, `db.py`, `store.py` + `test_store_claim.py` | 20-way concurrent claim test passes; fencing + lease expiry tested |
-| 2 | item tools + `test_tools_contract.py` | tools return strings on bad input; fenced tools refuse stale tokens |
-| 3 | answers + pause + reaper | pause → answer → auto-requeue works |
-| 4 | email tool + attempts guard | `--dry-run` renders MIME; stuck `submitting` lands in `review_state` |
-| 5 | `web_search`/`fetch_page`; per-worker Playwright MCP | 2 workers browse concurrently with separate profiles |
-| 6 | prompts + `agents.py` + `dispatch.py` | `itempipe process --count 2 --max 4 --dry-run` on a scratch DB |
-| 7 | supervisor fan-out + `status`/`reap`/`work` CLI | `itempipe run "one pass"` fans out search, drains apply |
-| 8 | `import-org` + cutover | counts match `jobs.org`; one real submission via Python |
-| 9 | optional: Postgres store behind the same interface, `due` command, `export-org` | — |
+| #   | Deliverable                                                                       | Done when                                                            |
+| --- | --------------------------------------------------------------------------------- | -------------------------------------------------------------------- |
+| 0   | `pyproject.toml`, `config.py` (vocab + limits), `.env.example`, `itempipe --help` | `uv run itempipe --help` works                                       |
+| 1   | `schema.sql`, `db.py`, `store.py` + `test_store_claim.py`                         | 20-way concurrent claim test passes; fencing + lease expiry tested   |
+| 2   | item tools + `test_tools_contract.py`                                             | tools return strings on bad input; fenced tools refuse stale tokens  |
+| 3   | answers + pause + reaper                                                          | pause → answer → auto-requeue works                                  |
+| 4   | email tool + attempts guard                                                       | `--dry-run` renders MIME; stuck `submitting` lands in `review_state` |
+| 5   | `web_search`/`fetch_page`; per-worker Playwright MCP                              | 2 workers browse concurrently with separate profiles                 |
+| 6   | prompts + `agents.py` + `dispatch.py`                                             | `itempipe process --count 2 --max 4 --dry-run` on a scratch DB       |
+| 7   | supervisor fan-out + `status`/`reap`/`work` CLI                                   | `itempipe run "one pass"` fans out search, drains apply              |
+| 8   | `import-org` + cutover                                                            | counts match `jobs.org`; one real submission via Python              |
+| 9   | optional: Postgres store behind the same interface, `due` command, `export-org`   | —                                                                    |
 
 ---
 
 ## 14. Traps to avoid (learned from the Emacs version, plus new ones)
 
 1. **Global "current item"** — was a `defvar` marker shared by every call. Now:
-   per-worker `WorkerContext` *and* a fencing token in the DB, because an
+   per-worker `WorkerContext` _and_ a fencing token in the DB, because an
    in-process fix alone still allows a stale worker in another process.
 2. **Dupes by regexp** — normalise once into `name_key`, UNIQUE. Never compare
    headings at the edge.
 3. **Silent lookup miss** — `cv-jobs--lead-at` returning nil under a `when`
    dropped `CREATED`/`NOTES` on every item. Assert `rowcount`.
 4. **Unanswered questions must stay unanswerable** — filter `answer IS NOT
-   NULL`.
+NULL`.
 5. **Pause is a state, not a note** — and it must be un-pausable automatically
    once the answer exists, or items silently rot.
 6. **Verbatim answers** — keep the raw text (salary strings etc.); the trailing

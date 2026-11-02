@@ -1,75 +1,44 @@
-# itempipe (TODO: rename)
+# itempipe
 
-The Python port described in `../PORT-TO-PYTHON.md`: the same prompt bodies and
-tool semantics as `agents/*.org`, but **N search workers and K apply workers run
-concurrently against one SQLite database**. The Emacs/typst files are untouched
-and remain the reference until the cutover.
-
-```
-py/
-  pyproject.toml    uv / PyPI metadata (nix does not need it)
-  .env.example      DEEPSEEK_API_KEY, ITEMPIPE_DB, limits, msmtp, paths
-  itempipe/
-    config.py       state_vocab + roles + every limit
-    db.py           connect / migrate / BEGIN IMMEDIATE
-    schema.sql      items, notes, attempts, targets, host_leases, workers, questions
-    store.py        ALL SQL: ItemStore, AnswerStore, TargetStore, HostLeases, WorkerRegistry
-    worker.py       WorkerContext, lease renewal, heartbeat, reaper
-    tools/          the 12 tools, as per-worker closures
-    prompts/        search.md, apply.md
-    agents.py       prompt loading, model, search/apply workers
-    dispatch.py     search fan-out + apply queue drain
-    org_import.py   jobs.org / application-questions.org -> SQLite
-    cli.py          run | work | process | ls | status | reap | answers | import-org
-  tests/            5 files: store, tools, config, import, dispatch
-```
-
-## Shell
+Two agents against one SQLite file: one finds job leads, one applies to them.
+Each can run in as many parallel workers as you like; the database is the queue.
 
 ```sh
-nix develop                    # from the repo root: python + sqlite + msmtp + playwright-mcp
-cp py/.env.example .env        # .envrc sources ./.env; fill DEEPSEEK_API_KEY
-itempipe-tests                 # pytest, via the shell function
-nix build .#itempipe           # the CLI as a wrapped script
-nix flake check                # the same tests in a sandbox
+nix develop
+python -m itempipe search "remote Go, EU timezone" -n 4
+python -m itempipe apply -n 2
+python -m itempipe run "remote Python infra" -n 4 -k 2   # search, then apply
+python -m itempipe ls --state NEW
+python -m itempipe answer 3 "one month"
+python -m itempipe reap
 ```
 
-## Use
+`search` records leads with `create_item`; duplicates, archived included, are
+refused. `apply` workers atomically claim a lead, drive a browser through the
+application, and end it in exactly one way: `advance_item` (applied),
+`pause_item_for_answer` (a human must answer), `archive_item` (dead end) or
+`release_item` (retry later).
 
-```sh
-itempipe import-org jobs.org application-questions.org   # one-shot, idempotent
-itempipe ls --state NEW
-itempipe process --count 2 --max 4 --dry-run             # one apply pass
-itempipe work --role apply --count 2
-itempipe work --role search --count 4 --brief "java remote EU"
-itempipe run "one pass" --workers 4 --max 3
-itempipe status            # depth, in-flight, stale leases, review queue
-itempipe status --review   # items a human must look at, never auto-retried
-itempipe reap
-itempipe answers add 7 "one month"
+## Why it is safe to run several
+
+- `claim_next_item` is one `UPDATE ... RETURNING`; the database is the lock.
+- Every later mutation is fenced by the claim token. An expired lease can never
+  finish someone else's item.
+- `begin_submission` is written before the irreversible submit. A worker that
+  dies mid-submit leaves `NEEDS_REVIEW`, never a second application.
+- `reap` requeues expired claims and unpauses items whose question has been
+  answered.
+
+## Layout
+
 ```
-
-## Deviations from the plan, deliberately
-
-* **`py/` is not a second flake.** The Python toolchain is part of the repo's
-  existing `flake.nix` (devShell, `packages.itempipe`, `checks`).
-* **No supervisor LLM.** `run` fans out over the channel map and then drains the
-  queue — `dispatch.py` is the supervisor. A planning model in front of a
-  deterministic fan-out bought nothing and cost a prompt that nothing loaded.
-* **No `export-org`, no LangGraph `Send` graph, no `runs` table writer.** The
-  plan lists them as optional/phase 8-9; they were dead code here.
-* **`create` has `require_url=False` for the importer** instead of a second
-  `import_item()` that duplicated the insert.
-
-## Invariants worth knowing before changing anything
-
-1. `claim_next` is one `UPDATE ... RETURNING`: the database is the lock.
-2. Every mutation after a claim is fenced by `claim_token`; a stale worker gets
-   `"This item is no longer assigned to this worker; stopping."`
-3. Dedupe is `UNIQUE(name_key)`, not a string comparison; the duplicate check
-   deliberately ignores `archived_at`.
-4. `archive` is a column; pipeline queries filter `archived_at IS NULL`.
-5. `advance_item` requires a `submitting`/`sent` attempt. A lease that expires
-   mid-submission goes to `NEEDS_REVIEW`, never back to the queue.
-6. Pause is a state, and the reaper un-pauses it once the question is answered.
-7. Every tool returns a string and is wrapped in `try/except`.
+itempipe/
+  config.py     env + defaults
+  db.py         connection, schema, transaction
+  schema.sql    items + questions
+  store.py      all SQL and the state machine
+  tools.py      web, email, item tools
+  agents.py     prompts, model, search() and apply()
+  cli.py        search | apply | run | ls | answer | reap
+  prompts/      search.md, apply.md
+```
