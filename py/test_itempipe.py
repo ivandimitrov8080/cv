@@ -448,5 +448,124 @@ class WebTest(unittest.TestCase):
                           asyncio.run(tool.ainvoke({"query": "Java,  remote!"})))
 
 
+class QuestionsTest(unittest.TestCase):
+    """application-questions.org is the answer store; a hold is how a lead waits for it."""
+
+    FILE = """#+TITLE: Application Questions and Answers
+
+* Recurring answers
+
+** Salary expectation
+   :PROPERTIES:
+   :ANSWER: 100 000 EUR / year
+   :NOTE: gross, per year
+   :END:
+
+** Do you have experience with Node.js?
+:PROPERTIES:
+:SOURCE: Acme
+:END:
+"""
+
+    def setUp(self):
+        self.tmp = tempfile.TemporaryDirectory()
+        ip.open_db(Path(self.tmp.name) / "t.db")
+        ip.Item.delete().execute()
+        self.path = Path(self.tmp.name) / "application-questions.org"
+        self.path.write_text(self.FILE, encoding="utf-8")
+        self.patch = mock.patch.object(ip, "QUESTIONS", self.path)
+        self.patch.start()
+
+    def tearDown(self):
+        self.patch.stop()
+        ip.db.close()
+        self.tmp.cleanup()
+
+    def tool(self, w, name):
+        return next(t for t in ip.tools_for(w) if t.name == name)
+
+    def hold(self, question="What is your notice period?"):
+        self.add()
+        w = ip.Worker()
+        w.claim()
+        return self.tool(w, "finish_item").invoke({"outcome": "hold", "reason": question})
+
+    def add(self, name=None):
+        """One fresh lead; names stay unique so a test can hold two of them at once."""
+        made = ip.Item.select().count()
+        name = name or ("Acme" if not made else f"Acme {made}")
+        return ip.Item.create(name=name, name_key=name.lower(), title="T",
+                              url=f"https://acme.dev/{made}")
+
+    def test_a_stored_answer_is_found_by_keyword_not_wording(self):
+        # The form says "What is your salary expectation?"; the file says "Salary expectation".
+        out = ip.answer_text("salary expectation")
+        self.assertIn("100 000 EUR / year", out)
+        self.assertIn("gross, per year", out)         # the note comes along
+
+    def test_an_answered_heading_without_an_answer_is_not_an_answer(self):
+        self.assertEqual([q.title for q in ip.answered("node.js")], [])
+        self.assertIn("No stored answer", ip.answer_text("node.js"))
+        self.assertIn("hold", ip.answer_text("node.js"))
+
+    def test_a_hold_saves_the_question_and_stops_the_lead(self):
+        out = self.hold()
+        item = ip.Item.get()
+        self.assertEqual(item.state, ip.HOLD)
+        self.assertEqual(item.question, "What is your notice period?")
+        self.assertEqual(ip.queued(), 0)             # out of the queue, not archived
+        self.assertIsNone(item.archived_at)
+        self.assertIn("on hold", out)
+        saved = self.path.read_text(encoding="utf-8")
+        self.assertIn("** What is your notice period?", saved)
+        self.assertIn(":SOURCE: Acme (T)", saved)    # who asked it, for the user
+
+    def test_a_hold_is_refused_when_the_file_already_answers_it(self):
+        before = self.path.read_text(encoding="utf-8")
+        out = self.hold("What is your salary expectation?")
+        self.assertIn("NOT held", out)
+        self.assertIn("100 000 EUR / year", out)
+        self.assertEqual(ip.Item.get().state, ip.WORKING)   # the lead is untouched
+        self.assertEqual(self.path.read_text(encoding="utf-8"), before)
+
+    def test_a_hold_needs_the_question_itself(self):
+        out = self.hold("   ")
+        self.assertIn("NOT done", out)
+        self.assertEqual(ip.Item.get().state, ip.WORKING)
+
+    def test_two_leads_held_on_one_question_leave_one_heading(self):
+        self.hold()
+        self.hold()
+        self.assertEqual(self.path.read_text(encoding="utf-8").count("** What is your"), 1)
+
+    def test_an_answered_question_returns_the_lead_to_the_queue(self):
+        self.hold()
+        self.assertEqual(ip.unhold(), 0)             # still unanswered
+        self.path.write_text(
+            self.FILE + "\n** What is your notice period?\n:PROPERTIES:\n"
+                        ":ANSWER: One month\n:END:\n", encoding="utf-8")
+        self.assertEqual(ip.unhold(), 1)
+        item = ip.Item.get()
+        self.assertEqual((item.state, item.question), (ip.NEW, None))
+        self.assertEqual(ip.queued(), 1)
+
+    def test_a_reworded_heading_still_releases_the_lead(self):
+        self.hold()
+        self.path.write_text(
+            self.FILE + "\n** Notice period at a new job\n:PROPERTIES:\n"
+                        ":ANSWER: One month\n:END:\n", encoding="utf-8")
+        self.assertEqual(ip.unhold(), 1)
+
+    def test_the_board_counts_held_leads(self):
+        self.hold()
+        self.assertEqual(ip.tally()[ip.HOLD], 1)
+
+    def test_a_missing_questions_file_is_created_by_the_first_hold(self):
+        self.path.unlink()
+        self.hold()
+        self.assertIn("#+TITLE", self.path.read_text(encoding="utf-8"))
+        self.assertEqual(ip.questions()[0].title, "What is your notice period?")
+
+
 if __name__ == "__main__":
     unittest.main()

@@ -13,7 +13,7 @@ python -m itempipe apply -n 2
 ```
 
 That is the whole interface. The program is `itempipe/__init__.py` — one peewee model,
-six tools, two coroutines — plus the two prompts in `itempipe/prompts/`,
+seven tools, two coroutines — plus the two prompts in `itempipe/prompts/`,
 `itempipe/status.py`, the progress board, and `itempipe/search.toml`, which holds
 **everything about the job market**. The module knows how to search, never what to look
 for: no stack, country, site or job title appears in the Python.
@@ -212,7 +212,32 @@ stdout only ever gets the report, so `itempipe apply > out.txt` still works; wit
   0:09 w1  ✓ Acme Corp: applied (no reason).
 ```
 
+## Questions, and the leads they hold
+
+`apply` never guesses. Before filling a required free-text or personal-detail field it
+calls `lookup_answer`, which reads `application-questions.org` (`ITEMPIPE_QUESTIONS`) —
+the same file a human edits: one heading per question, the answer in an `:ANSWER:`
+property, `:NOTE:`/`:SOURCE:` for context. Answers are matched by keyword, so
+`"salary expectation"` finds `** Salary expectation` even though the form words it
+differently; a heading with no `:ANSWER:` is an open question and matches nothing.
+
+A question the file does not answer does not cost the lead, and does not get invented:
+`finish_item("hold", "<question verbatim>")` appends the question to that file under the
+company that asked it and moves the lead to `HOLD`. `HOLD` is out of the queue but not
+archived. Fill in the `:ANSWER:` and the next run puts every lead held on that question
+back in the queue — `unhold` at startup, matching on the question's words, so even a
+reworded heading releases what it blocked. `itempipe init` counts both sides:
+
+```
+py/itempipe.db: 41 lead(s), 3 queued, 812 seen row(s), ...
+/home/ivand/src/cv/application-questions.org: 24 answered, 2 open; 2 lead(s) on hold
+```
+
+Holding is one question long, not one lead long: answer it once and every application
+that asks it — now and later — can use it.
+
 ## State
 
-`NEW` → claimed as `WORKING` → `ACTIVE` (applied) or archived with a reason.
-`NEEDS_REVIEW` means a submit was interrupted; a human should look at it.
+`NEW` → claimed as `WORKING` → `ACTIVE` (applied), `HOLD` (waiting on a question only
+you can answer), or archived with a reason. `NEEDS_REVIEW` means a submit was
+interrupted; a human should look at it.

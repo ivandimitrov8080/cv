@@ -39,7 +39,8 @@ except ImportError:                     # a nicety, never a hard dependency
     RICH = False
 
 ICON = {"call": "→", "result": "←", "state": "·"}
-LABEL = {"NEW": "new", "WORKING": "working", "ACTIVE": "active", "NEEDS_REVIEW": "review"}
+LABEL = {"NEW": "new", "WORKING": "working", "ACTIVE": "active", "HOLD": "hold",
+         "NEEDS_REVIEW": "review"}
 
 _lock = threading.Lock()                # guards _rows, _queue: Live renders on its own thread
 _rows: dict[str, dict] = {}

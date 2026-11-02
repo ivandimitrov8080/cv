@@ -31,12 +31,14 @@ from . import status
 
 ROOT = Path(__file__).resolve().parents[2]
 NEW, WORKING, ACTIVE, REVIEW = "NEW", "WORKING", "ACTIVE", "NEEDS_REVIEW"
+HOLD = "HOLD"                       # waiting for the user to answer a question
 FENCED = "This lead is no longer yours; stop."
 LEASE = timedelta(minutes=30)
 RETRY = timedelta(days=7)           # a dead posting may be a bad deploy: look once more
 RETENTION = timedelta(days=int(os.environ.get("ITEMPIPE_SEEN_DAYS", "365")))
 DB = Path(os.environ.get("ITEMPIPE_DB", ROOT / "py/itempipe.db"))
 PROMPTS, CV = Path(__file__).with_name("prompts"), ROOT / "cv.typ"
+QUESTIONS = Path(os.environ.get("ITEMPIPE_QUESTIONS", ROOT / "application-questions.org"))
 CONFIG = Path(os.environ.get("ITEMPIPE_CONFIG") or Path(__file__).with_name("search.toml"))
 CDP_PORT = int(os.environ.get("ITEMPIPE_CDP_PORT", "9222"))
 CHROME = shutil.which("chromium-sandboxed") or shutil.which("chromium")
@@ -151,10 +153,11 @@ NOTES, SEED_TASKS = CFG.notes, CFG.boards
 
 CANNED = re.compile(r"need more steps to process|sorry, i (?:can'?t|cannot)", re.I)
 
-APPLY = ("Claim one lead with claim_next_item, work it to a final state with finish_item, then "
-         "stop. If a tool says the lead is no longer yours, stop immediately. You share one "
-         "browser with the other workers: work only in the tab your own tools are on, and "
-         "never switch, open or close tabs.")
+APPLY = ("Claim one lead with claim_next_item, look answers up with lookup_answer before "
+         "filling a form, work it to a final state with finish_item, then stop. If a tool "
+         "says the lead is no longer yours, stop immediately. You share one browser with the "
+         "other workers: work only in the tab your own tools are on, and never switch, open "
+         "or close tabs.")
 
 db = SqliteDatabase(None, pragmas={"journal_mode": "wal", "busy_timeout": 10000})
 
@@ -175,6 +178,7 @@ class Item(Model):
     url = CharField()
     notes = TextField(null=True)
     state = CharField(default=NEW)
+    question = TextField(null=True)         # what a HOLD is waiting for an answer to
     submitting = BooleanField(default=False)
     advanced_on = DateTimeField(null=True)
     archived_at = DateTimeField(null=True)
@@ -220,6 +224,9 @@ def migrate():
     columns = {row[1] for row in db.execute_sql("PRAGMA table_info(seen)")}
     if columns and "angle" in columns and "label" not in columns:
         db.execute_sql("ALTER TABLE seen RENAME COLUMN angle TO label")
+    lead = {row[1] for row in db.execute_sql("PRAGMA table_info(items)")}
+    if lead and "question" not in lead:      # a hold needs somewhere to keep its question
+        db.execute_sql("ALTER TABLE items ADD COLUMN question TEXT")
 
 
 def open_db(path=DB):
@@ -249,7 +256,7 @@ def free():
 
 def tally():
     """Counts per state for the board's footer; archived leads are not counted."""
-    counts = {state: 0 for state in (NEW, WORKING, ACTIVE, REVIEW)}
+    counts = {state: 0 for state in (NEW, WORKING, ACTIVE, HOLD, REVIEW)}
     rows = (Item.select(Item.state, fn.COUNT(Item.id).alias("n"))
             .where(Item.archived_at.is_null()).group_by(Item.state).tuples())
     for state, count in rows:
@@ -523,6 +530,177 @@ def remember_leads():
     return made
 
 
+# -- the questions file ------------------------------------------------------
+#
+# `application-questions.org` is the answer store, and it belongs to the human: one heading
+# per question, the answer in an `:ANSWER:` property. The agent reads it through
+# `lookup_answer` and writes to it when it has to hold a lead, so the file is both the
+# memory and the inbox. A heading without `:ANSWER:` is a question waiting to be answered.
+
+QUESTIONS_HEAD = """#+TITLE: Application Questions and Answers
+
+# One entry per question, with the answer in an :ANSWER: property.
+# Questions are phrased generically (<Company>, <N> days, ...) so the same
+# answer serves every application. :SOURCE: lists the forms that asked it.
+# A heading with no :ANSWER: was written by `itempipe apply` and is still open:
+# fill it in and the lead it blocked goes back in the queue on the next run.
+"""
+
+HEADING = re.compile(r"^\*+\s+(.*?)\s*$")
+PROPERTY = re.compile(r"^\s*:([A-Za-z][\w@#%+-]*):\s*(.*?)\s*$")
+STOPWORDS = frozenset("""a an and any are as at be been by can could do does for from
+    has have how i if in is it its me my of on or please should tell that the their
+    them this to us was we were what when where which who why will with would you your
+    yours""".split())
+
+
+@dataclass(frozen=True)
+class Question:
+    """One heading of the questions file: what was asked, and the user's answer to it."""
+    title: str
+    answer: str = ""
+    note: str = ""
+    source: str = ""
+
+    @property
+    def key(self):
+        return question_key(self.title)
+
+
+def tokens_of(text):
+    """The words that carry the meaning of a question: lowercase, no stopwords."""
+    return [token for token in re.findall(r"[a-z0-9]+", str(text or "").lower())
+            if token not in STOPWORDS]
+
+
+def question_key(text):
+    """One question, one identity: case, punctuation, stopwords and spacing folded away."""
+    return " ".join(tokens_of(text))
+
+
+def questions(path=None):
+    """Every entry in the questions file, in file order: answered and open alike.
+
+    Org is read by hand rather than by a parser because only two things matter here: the
+    heading, and the properties under it. A heading with no properties at all (`*
+    Recurring answers`) is a section title, and simply matches nothing.
+    """
+    try:
+        text = Path(path or QUESTIONS).read_text(encoding="utf-8")
+    except OSError:
+        return []
+    found = []
+    for line in text.splitlines():
+        if match := HEADING.match(line):
+            found.append(Question(clean(match.group(1))))
+            continue
+        if not found or not (match := PROPERTY.match(line)):
+            continue
+        name, value = match.group(1).upper(), match.group(2)
+        if not value or name in ("PROPERTIES", "END"):
+            continue
+        entry = found[-1]
+        if name == "ANSWER":
+            found[-1] = Question(entry.title, value, entry.note, entry.source)
+        elif name == "NOTE":
+            found[-1] = Question(entry.title, entry.answer, value, entry.source)
+        elif name == "SOURCE":
+            found[-1] = Question(entry.title, entry.answer, entry.note, value)
+    return found
+
+
+def answer_score(title, tokens):
+    """3 per matching token, plus 1 when every token matched: specific beats broad."""
+    lowered = str(title or "").lower()
+    hits = sum(1 for token in tokens if token in lowered)
+    return hits * 3 + (1 if tokens and hits == len(tokens) else 0)
+
+
+def answered(query="", limit=5):
+    """The answered questions that best match `query`, best first. Unanswered never match."""
+    tokens = tokens_of(query)
+    rows = [entry for entry in questions() if entry.answer]
+    if not tokens:
+        return rows[:limit]
+    ranked = sorted(((answer_score(entry.title, tokens), entry) for entry in rows),
+                    key=lambda pair: pair[0], reverse=True)
+    return [entry for score, entry in ranked if score >= 3][:limit]
+
+
+def best_answer(query):
+    """The one stored answer that covers every word of `query`, if there is one.
+
+    Stricter than `answered` on purpose: this is what refuses a hold, so a partial match
+    (a salary question against "current salary") must not be taken as an answer.
+    """
+    tokens = tokens_of(query)
+    if not tokens:
+        return None
+    full = [entry for entry in questions()
+            if entry.answer and all(token in entry.title.lower() for token in tokens)]
+    return max(full, key=lambda entry: len(entry.title)) if full else None
+
+
+def answer_text(query="", limit=5):
+    """What `lookup_answer` hands the model: numbered questions with their answers."""
+    rows = answered(query, limit)
+    if rows:
+        blocks = []
+        for number, entry in enumerate(rows, 1):
+            block = f"{number}. {entry.title}\n   Answer: {entry.answer}"
+            if entry.note:
+                block += f"\n   Note: {entry.note}"
+            blocks.append(block)
+        return "\n\n".join(blocks)
+    hint = ('Do not invent one: call finish_item("hold", "<the form\'s question, verbatim>") '
+            "so it is saved for the user and the lead waits instead of being abandoned.")
+    if not any(entry.answer for entry in questions()):
+        return f"No stored answers yet. {hint}"
+    return f"No stored answer matches {clean(query)!r}. {hint}"
+
+
+def ask(question, source=""):
+    """Write an unanswered question to the file. Returns (entry, was_new).
+
+    Idempotent by wording: a question already in the file comes back unchanged, so two
+    workers stopping on the same field leave one heading for the user, not two.
+    """
+    question = clean(question)
+    known = {entry.key: entry for entry in questions()}
+    if (found := known.get(question_key(question))) is not None:
+        return found, False
+    path = Path(QUESTIONS)
+    path.parent.mkdir(parents=True, exist_ok=True)
+    try:
+        text = path.read_text(encoding="utf-8")
+    except OSError:
+        text = QUESTIONS_HEAD
+    if text and not text.endswith("\n"):
+        text += "\n"
+    block = (f"\n** {question}\n:PROPERTIES:\n"
+             f":SOURCE:{f' {clean(source)}' if clean(source) else ''}\n:END:\n")
+    path.write_text(text + block, encoding="utf-8")
+    return Question(question, source=clean(source)), True
+
+
+def unhold():
+    """Put held leads back in the queue once the file answers what held them there.
+
+    Matched on the question's own words, then on any answer that covers all of them, so
+    a heading the user reworded still releases the lead. Called at startup: the loop is
+    "hold, you answer, run again".
+    """
+    keys = {entry.key for entry in questions() if entry.answer}
+    back = 0
+    for item in list(Item.select().where(Item.state == HOLD)):
+        if not item.question:
+            continue
+        if question_key(item.question) in keys or best_answer(item.question):
+            back += (Item.update(state=NEW, question=None)
+                     .where(Item.id == item.id, Item.state == HOLD).execute())
+    return back
+
+
 @dataclass
 class Session:
     """One search conversation.
@@ -692,6 +870,15 @@ def tools_for(w=None, sess=None):
         return w.claim()
 
     @tool
+    def lookup_answer(query: str = "") -> str:
+        """Look up the user's own answers to application questions. Call it before filling
+        any required free-text or personal-detail field. Pass the two most meaningful words
+        of the form's question — "salary expectation", "notice period", "postal address" —
+        because the saved questions are worded differently, so keywords match where whole
+        sentences do not. Use the answer as written, filling in <Company> or <N>."""
+        return answer_text(query)
+
+    @tool
     def begin_submission() -> str:
         """Call immediately before the final submit, so a crash goes to review, not a retry."""
         item = w.mine()
@@ -704,8 +891,9 @@ def tools_for(w=None, sess=None):
     @tool
     def finish_item(outcome: str, reason: str = "") -> str:
         """End the claimed lead: "applied" (after begin_submission), "retry" (site down,
-        timeout) or "archive" (cannot apply; put the blocker, including any question you
-        cannot answer, in reason)."""
+        timeout), "hold" (a required field asks something lookup_answer cannot answer — put
+        the form's question verbatim in reason; the lead waits for the user instead of
+        being lost) or "archive" (the lead cannot be applied to at all)."""
         item = w.mine()
         if item is None:
             return FENCED
@@ -715,12 +903,28 @@ def tools_for(w=None, sess=None):
             w.end(state=ACTIVE, submitting=False, advanced_on=now())
         elif outcome == "retry":
             w.end(state=REVIEW if item.submitting else NEW, submitting=False)
+        elif outcome == "hold":
+            question = clean(reason)
+            if not question_key(question):
+                return ("NOT done: put the form's unanswered question verbatim in reason, "
+                        "so the user can answer it once for every application.")
+            if found := best_answer(question):
+                return (f"NOT held: {QUESTIONS.name} already answers that — "
+                        f"{found.title}: {found.answer}. Use it and finish the application.")
+            if item.submitting:
+                w.end(state=REVIEW, submitting=False, question=question)
+                return (f"{item.name}: the submission had already started, so it needs "
+                        f"review; the question is saved in {QUESTIONS.name}.")
+            entry, _ = ask(question, f"{item.name} ({item.title})")
+            w.end(state=HOLD, submitting=False, question=question)
+            return (f"{item.name}: on hold until you answer {entry.title!r} in "
+                    f"{QUESTIONS.name}. It goes back in the queue on the next run.")
         else:
             w.end(archived_at=now(), submitting=False,
                   archive_reason=clean(reason) or "abandoned")
         return f"{item.name}: {outcome} ({clean(reason) or 'no reason'})."
 
-    return [claim_next_item, begin_submission, finish_item] if w else [
+    return [claim_next_item, lookup_answer, begin_submission, finish_item] if w else [
         create_item, web_search, fetch_page]
 
 
@@ -1073,6 +1277,10 @@ async def apply(workers=2):
         if proc is not None:
             status.worker("··", "state", "closing browser")
             await stop_proc(proc)            # tolerates a browser that already died
+    held = Item.select().where(Item.state == HOLD).count()
+    if held:                                 # the run is over, but not for these
+        reports.append(f"{held} lead(s) on hold: answer the open questions in "
+                       f"{QUESTIONS} and they go back in the queue.")
     return reports
 
 
@@ -1084,6 +1292,7 @@ def main(argv=None):
     p.add_argument("-n", type=int, default=2, help="parallel workers")
     args = p.parse_args(argv)
     path = open_db(args.db)
+    back = unhold()                 # answers given since the last run release their leads
     if args.command == "init":
         forgotten, learned = prune(), remember_leads()
         unread = sum(1 for task in SEED_TASKS
@@ -1093,7 +1302,12 @@ def main(argv=None):
               f"{unread}/{len(SEED_TASKS)} queued board(s) unread, "
               f"{len(space_for())} quer(y/ies) in the config"
               + (f", {forgotten} old one(s) forgotten" if forgotten else "")
-              + (f", {learned} lead(s) marked recorded" if learned else ""))
+              + (f", {learned} lead(s) marked recorded" if learned else "")
+              + (f", {back} lead(s) back from hold" if back else ""))
+        stored = questions()
+        print(f"{QUESTIONS}: {sum(1 for q in stored if q.answer)} answered, "
+              f"{sum(1 for q in stored if not q.answer)} open; "
+              f"{Item.select().where(Item.state == HOLD).count()} lead(s) on hold")
         return 0
     if args.command == "search" and not (SEED_TASKS or space_for()):
         print(f"itempipe: {CONFIG} has no roles, regions or boards to search for. "
@@ -1102,6 +1316,9 @@ def main(argv=None):
 
     status.open_board(f"itempipe {args.command}" +
                       (" — Ctrl-C to stop" if args.command == "search" else ""), tally)
+    if back:
+        print(f"itempipe: {back} held lead(s) now have an answer and are back in the queue.",
+              file=sys.stderr)
 
     progress: list[str] = []
 
