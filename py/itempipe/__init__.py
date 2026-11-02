@@ -12,7 +12,9 @@ from pathlib import Path
 
 from langchain_core.tools import tool
 from peewee import (BooleanField, CharField, DateTimeField, IntegrityError, Model,
-                    SqliteDatabase, TextField)
+                    SqliteDatabase, TextField, fn)
+
+from . import status
 
 ROOT = Path(__file__).resolve().parents[2]
 NEW, WORKING, ACTIVE, REVIEW = "NEW", "WORKING", "ACTIVE", "NEEDS_REVIEW"
@@ -76,6 +78,16 @@ def free():
     return Item.select().where(Item.archived_at.is_null(),
                                (Item.state == NEW) |
                                ((Item.state == WORKING) & (Item.claimed_until < now())))
+
+
+def tally():
+    """Counts per state for the board's footer; archived leads are not counted."""
+    counts = {state: 0 for state in (NEW, WORKING, ACTIVE, REVIEW)}
+    rows = (Item.select(Item.state, fn.COUNT(Item.id).alias("n"))
+            .where(Item.archived_at.is_null()).group_by(Item.state).tuples())
+    for state, count in rows:
+        counts[state] = count
+    return counts
 
 
 open_db()   # so `import itempipe` is usable; the CLI re-points it at --db
@@ -205,17 +217,32 @@ def agent(role, tool_list):
     return create_react_agent(model, tool_list, prompt=prompt)
 
 
-async def run(agent_, text):
-    out = await agent_.ainvoke({"messages": [{"role": "user", "content": text}]},
-                               config={"recursion_limit": 60})
-    return str(out["messages"][-1].content).strip()
+async def run(agent_, text, tag="·"):
+    """Stream the graph's node updates, so every tool call shows up while it happens."""
+    answer = ""
+    async for update in agent_.astream({"messages": [{"role": "user", "content": text}]},
+                                       config={"recursion_limit": 60},
+                                       stream_mode="updates"):
+        for payload in update.values():
+            for message in (payload or {}).get("messages", []):
+                if message.type == "tool":
+                    status.worker(tag, "result", message.content)
+                elif calls := getattr(message, "tool_calls", None):
+                    for call in calls:
+                        status.worker(tag, "call", f"{call['name']} {call['args']}")
+                elif message.content:
+                    answer = str(message.content)
+    status.finished(tag, answer or "done")
+    return answer.strip()
 
 
 async def search(brief, workers=4):
     async def one(i):
+        tag, angle = f"w{i + 1}", ANGLES[i % len(ANGLES)]
+        status.worker(tag, "state", f"angle: {angle}", state="searching")
         return await run(agent("search", tools_for()),
                          f"You are search worker {i + 1} of {workers}. "
-                         f"Angle: {ANGLES[i % len(ANGLES)]}.\n\n{brief}")
+                         f"Angle: {angle}.\n\n{brief}", tag=tag)
     return list(await asyncio.gather(*(one(i) for i in range(workers))))
 
 
@@ -233,12 +260,13 @@ async def apply(workers=2):
     slots, reports = asyncio.Semaphore(2), []
 
     async def one(i):
-        w = Worker()
+        tag, w = f"w{i + 1}", Worker()
         async with slots:
+            status.worker(tag, "state", "starting browser", state="browser")
             a = agent("apply", tools_for(w) + await browser(i))
             while before := queued():
                 try:
-                    reports.append(await run(a, APPLY))
+                    reports.append(await run(a, APPLY, tag=tag))
                 finally:            # a worker that stopped mid-claim must not hold a lock
                     if item := w.mine():
                         w.end(state=REVIEW if item.submitting else NEW, submitting=False)
@@ -260,5 +288,28 @@ def main(argv=None):
     if args.command == "init":
         print(f"{path}: {Item.select().count()} lead(s), {queued()} queued")
         return 0
-    fn, brief = (search, (args.brief,)) if args.command == "search" else (apply, ())
-    print("\n---\n".join(asyncio.run(fn(*brief, workers=args.n))))
+
+    status.open_board(f"itempipe {args.command}", tally)
+
+    async def tick(every=1.0):
+        """Keep the tally, the clock and the spinners current while workers run."""
+        while True:
+            status.refresh()
+            await asyncio.sleep(every)
+
+    async def go():
+        poller = asyncio.create_task(tick())
+        try:
+            if args.command == "search":
+                return await search(args.brief, workers=args.n)
+            return await apply(workers=args.n)
+        finally:
+            poller.cancel()
+            await asyncio.gather(poller, return_exceptions=True)
+
+    try:
+        reports = asyncio.run(go())     # a KeyboardInterrupt still restores the tty
+    finally:
+        status.close_board()
+    print("\n---\n".join(reports))
+    return 0

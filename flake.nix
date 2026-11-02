@@ -38,6 +38,7 @@
         "peewee"
         "trafilatura"
         "ddgs"
+        "rich"
       ];
       pyDevDeps = [
         "ruff"

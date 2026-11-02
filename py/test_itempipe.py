@@ -1,6 +1,6 @@
 """Queue mechanics only: no model, no browser, no network."""
 
-import tempfile, unittest
+import contextlib, io, tempfile, unittest
 from pathlib import Path
 
 import itempipe as ip
@@ -76,6 +76,31 @@ class QueueTest(unittest.TestCase):
         w.claim()
         self.tool(w, "finish_item").invoke({"outcome": "archive", "reason": "closed"})
         self.assertEqual((ip.Item.get().archive_reason, ip.queued()), ("closed", 0))
+
+
+class StatusTest(unittest.TestCase):
+    """The board must be inert before open_board and plain off a tty."""
+
+    def test_silent_until_opened(self):
+        with contextlib.redirect_stderr(io.StringIO()) as err:
+            ip.status.worker("w1", "call", "something")
+            ip.status.finished("w1")
+            ip.status.refresh()
+            ip.status.close_board()
+        self.assertEqual(err.getvalue(), "")
+
+    def test_plain_lines_when_stderr_is_not_a_tty(self):
+        counts = lambda: {"NEW": 2, "ACTIVE": 1}
+        with contextlib.redirect_stderr(io.StringIO()) as err:
+            ip.status.open_board("itempipe test", counts)
+            ip.status.worker("w1", "call", "fetch_page {'url': 'https://a'}")
+            ip.status.finished("w1", "A: applied")
+            ip.status.close_board()
+        out = err.getvalue()
+        self.assertIn("w1", out)
+        self.assertIn("fetch_page", out)
+        self.assertIn("A: applied", out)
+        self.assertIn("2 new · 1 active", out)
 
 
 if __name__ == "__main__":

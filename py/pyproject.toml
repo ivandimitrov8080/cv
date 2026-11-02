@@ -16,6 +16,7 @@ dependencies = [
   "langchain-openai>=0.2",
   "langgraph>=0.2",
   "peewee>=3.17",
+  "rich>=13.7",
   "trafilatura>=1.9",
 ]
 

@@ -12,8 +12,9 @@ python -m itempipe apply -n 2
 itempipe-check                     # queue tests, no model or network needed
 ```
 
-That is the whole interface. The whole program is `itempipe/__init__.py` — one peewee model,
-six tools, two coroutines — plus the two prompts in `itempipe/prompts/`.
+That is the whole interface. The program is `itempipe/__init__.py` — one peewee model,
+six tools, two coroutines — plus the two prompts in `itempipe/prompts/`, and
+`itempipe/status.py`, the progress board.
 
 ## Why it is safe to run several
 
@@ -28,6 +29,33 @@ six tools, two coroutines — plus the two prompts in `itempipe/prompts/`.
 * Claiming also picks up rows whose lease expired, so a killed worker costs nothing.
 
 Inspect the queue with `sqlite3 py/itempipe.db 'select id, state, name from items'`.
+
+## Progress
+
+While workers run, `rich` draws a board on **stderr**: a row per worker (spinner, tool
+calls made, what it is doing right now) and a footer with the queue tally, refreshed once a
+second from the database. When it finishes, the board is replaced by a final panel.
+
+The board lives in `itempipe/status.py` and is driven by five functions:
+
+```python
+status.open_board("itempipe apply", tally)   # any callable -> {state: count}
+status.worker("w1", "call", "fetch_page {...}")
+status.finished("w1", "Acme: applied")
+status.refresh()                             # re-read the tally, tick the clock
+status.close_board()
+```
+
+All of them are no-ops before `open_board`, and none of them import the database.
+
+stdout only ever gets the report, so `itempipe apply > out.txt` still works; with no tty
+(or without `rich`) each event is a plain line on stderr instead:
+
+```
+  0:07 w1  → fetch_page {'url': 'https://acme.dev/jobs/42'}
+  0:09 w1  ← Submission guard set.
+  0:09 w1  ✓ Acme Corp: applied (no reason).
+```
 
 ## State
 
