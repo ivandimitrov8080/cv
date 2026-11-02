@@ -39,6 +39,13 @@ set of logins, and one tab per worker: a worker's tools only ever see its own pa
 
 * A Chromium already listening on that port is adopted and left running; one we started
   is terminated when `apply` exits.
+* Chromium's stderr goes to `/tmp/itempipe-chromium-9222.log` (`ITEMPIPE_CHROME_LOG`, and
+  `ITEMPIPE_CDP_PORT` for the port). If it refuses to start, `apply` prints the last lines
+  of that log plus the likely fix, and exits 1, rather than a traceback.
+* `ITEMPIPE_HEADED=1` drops `--headless`, so you can watch a run.
+* The profile's location and the browser's death are the two things that go wrong here.
+  `--headless` plus no display, a profile locked by an earlier crash, and a taken port each
+  have their own line in that message.
 * The profile is `/tmp/itempipe-chromium` (`ITEMPIPE_PROFILE` to change it). Under
   `chromium-sandboxed` that is inside the sandbox's tmpfs, so logins do not survive a
   reboot; bind-mount a profile path into the wrapper if you want them to.

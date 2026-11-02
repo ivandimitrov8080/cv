@@ -1,6 +1,6 @@
 """Queue mechanics only: no model, no browser, no network."""
 
-import asyncio, contextlib, io, tempfile, unittest
+import asyncio, contextlib, io, sys, tempfile, unittest
 from pathlib import Path
 from unittest import mock
 
@@ -112,6 +112,25 @@ class BrowserTest(unittest.TestCase):
         self.assertIn("--cdp-endpoint", cfg["args"])
         self.assertNotIn("--user-data-dir", cfg["args"])   # the browser owns the profile
         self.assertEqual(ip.cdp_endpoint(9333), "http://127.0.0.1:9333")
+
+    def test_stopping_a_dead_process_is_not_an_error(self):
+        # The old code called kill() on a browser that had already exited, which raised
+        # ProcessLookupError instead of saying why chromium refused to start.
+        async def gone():
+            proc = await asyncio.create_subprocess_exec(
+                sys.executable, "-c", "pass",
+                stdout=asyncio.subprocess.DEVNULL, stderr=asyncio.subprocess.DEVNULL)
+            await proc.wait()
+            await ip.stop_proc(proc)
+            return proc.returncode
+        self.assertEqual(asyncio.run(gone()), 0)
+
+    def test_the_log_is_translated_into_a_fix(self):
+        self.assertIn("in use", ip.chrome_hint("Failed to create SingletonLock"))
+        self.assertIn("--no-sandbox", ip.chrome_hint("Running as root without --no-sandbox"))
+        self.assertIn("display", ip.chrome_hint("Missing X server or $DISPLAY"))
+        self.assertIn("9222", ip.chrome_hint("Address already in use"))
+        self.assertIn("No recognised cause", ip.chrome_hint(""))
 
 
 class WebTest(unittest.TestCase):

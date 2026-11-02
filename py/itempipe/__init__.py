@@ -5,7 +5,7 @@ it had), so the database is the lock. Every later write is fenced by that token,
 `submitting` is set before the irreversible step, so a crash goes to review, not a retry.
 """
 
-import argparse, asyncio, os, re, shutil, uuid
+import argparse, asyncio, contextlib, os, re, shutil, sys, time, uuid
 from dataclasses import dataclass
 from datetime import datetime, timedelta, timezone
 from pathlib import Path
@@ -24,6 +24,8 @@ DB = Path(os.environ.get("ITEMPIPE_DB", ROOT / "py/itempipe.db"))
 PROMPTS, CV = Path(__file__).with_name("prompts"), ROOT / "cv.typ"
 CDP_PORT = int(os.environ.get("ITEMPIPE_CDP_PORT", "9222"))
 CHROME = shutil.which("chromium-sandboxed") or shutil.which("chromium")
+PROFILE = Path(os.environ.get("ITEMPIPE_PROFILE", "/tmp/itempipe-chromium"))
+CHROME_LOG = Path(os.environ.get("ITEMPIPE_CHROME_LOG", f"/tmp/itempipe-chromium-{CDP_PORT}.log"))
 SEARCH_TRIES = int(os.environ.get("ITEMPIPE_SEARCH_TRIES", "3"))
 ANGLES = ('HN "Who is hiring?"', "YC Work at a Startup", "niche boards", "company careers",
           "practitioner communities", "freelance / contract")
@@ -33,6 +35,10 @@ APPLY = ("Claim one lead with claim_next_item, work it to a final state with fin
          "never switch, open or close tabs.")
 
 db = SqliteDatabase(None, pragmas={"journal_mode": "wal", "busy_timeout": 10000})
+
+
+class Startup(RuntimeError):
+    """The browser could not be had; the message says what to do about it."""
 
 
 class Item(Model):
@@ -56,6 +62,11 @@ class Item(Model):
 
 def now():
     return datetime.now(timezone.utc).replace(tzinfo=None)
+
+
+def flag(name):
+    """An env var read as a switch: unset, 0, false, no, off all mean no."""
+    return os.environ.get(name, "").strip().lower() not in ("", "0", "false", "no", "off")
 
 
 def clean(value):
@@ -301,42 +312,103 @@ def cdp_endpoint(port=CDP_PORT):
     return f"http://127.0.0.1:{port}"
 
 
-async def _listening(endpoint):
+async def _listening(endpoint, timeout=0.5):
     """True if something is already answering CDP there."""
     import httpx
     try:
-        async with httpx.AsyncClient(timeout=1.0) as client:
+        async with httpx.AsyncClient(timeout=timeout) as client:
             return (await client.get(f"{endpoint}/json/version")).is_success
     except Exception:
         return False
 
 
-async def chromium(port=CDP_PORT):
+def _tail(lines=14):
+    try:
+        text = CHROME_LOG.read_text(encoding="utf-8", errors="replace").strip()
+    except OSError:
+        return ""
+    return "\n".join(text.splitlines()[-lines:])
+
+
+def chrome_hint(log):
+    """Pick the likely cause out of chromium's own words, so the fix is obvious."""
+    text = (log or "").lower()
+    if "singletonlock" in text or "profile appears to be in use" in text:
+        return (f"the profile {PROFILE} is in use by another Chromium. Close it, or set "
+                "ITEMPIPE_PROFILE elsewhere.")
+    if "no usable sandbox" in text or "running as root" in text:
+        return "Chromium refuses its sandbox here; run it with --no-sandbox."
+    if "cannot open display" in text or "missing x server" in text or "ozone" in text:
+        return ("Chromium wants a display. Keep --headless, or run under a session with "
+                "ITEMPIPE_HEADED=1.")
+    if "address already in use" in text or "devtoolsactiveport" in text:
+        return (f"CDP port {CDP_PORT} is taken. Kill the other browser, or set "
+                "ITEMPIPE_CDP_PORT.")
+    if "error while loading shared libraries" in text or "bwrap:" in text:
+        return "Chromium (or the sandbox wrapper) could not start: see the log."
+    if "permission denied" in text:
+        return f"Chromium cannot write {PROFILE}; check its owner and the sandbox binds."
+    return "No recognised cause; the log below is the whole story."
+
+
+async def stop_proc(proc, timeout=5.0):
+    """Terminate, then kill. A process that is already gone is not an error."""
+    if proc.returncode is not None:
+        return
+    with contextlib.suppress(ProcessLookupError, ChildProcessError):
+        proc.terminate()
+    try:
+        await asyncio.wait_for(proc.wait(), timeout)
+        return
+    except (asyncio.TimeoutError, ProcessLookupError):
+        pass
+    with contextlib.suppress(ProcessLookupError, ChildProcessError):
+        proc.kill()
+    with contextlib.suppress(ProcessLookupError, ChildProcessError):
+        await asyncio.wait_for(proc.wait(), timeout)
+
+
+async def chromium(port=CDP_PORT, timeout=20.0):
     """Start one headless Chromium that every worker's playwright-mcp attaches to.
 
     Returns the process when we started it, or None when a Chromium was already
     listening (a previous run, or one you started yourself): in that case it is not
     ours to kill. Every worker gets its own MCP session against this browser, so each
     holds its own tab; nothing else is shared but the process and its profile.
+
+    Chromium's stderr goes to CHROME_LOG rather than the terminal, because a browser
+    that refuses to start is silent on stdout and its last lines name the reason.
     """
     endpoint = cdp_endpoint(port)
     if await _listening(endpoint):
         return None
-    profile = Path(os.environ.get("ITEMPIPE_PROFILE", "/tmp/itempipe-chromium"))
-    profile.mkdir(parents=True, exist_ok=True)
-    proc = await asyncio.create_subprocess_exec(
-        CHROME or "chromium", "--headless", f"--remote-debugging-port={port}",
-        "--user-data-dir", str(profile), "--no-first-run", "--no-default-browser-check",
-        "about:blank",
-        stdout=asyncio.subprocess.DEVNULL, stderr=asyncio.subprocess.DEVNULL)
-    for _ in range(80):                     # ~20s for the port to start answering
+    if CHROME is None:
+        raise Startup("no chromium on PATH; install chromium or point PATH at it.")
+    PROFILE.mkdir(parents=True, exist_ok=True)
+    CHROME_LOG.parent.mkdir(parents=True, exist_ok=True)
+    args = [CHROME, f"--remote-debugging-port={port}", "--user-data-dir", str(PROFILE),
+            "--no-first-run", "--no-default-browser-check", "about:blank"]
+    if not flag("ITEMPIPE_HEADED"):
+        args.insert(1, "--headless")
+    with open(CHROME_LOG, "wb") as stderr:      # fresh log each run; the child keeps the fd
+        proc = await asyncio.create_subprocess_exec(
+            *args, stdout=asyncio.subprocess.DEVNULL, stderr=stderr)
+    deadline, pause = time.monotonic() + timeout, 0.25
+    while time.monotonic() < deadline:
         if await _listening(endpoint):
             return proc
-        if proc.returncode is not None:
+        if proc.returncode is not None:         # it gave up; the log says why
             break
-        await asyncio.sleep(0.25)
-    proc.kill()
-    raise RuntimeError(f"chromium never opened {endpoint}")
+        await asyncio.sleep(pause)
+    await stop_proc(proc)                       # kill() on a reaped process raises
+    detail = _tail()
+    how = (f"exited with {proc.returncode}" if proc.returncode is not None
+           else f"was still running after {timeout:.0f}s")
+    raise Startup("\n".join(filter(None, (
+        f"chromium {how} without opening {endpoint}.",
+        f"  {chrome_hint(detail)}",
+        f"  log: {CHROME_LOG}",
+        detail))))
 
 
 def mcp_config(endpoint):
@@ -372,10 +444,9 @@ async def apply(workers=2):
 
         await asyncio.gather(*(one(i) for i in range(workers)))
     finally:
-        if proc is not None and proc.returncode is None:
+        if proc is not None:
             status.worker("··", "state", "closing browser")
-            proc.terminate()
-            await proc.wait()
+            await stop_proc(proc)            # tolerates a browser that already died
     return reports
 
 
@@ -411,6 +482,9 @@ def main(argv=None):
 
     try:
         reports = asyncio.run(go())     # a KeyboardInterrupt still restores the tty
+    except Startup as exc:              # no browser: a sentence, not a traceback
+        print(f"itempipe: {exc}", file=sys.stderr)
+        return 1
     finally:
         status.close_board()
     print("\n---\n".join(reports))
