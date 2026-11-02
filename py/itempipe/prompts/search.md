@@ -16,6 +16,11 @@ The tracker holds every company already handled, archived ones included.
 `create_item` refuses those and names their state: that is a duplicate, so report it
 and move on. Do not sneak a rejected company back in under a different spelling.
 
+WHEN A TOOL REFUSES
+A tool that answers `NOT searched` or `NOT fetched` has told you what went wrong. Do not
+repeat the same call; change the query, try a different site, or try later. No results for
+one query is normal, not an error: keep going, and if you end up with nothing, say so.
+
 WORKING ALONGSIDE OTHER WORKERS
 Several search agents run at once, each on a different angle. Record only what you
 verified yourself.

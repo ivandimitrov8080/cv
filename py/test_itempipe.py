@@ -1,7 +1,8 @@
 """Queue mechanics only: no model, no browser, no network."""
 
-import contextlib, io, tempfile, unittest
+import asyncio, contextlib, io, tempfile, unittest
 from pathlib import Path
+from unittest import mock
 
 import itempipe as ip
 
@@ -111,6 +112,40 @@ class BrowserTest(unittest.TestCase):
         self.assertIn("--cdp-endpoint", cfg["args"])
         self.assertNotIn("--user-data-dir", cfg["args"])   # the browser owns the profile
         self.assertEqual(ip.cdp_endpoint(9333), "http://127.0.0.1:9333")
+
+
+class WebTest(unittest.TestCase):
+    """A dead search must come back as a sentence the agent can act on, not an exception."""
+
+    def tool(self, name):
+        return next(t for t in ip.tools_for() if t.name == name)
+
+    def search_raising(self, message):
+        from ddgs.exceptions import DDGSException
+        import ddgs
+        fake = mock.Mock()
+        fake.return_value.text.side_effect = DDGSException(message)
+        with mock.patch.object(ip, "SEARCH_TRIES", 1), mock.patch.object(ddgs, "DDGS", fake):
+            return asyncio.run(self.tool("web_search").ainvoke({"query": "nothing at all"}))
+
+    def test_no_results_becomes_advice(self):
+        out = self.search_raising("No results found.")
+        self.assertIn("NOT searched", out)
+        self.assertIn("no results for 'nothing at all'", out)
+        self.assertIn("Do not repeat", out)
+
+    def test_rate_limit_is_told_apart_from_no_results(self):
+        out = self.search_raising("Ratelimit 429")
+        self.assertIn("rate limiting", out)
+        self.assertIn("not a failure", ip.search_failure("no results", "q", 3))
+
+    def test_fetch_page_refuses_a_non_http_url(self):
+        out = asyncio.run(self.tool("fetch_page").ainvoke({"url": "file:///etc/passwd"}))
+        self.assertIn("NOT fetched", out)
+
+    def test_hits_text_renders_rows(self):
+        rows = [{"title": "T", "href": "https://a", "body": "B"}]
+        self.assertEqual(ip.hits_text(rows), "T\nhttps://a\nB")
 
 
 if __name__ == "__main__":

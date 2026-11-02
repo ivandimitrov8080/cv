@@ -47,6 +47,21 @@ set of logins, and one tab per worker: a worker's tools only ever see its own pa
   what we rely on; if you need one cookie jar across all workers, verify it rather than
   assume it.
 
+## When a tool cannot answer
+
+Tools never raise. `ddgs` raises `DDGSException("No results found.")` where it could
+return `[]`, and that used to take the whole worker down mid-node:
+
+* `web_search` retries `ITEMPIPE_SEARCH_TRIES` times (default 3, 1.5s then 3s apart) and
+then returns `NOT searched: …` with the reason and what to do about it — a rate limit is
+worded differently from a genuinely empty query, because the fix differs.
+* `fetch_page` returns `NOT fetched: …` for a non-http URL, a network error, or any
+`4xx`/`5xx` rather than handing the model an error page as if it were the posting.
+* The prompts tell the agent that `NOT …` means change the query or the site, not retry.
+
+A search that finds nothing is a normal outcome, so it is reported, not thrown; queue
+state is untouched by either tool, so no lead is lost when this happens.
+
 ## Progress
 
 While workers run, `rich` draws a board on **stderr**: a row per worker (spinner, tool

@@ -24,6 +24,7 @@ DB = Path(os.environ.get("ITEMPIPE_DB", ROOT / "py/itempipe.db"))
 PROMPTS, CV = Path(__file__).with_name("prompts"), ROOT / "cv.typ"
 CDP_PORT = int(os.environ.get("ITEMPIPE_CDP_PORT", "9222"))
 CHROME = shutil.which("chromium-sandboxed") or shutil.which("chromium")
+SEARCH_TRIES = int(os.environ.get("ITEMPIPE_SEARCH_TRIES", "3"))
 ANGLES = ('HN "Who is hiring?"', "YC Work at a Startup", "niche boards", "company careers",
           "practitioner communities", "freelance / contract")
 APPLY = ("Claim one lead with claim_next_item, work it to a final state with finish_item, then "
@@ -140,6 +141,24 @@ class Worker:
         return done == 1
 
 
+def hits_text(found):
+    """Render ddgs rows for the model; empty string when nothing was found."""
+    return "\n\n".join(
+        "\n".join(filter(None, (row.get("title"), row.get("href"), row.get("body"))))
+        for row in found)
+
+
+def search_failure(reason, query, tries):
+    """The message the agent gets instead of an exception: what happened, what to do."""
+    if "rate" in reason.lower() or "429" in reason:
+        return (f"NOT searched: the search backends are rate limiting us ({reason}). Do not "
+                "retry straight away. Use fetch_page on a URL you already have, or work "
+                "another angle, and leave this query for later.")
+    return (f"NOT searched: no results for {query!r} after {tries} tries ({reason}). Try a "
+            "shorter or differently worded query, a company name, or site: a specific "
+            "board. Do not repeat the same query. Finding nothing here is not a failure.")
+
+
 def tools_for(w=None):
     @tool
     def create_item(name: str, title: str, url: str, notes: str = "") -> str:
@@ -160,18 +179,46 @@ def tools_for(w=None):
     async def web_search(query: str) -> str:
         """Search the web; then open the individual posting with fetch_page."""
         from ddgs import DDGS
-        found = await asyncio.to_thread(lambda: list(DDGS().text(query, max_results=8) or []))
-        return "\n\n".join("\n".join(filter(None, (r.get("title"), r.get("href"), r.get("body"))))
-                           for r in found) or "No results."
+        from ddgs.exceptions import DDGSException
+        reason = "no engine answered"
+        for attempt in range(SEARCH_TRIES):
+            try:                        # ddgs raises where it could return an empty list
+                found = await asyncio.to_thread(
+                    lambda: list(DDGS(timeout=15).text(query, max_results=8) or []))
+            except DDGSException as exc:
+                reason = clean(exc) or "no results"
+            except Exception as exc:    # a broken engine must not kill the worker
+                reason = f"{type(exc).__name__}: {clean(exc)}"
+            else:
+                if found:
+                    return hits_text(found)
+                reason = "no results"
+            if attempt + 1 < SEARCH_TRIES:
+                await asyncio.sleep(1.5 * (attempt + 1))
+        return search_failure(reason, query, SEARCH_TRIES)
 
     @tool
     async def fetch_page(url: str) -> str:
         """Fetch one URL as readable text, to check a posting is still open."""
         import httpx, trafilatura
-        async with httpx.AsyncClient(follow_redirects=True, timeout=25) as client:
-            html = (await client.get(url)).text
-        text = await asyncio.to_thread(trafilatura.extract, html) or html
-        return "\n".join(l for l in (p.strip() for p in text.splitlines()) if l)[:8000]
+        url = clean(url)
+        if not url.startswith(("http://", "https://")):
+            return "NOT fetched: need an http(s) URL."
+        try:
+            async with httpx.AsyncClient(follow_redirects=True, timeout=25) as client:
+                response = await client.get(url)
+        except httpx.HTTPError as exc:
+            return (f"NOT fetched: {type(exc).__name__}: {clean(exc)}. The site may be "
+                    "down or slow; retry once later, or skip this lead.")
+        if response.status_code >= 400:
+            return (f"NOT fetched: HTTP {response.status_code} for {url}. The posting is "
+                    "probably gone or behind a login, so record nothing from it.")
+        try:
+            text = await asyncio.to_thread(trafilatura.extract, response.text)
+        except Exception:               # unparseable html: hand over the raw text
+            text = None
+        body = "\n".join(l for l in ((text or response.text).splitlines()) if l.strip())
+        return body.strip()[:8000] or "Fetched, but the page has no readable text."
 
     @tool
     def claim_next_item() -> str:
