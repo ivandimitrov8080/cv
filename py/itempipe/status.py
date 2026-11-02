@@ -60,13 +60,13 @@ def _short(value, limit=96):
 
 
 def _row(tag):
-    return _rows.setdefault(tag, {"state": "starting", "what": "…", "tools": 0})
+    return _rows.setdefault(tag, {"state": "starting", "what": "…", "tools": 0,
+                                 "t0": time.monotonic()})
 
 
 def _panel(final=False):
     """One frame: a row per worker, the queue tally as the caption."""
     with _lock:
-        age = _clock(time.monotonic() - _t0)
         table = Table(box=box.SIMPLE_HEAD, expand=True, pad_edge=False,
                       caption=_queue, caption_style="dim")
         table.add_column("", width=3, no_wrap=True)
@@ -77,7 +77,8 @@ def _panel(final=False):
         for tag, row in _rows.items():
             settled = final or row["state"] == "done"
             table.add_row(Text("✓", style="green") if settled else Spinner("dots", style="cyan"),
-                          tag, str(row["tools"]), row["what"], age)
+                          tag, str(row["tools"]), row["what"],
+                          _clock(time.monotonic() - row.get("t0", _t0)))
     return Panel(table, title=f"{_title}: done" if final else _title, title_align="left",
                  border_style="green" if final else "cyan", padding=(0, 1))
 

@@ -8,11 +8,18 @@ Search works the same way one level up. A *session* is one conversation that rec
 lead and then ends, so no worker ever drags a 60-step transcript around. What outlives it
 is the `seen` table: every URL and query a worker has looked at and how it turned out. A
 clean session therefore starts blind to the conversation but not blind to the work.
+
+`search` does not finish. A worker walks an endless, deterministic space of queries —
+including `site:` sweeps of the ATSs thousands of small companies use as their only job
+page — and `seen` keeps it from ever repeating one. Stop it with Ctrl-C; what it found so
+far is printed.
 """
 
-import argparse, asyncio, contextlib, os, re, shutil, sys, time, uuid
+import argparse, asyncio, contextlib, json, os, re, shutil, sys, time, uuid
 from dataclasses import dataclass, field
 from datetime import datetime, timedelta, timezone
+from functools import lru_cache
+from itertools import chain
 from pathlib import Path
 from urllib.parse import urlsplit
 
@@ -35,18 +42,22 @@ CHROME = shutil.which("chromium-sandboxed") or shutil.which("chromium")
 PROFILE = Path(os.environ.get("ITEMPIPE_PROFILE", "/tmp/itempipe-chromium"))
 CHROME_LOG = Path(os.environ.get("ITEMPIPE_CHROME_LOG", f"/tmp/itempipe-chromium-{CDP_PORT}.log"))
 SEARCH_TRIES = int(os.environ.get("ITEMPIPE_SEARCH_TRIES", "3"))
-SESSIONS = int(os.environ.get("ITEMPIPE_SESSIONS", "6"))        # hard stop per worker
+SESSIONS = int(os.environ.get("ITEMPIPE_SESSIONS", "0"))        # 0 = until you stop it
 STEPS = int(os.environ.get("ITEMPIPE_SESSION_STEPS", "26"))     # graph steps per session
 BUDGET = int(os.environ.get("ITEMPIPE_TOOL_BUDGET", "12"))      # tool calls per session
-SEEDS = int(os.environ.get("ITEMPIPE_BOARD_SEEDS", "3"))        # boards handed to a session
+SEEDS = int(os.environ.get("ITEMPIPE_BOARD_SEEDS", "2"))        # boards handed to a session
+PAUSE = float(os.environ.get("ITEMPIPE_PAUSE", "2"))            # breather between sessions
+IDLE = float(os.environ.get("ITEMPIPE_IDLE", "300"))            # wait when no query is left
+BOARD_TTL = timedelta(days=float(os.environ.get("ITEMPIPE_BOARD_DAYS", "3")))
 HN_THREAD = os.environ.get("ITEMPIPE_HN_THREAD", "49922569")    # this month's who-is-hiring
 
 ANGLES = ('HN "Who is hiring?"', "YC Work at a Startup", "niche boards", "company careers",
           "practitioner communities", "freelance / contract")
 
-# Where each angle starts. A worker is handed the first few boards it has not opened yet;
-# when the list runs out the angle is done. An empty list means the angle is search-driven
-# (find a company, then its own careers page), so its sessions start from a query instead.
+# Where each angle starts. A session is handed the first few boards this angle has not
+# read in ITEMPIPE_BOARD_DAYS. An empty list means the angle is search-driven (find a
+# company, then its own careers page); the query space in `query_space` fills in either
+# way, which is what keeps a run going after these are read.
 ANGLE_BOARDS = {
     'HN "Who is hiring?"': [
         f"https://news.ycombinator.com/item?id={HN_THREAD}",
@@ -78,8 +89,25 @@ ANGLE_BOARDS = {
 
 # A `seen` verdict: what one check of one URL or query came to.
 CLAIMED, OPEN, DEAD = "claimed", "open", "dead"           # a URL
+BOARD = "board"                                          # a URL that is a board, not a posting
 SEARCHED, NOQUERY = "searched", "noresults"              # a query
 SKIPPED, DUPLICATE, RECORDED = "skipped", "duplicate", "recorded"
+
+# More boards from a JSON file: {"angle name": ["url", ...]}. A name that is not an
+# angle yet is added to the rotation, so a new site (LinkedIn, a regional board) is
+# configuration, not a patch.
+extra = {}
+if config_file := os.environ.get("ITEMPIPE_BOARDS", "").strip():
+    try:
+        data = json.loads(Path(config_file).expanduser().read_text(encoding="utf-8"))
+        extra = {str(k): [str(u) for u in v] for k, v in data.items() if isinstance(v, list)}
+    except (OSError, ValueError) as exc:
+        print(f"itempipe: ignoring ITEMPIPE_BOARDS={config_file}: {exc}", file=sys.stderr)
+for name, urls in extra.items():
+    ANGLE_BOARDS.setdefault(name, [])
+    ANGLE_BOARDS[name] = ANGLE_BOARDS[name] + [u for u in urls
+                                               if u not in ANGLE_BOARDS[name]]
+ANGLES = ANGLES + tuple(name for name in extra if name not in ANGLES)
 
 CANNED = re.compile(r"need more steps to process|sorry, i (?:can'?t|cannot)", re.I)
 
@@ -264,13 +292,16 @@ def query_key(query):
 def retryable(row, session=None):
     """May this row be looked at again?
 
-    `claimed` is a lease, because a worker can die mid-fetch. A dead page or an empty
-    query gets one more look after a week — a 404 can be a bad deploy. Everything else is
-    fair game in the *next* session, which is what makes a clean session per lead cheap.
-    A recorded lead is never revisited.
+    `claimed` is a lease, because a worker can die mid-fetch. A board is worth re-reading
+    after BOARD_TTL — boards gain postings, individual postings do not come back — and a
+    dead posting or empty query gets one more look after a week, because a 404 can be a
+    bad deploy. Everything else is fair game in the *next* session, which is what makes a
+    clean session per lead cheap. A recorded lead is never revisited.
     """
     if row.verdict == RECORDED:
         return False
+    if row.kind == BOARD:
+        return row.checked_at < now() - BOARD_TTL
     if row.verdict == CLAIMED:
         return row.checked_at < now() - LEASE
     if row.verdict in (DEAD, NOQUERY):
@@ -333,12 +364,105 @@ def recent_rows(angle, k=12):
 
 
 def frontier(angle, offset=0, k=SEEDS):
-    """The boards this angle has not opened yet, rotated by `offset` so that two workers
-    sharing one angle do not start on the same page."""
-    boards = [u for u in ANGLE_BOARDS.get(angle, ())
-              if (row := Seen.get_or_none(Seen.key == url_key(u))) is None
-              or (row.verdict == DEAD and retryable(row))]
+    """The boards this angle can usefully open now: never read, or read longer ago than
+    BOARD_TTL. Rotated by `offset` so two workers sharing an angle start elsewhere."""
+    boards = []
+    for url in ANGLE_BOARDS.get(angle, ()):
+        row = Seen.get_or_none(Seen.key == url_key(url))
+        if row is None or (row.kind == BOARD and retryable(row)):
+            boards.append(url)
     return (boards[offset:] + boards[:offset])[:k] if boards else []
+
+
+def is_board(url):
+    """A URL the configuration calls a board, which is re-readable unlike a posting."""
+    key = url_key(url)
+    return any(key == url_key(u) for u in chain.from_iterable(ANGLE_BOARDS.values()))
+
+
+TECHS = ("java spring boot", "java spring", "java backend", "java developer",
+         "kotlin spring boot", "jvm backend")
+LEVELS = ("", "senior ", "staff ", "lead ")
+PLACES = ("remote europe", "remote eu", "remote worldwide", "europe remote",
+          "bulgaria", "czechia", "poland", "romania", "germany", "netherlands",
+          "portugal", "spain", "estonia", "lithuania", "croatia", "slovakia")
+PHRASES = ("hiring", "open role", "jobs", "careers")
+CONTRACT = ("contract", "b2b", "freelance", "day rate")
+CITIES = ("sofia", "plovdiv", "varna", "prague", "brno", "warsaw", "krakow",
+          "wroclaw", "bucharest", "cluj", "timisoara", "berlin", "munich", "hamburg",
+          "amsterdam", "rotterdam", "lisbon", "porto", "barcelona", "madrid",
+          "tallinn", "vilnius", "riga", "budapest", "bratislava", "ljubljana",
+          "zagreb", "athens", "thessaloniki", "dublin", "vienna", "zurich",
+          "stockholm", "copenhagen", "helsinki", "oslo")
+# Hosts thousands of small companies use as their only job page, so a `site:` sweep of
+# them is how the companies that never touch a job board get found.
+ATS = ("jobs.ashbyhq.com", "jobs.lever.co", "boards.greenhouse.io", "apply.workable.com",
+       "jobs.personio.de", "job-boards.greenhouse.io", "join.com", "careers.teamtailor.com",
+       "recruitee.com", "breezy.hr", "jobs.smartrecruiters.com", "jobs.eu.lever.co")
+
+
+def query_space(angle=""):
+    """Every query this angle would ever run, in a fixed order.
+
+    Deliberately not a list of sites: this is the part that keeps producing new places to
+    look after the hardcoded boards are read out, and it is wide enough (a few thousand
+    queries) that a run does not come back to the same place.
+    """
+    tails = CONTRACT if any(w in angle.lower() for w in ("contract", "freelance")) else PHRASES
+    for level in LEVELS:
+        for tech in TECHS:
+            for place in PLACES:
+                for tail in tails:
+                    yield f"{level}{tech} {place} {tail}"
+    for host in ATS:
+        for level in LEVELS:
+            for tech in TECHS:
+                yield f"site:{host} {level}{tech} remote"
+        for place in PLACES:
+            yield f"site:{host} java spring {place}"
+    for tech in TECHS:
+        for city in CITIES:
+            yield f'"{tech}" "{city}" careers'
+
+
+@lru_cache(maxsize=None)
+def space_for(angle=""):
+    return tuple(query_space(angle))
+
+
+def next_queries(angle, cursor, k=2):
+    """Up to `k` queries from this worker's position that nobody has run yet.
+
+    Returns the queries and the cursor to continue from, so two workers walk different
+    parts of the same space and `seen` absorbs any overlap.
+    """
+    space = space_for(angle)
+    if not space:
+        return [], cursor
+    used = {row.key for row in Seen.select(Seen.key).where(Seen.kind == "query")}
+    out = []
+    for step in range(len(space)):
+        pos = (cursor + step) % len(space)
+        query = space[pos]
+        if query_key(query) in used:
+            continue
+        out.append(query)
+        if len(out) == k:
+            return out, (pos + 1) % len(space)
+    return [], (cursor + len(space)) % len(space)
+
+
+def starting_cursor(i, workers, angle):
+    """Spread the workers over the query space instead of starting them on one query."""
+    space = space_for(angle)
+    return (i * len(space) // max(workers, 1)) if space else 0
+
+
+def plan_for(angle, i, workers, cursor):
+    """One session's work: boards worth re-reading, then queries nobody has run."""
+    boards = frontier(angle, i // max(len(ANGLES), 1))
+    queries, cursor = next_queries(angle, cursor, k=2 if boards else 3)
+    return boards, queries, cursor
 
 
 def reconcile(sess):
@@ -354,6 +478,27 @@ def reconcile(sess):
 def prune(older=RETENTION):
     """Forget browsing memory older than `older`. Leads are never touched."""
     return Seen.delete().where(Seen.checked_at < now() - older).execute()
+
+
+def remember_leads():
+    """Say in `seen` what the tracker already knows.
+
+    Without this, every existing lead is a posting waiting to be re-found, verified and
+    refused as a duplicate — the most expensive way there is to learn nothing.
+    """
+    known = {row.key for row in Seen.select(Seen.key)}
+    made = 0
+    for name, url in Item.select(Item.name, Item.url).tuples():
+        key = url_key(url)
+        if key in known:
+            continue
+        known.add(key)
+        try:
+            Seen.create(key=key, kind="url", url=url, verdict=RECORDED, note=name)
+            made += 1
+        except IntegrityError:
+            pass
+    return made
 
 
 @dataclass
@@ -475,20 +620,20 @@ def tools_for(w=None, sess=None):
         if not url.startswith(("http://", "https://")):
             return "NOT fetched: need an http(s) URL."
         sess.spend()
-        key = url_key(url)
-        won, row = claim_seen(key, kind="url", url=url, angle=sess.angle, session=sess.token)
+        key, kind = url_key(url), BOARD if is_board(url) else "url"
+        won, row = claim_seen(key, kind=kind, url=url, angle=sess.angle, session=sess.token)
         if not won:
             return seen_refusal(row, "fetched") + budget_note(sess)
         try:
             async with httpx.AsyncClient(follow_redirects=True, timeout=25) as client:
                 response = await client.get(url)
         except httpx.HTTPError as exc:
-            settle(key, OPEN, f"{type(exc).__name__}", sess.token)
+            settle(key, OPEN, f"{type(exc).__name__}", sess.token, kind=kind)
             return (f"NOT fetched: {type(exc).__name__}: {clean(exc)}. The site may be "
                     "down or slow; take another board and come back in a later session."
                     + budget_note(sess))
         if response.status_code >= 400:
-            settle(key, DEAD, f"HTTP {response.status_code}", sess.token)
+            settle(key, DEAD, f"HTTP {response.status_code}", sess.token, kind=kind)
             return (f"NOT fetched: HTTP {response.status_code} for {url}. The posting is "
                     "probably gone or behind a login, so record nothing from it."
                     + budget_note(sess))
@@ -497,7 +642,7 @@ def tools_for(w=None, sess=None):
         except Exception:               # unparseable html: hand over the raw text
             text = None
         body = "\n".join(l for l in ((text or response.text).splitlines()) if l.strip())
-        settle(key, OPEN, f"HTTP {response.status_code}", sess.token)
+        settle(key, OPEN, f"HTTP {response.status_code}", sess.token, kind=kind)
         return ((body.strip()[:8000] or "Fetched, but the page has no readable text.")
                 + budget_note(sess))
 
@@ -578,11 +723,11 @@ async def run(agent_, text, tag="·", finish=True, limit=60):
     return answer.strip()
 
 
-def session_brief(brief, i, workers, n, angle, boards, recorded):
-    """What one clean session is told: the angle, where to start, and what is settled."""
-    start = ("\n".join(f"- {url}" for url in boards) if boards else
-             "- no fixed board on this angle: web_search for it, then open the posting")
-    recent = "\n".join(
+def session_brief(brief, i, workers, n, angle, boards, queries, recorded):
+    """What one clean session is told: the angle, its plan, and what is already settled."""
+    plan = [f"- fetch {url} and read it for postings that fit" for url in boards]
+    plan += [f'- search "{query}" and open the postings it turns up' for query in queries]
+    settled = "\n".join(
         f"- {row.url}{f' ({row.note})' if row.note else ''} — {row.verdict}"
         for row in recent_rows(angle)) or "- nothing yet"
     return f"""You are search worker {i + 1} of {workers}, session {n} on angle: {angle}.
@@ -591,60 +736,75 @@ This session is one lead long: verify one posting, call create_item once, then s
 write your report. A fresh session starts immediately after you with a clean memory, so
 do not survey a whole board and do not save findings up.
 
-Start here, fetching each once:
-{start}
+Do these, in order, and stop:
+{chr(10).join(plan) or '- search for this angle yourself, then open the posting'}
 
-Already settled by this run or an earlier one. A tool that answers "already checked" is
+Already settled, by this run or an earlier one. A tool that answers "already checked" is
 pointing you elsewhere, not failing:
-{recent}
+{settled}
 
 Recorded by this worker so far: {', '.join(recorded) or 'nothing'}
 
 {brief}"""
 
 
-async def search(brief, workers=4):
-    """Each session starts from a clean context and ends after one recorded lead.
+async def search(brief, workers=4, sessions=SESSIONS, progress=None):
+    """Search until you stop it.
 
-    The durable part is the `seen` table, not the model: which boards were opened, which
-    postings were dead, which queries came back empty and which leads were recorded all
-    outlive the conversation, and are shared with every other worker.
+    Each worker is an endless rotation of clean sessions. A session gets a plan — boards
+    this angle has not read lately, then queries nobody has run — records at most one
+    lead, and hands what it learned to `seen`. Because `seen` remembers every URL and
+    query, the rotation keeps converging on *new* work instead of re-finding the same
+    postings, which is what lets it run for hours. Ctrl-C stops it and prints the log.
     """
-    async def one(i):
-        tag, angle, total, notes = f"w{i + 1}", ANGLES[i % len(ANGLES)], [], []
-        offset = i // len(ANGLES)       # workers sharing an angle start further along
-        miss = 0                        # sessions in a row that recorded nothing
-        status.worker(tag, "state", f"angle: {angle}", state="searching")
-        try:
-            for n in range(SESSIONS):
-                sess = Session(angle=angle, tag=tag)
-                boards = frontier(angle, offset)
-                if not boards and ANGLE_BOARDS.get(angle):
-                    break               # the boards this angle starts from are all opened
-                status.worker(tag, "state", f"{angle}: session {n + 1}, "
-                              f"{len(boards) or 'no'} board(s)", state="searching")
-                try:
-                    notes.append(await run(
-                        agent("search", tools_for(sess=sess)),
-                        session_brief(brief, i, workers, n + 1, angle, boards, total),
-                        tag=tag, finish=False, limit=STEPS))
-                finally:
-                    reconcile(sess)     # pages opened but not recorded were judged
-                total += sess.recorded
-                miss = 0 if sess.recorded else miss + 1
-                if miss >= 2:           # two empty sessions: this angle is worked out
-                    break
-        except Exception as exc:        # one worker must not take the others down
-            status.worker(tag, "state", f"{type(exc).__name__}: {clean(exc)}")
-        best = max((text for text in notes if text), key=len, default="")
-        status.finished(tag, f"{len(total)} recorded: {', '.join(total) or 'none'}")
-        return (f"[{tag}] {angle} — {len(total)} recorded: {', '.join(total) or 'none'}"
-                + (f"\n\n{best}" if best else ""))
+    progress = progress if progress is not None else []
+    remember_leads()
 
-    reports = await asyncio.gather(*(one(i) for i in range(workers)), return_exceptions=True)
-    return [report if isinstance(report, str)
-            else f"[worker crashed: {type(report).__name__}: {clean(report)}]"
-            for report in reports]
+    async def one(i):
+        tag, angle = f"w{i + 1}", ANGLES[i % len(ANGLES)]
+        cursor, total, fails, n = starting_cursor(i, workers, angle), [], 0, 0
+        status.worker(tag, "state", f"angle: {angle}", state="searching")
+        while sessions <= 0 or n < sessions:
+            n += 1
+            sess = Session(angle=angle, tag=tag)
+            try:
+                boards, queries, cursor = plan_for(angle, i, workers, cursor)
+                if not boards and not queries:
+                    status.worker(tag, "state", "no new query: waiting for the boards "
+                                  "to refresh", state="idle")
+                    await asyncio.sleep(IDLE)
+                    continue
+                status.worker(tag, "state", f"{angle}: session {n}, {len(boards)} board(s), "
+                              f"{len(queries)} search(es)", state="searching")
+                report = await run(agent("search", tools_for(sess=sess)),
+                                   session_brief(brief, i, workers, n, angle, boards,
+                                                 queries, total),
+                                   tag=tag, finish=False, limit=STEPS)
+                total += sess.recorded
+                progress.append(f"[{tag}] session {n}: "
+                                + (", ".join(sess.recorded) or
+                                   (clean(report)[:160] or "nothing")))
+                fails = 0 if sess.recorded else fails + 1
+            except asyncio.CancelledError:
+                raise
+            except Exception as exc:    # one bad session is not the end of the run
+                fails += 1
+                status.worker(tag, "state", f"{type(exc).__name__}: {clean(exc)}",
+                              state="searching")
+                await asyncio.sleep(min(60.0, PAUSE * 2 ** min(fails, 5)))
+            finally:
+                reconcile(sess)         # pages opened but not recorded were judged
+            await asyncio.sleep(PAUSE)
+        progress.append(f"[{tag}] {angle} — stopped after {n} session(s): "
+                        f"{len(total)} recorded: {', '.join(total) or 'none'}")
+
+    results = await asyncio.gather(*(one(i) for i in range(workers)),
+                                   return_exceptions=True)
+    for result in results:
+        if isinstance(result, BaseException) and not isinstance(result, asyncio.CancelledError):
+            progress.append(f"[itempipe] worker crashed: {type(result).__name__}: "
+                            f"{clean(result)}")
+    return progress
 
 
 def cdp_endpoint(port=CDP_PORT):
@@ -798,13 +958,17 @@ def main(argv=None):
     args = p.parse_args(argv)
     path = open_db(args.db)
     if args.command == "init":
-        forgotten = prune()
+        forgotten, learned = prune(), remember_leads()
         print(f"{path}: {Item.select().count()} lead(s), {queued()} queued, "
               f"{Seen.select().count()} seen row(s)"
-              + (f", {forgotten} old one(s) forgotten" if forgotten else ""))
+              + (f", {forgotten} old one(s) forgotten" if forgotten else "")
+              + (f", {learned} lead(s) marked recorded" if learned else ""))
         return 0
 
-    status.open_board(f"itempipe {args.command}", tally)
+    status.open_board(f"itempipe {args.command}" +
+                      (" — Ctrl-C to stop" if args.command == "search" else ""), tally)
+
+    progress: list[str] = []
 
     async def tick(every=1.0):
         """Keep the tally, the clock and the spinners current while workers run."""
@@ -816,7 +980,7 @@ def main(argv=None):
         poller = asyncio.create_task(tick())
         try:
             if args.command == "search":
-                return await search(args.brief, workers=args.n)
+                return await search(args.brief, workers=args.n, progress=progress)
             return await apply(workers=args.n)
         finally:
             poller.cancel()
@@ -827,7 +991,9 @@ def main(argv=None):
     except Startup as exc:              # no browser: a sentence, not a traceback
         print(f"itempipe: {exc}", file=sys.stderr)
         return 1
+    except KeyboardInterrupt:           # search runs until you stop it
+        reports = progress
     finally:
         status.close_board()
-    print("\n---\n".join(reports))
+    print("\n".join(reports) or "nothing recorded")
     return 0

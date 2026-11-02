@@ -148,6 +148,50 @@ class SeenTest(unittest.TestCase):
     def test_an_angle_with_no_boards_is_left_to_the_model(self):
         with mock.patch.dict(ip.ANGLE_BOARDS, {"x": []}):
             self.assertEqual(ip.frontier("x"), [])
+            boards, queries, _ = ip.plan_for("x", 0, 1, 0)
+            self.assertEqual(boards, [])
+            self.assertEqual(len(queries), 3)    # the query space keeps it going
+
+    def test_the_contract_angle_searches_for_contracts(self):
+        self.assertIn("contract", " ".join(ip.space_for("freelance / contract")[:8]))
+
+    def test_a_board_comes_back_after_its_ttl(self):
+        with mock.patch.dict(ip.ANGLE_BOARDS, {"x": ["https://a.com/board"]}):
+            key = ip.url_key("https://a.com/board")
+            self.assertTrue(ip.is_board("https://a.com/board"))
+            self.assertFalse(ip.is_board("https://a.com/posting"))
+            ip.claim_seen(key, kind=ip.BOARD, session="s1")
+            ip.settle(key, ip.SKIPPED, "read", "s1", kind=ip.BOARD)
+            self.assertEqual(ip.frontier("x"), [])
+            ip.Seen.update(checked_at=ip.now() - ip.BOARD_TTL - timedelta(minutes=1)).execute()
+            self.assertEqual(ip.frontier("x"), ["https://a.com/board"])
+
+    def test_the_query_space_never_runs_out_of_new_queries(self):
+        self.assertGreater(len(ip.space_for("x")), 500)
+        first, cursor = ip.next_queries("x", 0, 2)
+        self.assertEqual(len(first), 2)
+        for query in first:                 # once run, they are in `seen`
+            ip.claim_seen(ip.query_key(query), kind="query", url=query, session="s1")
+        second, _ = ip.next_queries("x", cursor, 2)
+        self.assertFalse(set(first) & set(second))
+
+    def test_workers_start_at_different_queries(self):
+        starts = {ip.starting_cursor(i, 10, "x") for i in range(10)}
+        self.assertEqual(len(starts), 10)
+
+    def test_a_plan_prefers_boards_then_fills_with_queries(self):
+        with mock.patch.dict(ip.ANGLE_BOARDS, {"x": ["https://a.com/board"]}):
+            boards, queries, _ = ip.plan_for("x", 0, 1, 0)
+            self.assertEqual(boards, ["https://a.com/board"])
+            self.assertEqual(len(queries), 2)
+
+    def test_existing_leads_are_remembered_as_recorded(self):
+        ip.Item.create(name="Acme", name_key="acme", title="T", url="https://a.com/1")
+        self.assertEqual(ip.remember_leads(), 1)
+        self.assertEqual(ip.Seen.get(ip.Seen.key == ip.url_key("https://a.com/1")).verdict,
+                         ip.RECORDED)
+        self.assertEqual(ip.remember_leads(), 0)     # idempotent
+        self.assertFalse(ip.claim_seen(ip.url_key("https://a.com/1"), session="s2")[0])
 
     def test_a_recorded_url_cannot_come_back_under_another_name(self):
         def create_item(sess):
