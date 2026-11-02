@@ -860,11 +860,15 @@ def chrome_hint(log):
     if "no usable sandbox" in text or "running as root" in text:
         return "Chromium refuses its sandbox here; run it with --no-sandbox."
     if "cannot open display" in text or "missing x server" in text or "ozone" in text:
-        return ("Chromium wants a display. Keep --headless, or run under a session with "
-                "ITEMPIPE_HEADED=1.")
+        return ("Chromium wants a display. Run under a graphical session (or through "
+                "chromium-sandboxed, which binds the Wayland socket), or set "
+                "ITEMPIPE_HEADLESS=1.")
     if "address already in use" in text or "devtoolsactiveport" in text:
         return (f"CDP port {CDP_PORT} is taken. Kill the other browser, or set "
                 "ITEMPIPE_CDP_PORT.")
+    if "multiple targets are not supported" in text:
+        return ("Chromium's headless mode cannot open more than one tab at startup. "
+                "Unset ITEMPIPE_HEADLESS to run headed.")
     if "error while loading shared libraries" in text or "bwrap:" in text:
         return "Chromium (or the sandbox wrapper) could not start: see the log."
     if "permission denied" in text:
@@ -890,7 +894,8 @@ async def stop_proc(proc, timeout=5.0):
 
 
 async def chromium(port=CDP_PORT, timeout=20.0):
-    """Start one headless Chromium that every worker's playwright-mcp attaches to.
+    """Start one Chromium — headed unless ITEMPIPE_HEADLESS is set — that every worker's
+    playwright-mcp attaches to.
 
     Returns the process when we started it, or None when a Chromium was already
     listening (a previous run, or one you started yourself): in that case it is not
@@ -909,7 +914,7 @@ async def chromium(port=CDP_PORT, timeout=20.0):
     CHROME_LOG.parent.mkdir(parents=True, exist_ok=True)
     args = [CHROME, f"--remote-debugging-port={port}", "--user-data-dir", str(PROFILE),
             "--no-first-run", "--no-default-browser-check", "about:blank"]
-    if not flag("ITEMPIPE_HEADED"):
+    if flag("ITEMPIPE_HEADLESS"):        # headed by default: headless is opt-in
         args.insert(1, "--headless")
     with open(CHROME_LOG, "wb") as stderr:      # fresh log each run; the child keeps the fd
         proc = await asyncio.create_subprocess_exec(
