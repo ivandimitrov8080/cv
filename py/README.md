@@ -13,8 +13,7 @@ itempipe-check                     # queue tests, no model or network needed
 ```
 
 That is the whole interface. The whole program is `itempipe/__init__.py` — one peewee model,
-six tools, two coroutines — plus the two prompts in `itempipe/prompts/`. Opening an older
-tracker migrates its `items` rows into the current schema once, in place.
+six tools, two coroutines — plus the two prompts in `itempipe/prompts/`.
 
 ## Why it is safe to run several
 

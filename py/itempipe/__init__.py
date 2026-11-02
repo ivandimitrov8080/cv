@@ -56,21 +56,14 @@ def clean(value):
 
 
 def open_db(path=DB):
-    """Point peewee at `path`, create the table, and migrate an older tracker in place."""
+    """Point peewee at `path` and make sure the table exists."""
     path = Path(path)
     path.parent.mkdir(parents=True, exist_ok=True)
     if not db.is_closed():
-        db.close()                       # a different --db must not reuse the old connection
+        db.close()
     db.init(str(path))
     db.connect()
     Item.create_table(safe=True)
-    existing = {c.name for c in db.get_columns("items")}
-    if existing != set(Item._meta.fields):      # schema drift: keep the rows, rebuild the table
-        shared = ", ".join(n for n in Item._meta.fields if n in existing)
-        db.execute_sql("ALTER TABLE items RENAME TO items_legacy")
-        Item.create_table()
-        db.execute_sql(f"INSERT INTO items ({shared}) SELECT {shared} FROM items_legacy")
-        db.execute_sql("DROP TABLE items_legacy")
     return path
 
 
@@ -85,7 +78,7 @@ def free():
                                ((Item.state == WORKING) & (Item.claimed_until < now())))
 
 
-open_db()   # importing prepares the store; the CLI re-points it when --db is given
+open_db()   # so `import itempipe` is usable; the CLI re-points it at --db
 
 
 @dataclass

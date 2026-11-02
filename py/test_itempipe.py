@@ -1,6 +1,6 @@
 """Queue mechanics only: no model, no browser, no network."""
 
-import sqlite3, tempfile, unittest
+import tempfile, unittest
 from pathlib import Path
 
 import itempipe as ip
@@ -76,22 +76,6 @@ class QueueTest(unittest.TestCase):
         w.claim()
         self.tool(w, "finish_item").invoke({"outcome": "archive", "reason": "closed"})
         self.assertEqual((ip.Item.get().archive_reason, ip.queued()), ("closed", 0))
-
-    def test_open_db_migrates_an_older_tracker_in_place(self):
-        path = Path(self.tmp.name) / "old.db"
-        ip.db.close()
-        old = sqlite3.connect(path)
-        old.execute("CREATE TABLE items (id INTEGER PRIMARY KEY, name TEXT, name_key TEXT, "
-                    "title TEXT, url TEXT, notes TEXT, state TEXT, submitting INTEGER, "
-                    "advanced_on TEXT, archived_at TEXT, archive_reason TEXT, claimed_by TEXT, "
-                    "claim_token TEXT, claimed_until TEXT)")
-        old.execute("INSERT INTO items (name, name_key, title, url, state) "
-                    "VALUES ('Acme', 'acme', 'Dev', 'https://a', 'NEW')")
-        old.commit()
-        old.close()
-        ip.open_db(path)
-        self.assertEqual(ip.Item.get().name, "Acme")
-        self.assertNotIn("items_legacy", ip.db.get_tables())
 
 
 if __name__ == "__main__":
