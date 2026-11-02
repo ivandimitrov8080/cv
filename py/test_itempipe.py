@@ -28,8 +28,8 @@ class QueueTest(unittest.TestCase):
             self.add(url="https://b")
 
     def test_claim_is_exclusive_and_moves_to_the_next_lead(self):
-        for name in "ab":
-            self.add(name, url=f"https://{name}")
+        for name in ("A", "B"):
+            self.add(name, url=f"https://{name.lower()}")
         one, two = ip.Worker(), ip.Worker()
         self.assertIn("Name: A", one.claim())
         self.assertIn("Name: B", two.claim())
