@@ -13,6 +13,8 @@
 # parenthetical asides do not matter, so one short heading ("Postal address")
 # answers every form that asks about it. `itempipe questions` lists the open
 # ones as file:line, and `itempipe questions postal` finds a heading by words.
+#
+# Keep one heading per question, short, with the form's paperwork in :SOURCE:.
 
 * Recurring answers
 
@@ -147,10 +149,12 @@
    :SOURCE: Hazelcast
    :END:
 
-** Home address (Address Line 1, Town, Postcode)
+** Postal address
    :PROPERTIES:
+   :DECLINE: t
    :ANSWER: N/A
-   :SOURCE: Hazelcast
+   :NOTE: One heading for every address field: the street address is not in the CV/profile and is not given out. DECLINE means leave it blank; N/A is what to type where the form refuses to submit without it.
+   :SOURCE: Hazelcast (Home address: Address Line 1, Town, Postcode), Dynatrace (Address Line 1 / City / State/Province / Zip), Taulia (SAP - Address, City, ZIP required), Graphwise/Ontotext (Address / City / Province / Postal Code)
    :END:
 
 ** Telegram username
@@ -163,25 +167,6 @@
    :PROPERTIES:
    :ANSWER: I would like a fully-remote software development job that offers genuinely challenging problems not due to bad management, unrealistic deadlines and lack of testing or bad code quality, but because the problems are technically unique and the solution is not a solved problem. I dislike working with software that reinvents the wheel in a worse way. I like improving on existing solutions if the change is meaningfully different.
    :SOURCE: Vaadin, team.blue
-   :END:
-** Address Line 1: / City: / State/Province: / Zip/Postal Code: (all marked required on the Dynatrace SAP SuccessFactors application form)
-   :PROPERTIES:
-   :ANSWER:
-   :END:
-
-** Address Line 1 (also City, State/Province and Zip/Postal Code are required)
-   :PROPERTIES:
-   :ANSWER:
-   :END:
-
-** What is your full postal address - Address Line 1, City, State/Province and Zip or Postal Code?
-   :PROPERTIES:
-   :ANSWER:
-   :END:
-
-** Address Line 1 - City - State/Province - Zip/Postal Code (required by Dynatrace application form)
-   :PROPERTIES:
-   :ANSWER:
    :END:
 
 ** Do you have experience with Node.JS
@@ -199,26 +184,17 @@
    :ANSWER:
    :END:
 
-** Address is required. City is required. ZIP is required. (Taulia/SAP application form, Profile Information section — Country is set to Bulgaria and phone to +447411180797; only the residential address, city and postal code are missing and are not in the CV/profile.)
-   :PROPERTIES:
-   :ANSWER:
-   :SOURCE: Taulia (SAP Taulia)
-   :END:
-
-** Address* / City* / Province* / Postal Code* (required address fields on the Graphwise–Ontotext "Senior Java Backend Engineer" BambooHR application form, https://graphwise.bamboohr.com/careers/90) — no postal address is in the CV; what values should be entered? Note: the posting asks for a JSON-LD string in the Address field, but City, Province and Postal Code are still required.
-   :PROPERTIES:
-   :ANSWER:
-   :SOURCE: Graphwise (Ontotext)
-   :END:
-
 ** Are you open to relocating to Spain if you are currently based elsewhere?
    :PROPERTIES:
    :ANSWER:
    :SOURCE: Qualifyze GmbH
    :END:
 
-
-       
+** Available for Realocation to Portugal (Not supported by HumanIT):
+   :PROPERTIES:
+   :ANSWER:
+   :SOURCE: HumanIT
+   :END:
 
 ** What second languages do you speak?: *
    :PROPERTIES:
@@ -245,28 +221,19 @@
    :ANSWER:
    :END:
 
-** Available for Realocation to Portugal (Not supported by HumanIT):
-   :PROPERTIES:
-   :ANSWER:
-   :END:
-
-** Required fields not covered by stored answers: Nationality, second languages spoken, current employment/employer, current job title, tech stack (multi-select), and availability for relocation to Portugal. Saved as questions; lead returns once answered.
-
 ** 3 References (1 Direct Manager)
    :PROPERTIES:
    :ANSWER:
    :END:
 
-** Required field "3 References (1 Direct Manager)" has no stored answer; saved as a question for the user.
-
-** Resume: * (the resume PDF at ~/src/cv/result/Ivan_Dimitrov_Resume_IT_Consultant.pdf is not readable by the upload tool, which is limited to /home/ivand/src/cv — which path or public URL should I upload?)
+** Arbeitszeugnis
    :PROPERTIES:
    :ANSWER:
+   :NOTE: Required upload: the employment reference letter (Arbeitszeugnis).
    :END:
 
-** Arbeitszeugnis* (erforderlich) — please upload your employment reference letter
+** Resume
    :PROPERTIES:
    :ANSWER:
+   :NOTE: Required upload. The PDF is result/Ivan_Dimitrov_Resume_IT_Consultant.pdf under ~/src/cv, and https://idimitrov.dev serves it publicly; an earlier upload tool could not reach the local path, so a public URL is the safe answer.
    :END:
-
-** Required upload "Arbeitszeugnis" (employment reference) has no stored file/answer, and the CV PDF path was not accessible for upload. Saved the required question; lead held for the user.
