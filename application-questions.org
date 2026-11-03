@@ -171,22 +171,22 @@
 
 ** Do you have experience with Node.JS
    :PROPERTIES:
-   :ANSWER:
+   :ANSWER:   Yes, I do.
    :END:
 
 ** How would you rate/describe your knowledge of Java?
    :PROPERTIES:
-   :ANSWER:
+   :ANSWER:   Expert.
    :END:
 
 ** If needed, would being employed by an EOR/employer of record be acceptable to you in the future?
    :PROPERTIES:
-   :ANSWER:
+   :ANSWER:   No, remote only.
    :END:
 
 ** Are you open to relocating to Spain if you are currently based elsewhere?
    :PROPERTIES:
-   :ANSWER:
+   :ANSWER:   No, remote only.
    :SOURCE: Qualifyze GmbH
    :END:
 
