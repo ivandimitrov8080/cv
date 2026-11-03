@@ -44,6 +44,7 @@ RETRY = timedelta(days=7)           # a dead posting may be a bad deploy: look o
 RETENTION = timedelta(days=int(os.environ.get("ITEMPIPE_SEEN_DAYS", "365")))
 DB = Path(os.environ.get("ITEMPIPE_DB", ROOT / "py/itempipe.db"))
 PROMPTS, CV = Path(__file__).with_name("prompts"), ROOT / "cv.typ"
+SCHEMA = Path(__file__).with_name("schema.sql")     # the whole schema; `init` executes it
 QUESTIONS = Path(os.environ.get("ITEMPIPE_QUESTIONS", ROOT / "application-questions.org"))
 CONFIG = Path(os.environ.get("ITEMPIPE_CONFIG") or Path(__file__).with_name("search.toml"))
 PROFILE = Path(os.environ.get("ITEMPIPE_PROFILE", "/tmp/itempipe-chromium"))
@@ -183,7 +184,7 @@ class Item(Model):
     name = CharField()
     name_key = CharField(unique=True)       # lowercased name: the dedupe key
     title = CharField()
-    url = CharField()
+    url = CharField()                       # unique by item_url_key in schema.sql
     notes = TextField(null=True)
     state = CharField(default=NEW)
     submitting = BooleanField(default=False)
@@ -194,7 +195,8 @@ class Item(Model):
     claimed_until = DateTimeField(null=True)
 
     class Meta:
-        database = db
+        database = db                       # the DDL itself is itempipe/schema.sql;
+                                            # `unique=True` here is documentation only
 
 
 class Seen(Model):
@@ -247,35 +249,33 @@ def clean(value):
     return re.sub(r"\s+", " ", str(value or "")).strip()
 
 
-def migrate():
-    """Bring an older database up to this schema, in place.
-
-    `seen.angle` became `seen.label`, and a lead no longer remembers a single question:
-    questions are general Q/A in `application-questions.org`, and several of them can wait
-    on one lead. The old column is dropped where SQLite allows it, and is simply unused
-    where it does not (an extra column breaks nothing, the model has no field for it).
-    """
-    columns = {row[1] for row in db.execute_sql("PRAGMA table_info(seen)")}
-    if columns and "angle" in columns and "label" not in columns:
-        db.execute_sql("ALTER TABLE seen RENAME COLUMN angle TO label")
-    lead = {row[1] for row in db.execute_sql("PRAGMA table_info(items)")}
-    if "question" in lead:
-        with contextlib.suppress(Exception):    # DROP COLUMN needs sqlite >= 3.35
-            db.execute_sql("ALTER TABLE items DROP COLUMN question")
-
-
 def open_db(path=DB):
-    """Point peewee at `path` and make sure both tables exist."""
+    """Point peewee at `path` and connect. It creates no tables and alters nothing.
+
+    The schema is `itempipe/schema.sql`, executed by `init_db` and by nothing else, so a
+    missing or stale database is not patched up on the way in: the first query fails, and
+    that is the point. A schema change is an edit to that one file plus a re-`init`.
+    """
     path = Path(path)
     path.parent.mkdir(parents=True, exist_ok=True)
     if not db.is_closed():
         db.close()
     db.init(str(path))
     db.connect()
-    Item.create_table(safe=True)
-    Seen.create_table(safe=True)
-    Hold.create_table(safe=True)
-    migrate()
+    return path
+
+
+def init_db(path=DB):
+    """`itempipe init`: execute `schema.sql` as written, then hand back the path.
+
+    One file, one pass, no conditionals — no statement text lives in this module and the
+    file remembers no earlier shape of the database. Run it against a database that
+    already holds the tables and SQLite says "table item already exists": delete the file
+    and init again. Nothing here tries to be clever about that.
+    """
+    path = open_db(path)
+    sql = SCHEMA.read_text(encoding="utf-8")       # read whole: executescript splits it
+    db.connection().executescript(sql)              # sqlite3 does the splitting, not us
     return path
 
 
@@ -310,7 +310,8 @@ def tally():
     return counts
 
 
-open_db()   # so `import itempipe` is usable; the CLI re-points it at --db
+open_db()   # connects so `import itempipe` is usable; no DDL. The CLI re-points it at
+            # --db, and `init` is the only thing that executes schema.sql
 
 
 @dataclass
@@ -1113,8 +1114,11 @@ def tools_for(w=None, sess=None):
         try:
             Item.create(name=name, name_key=lower, title=title, url=url,
                         notes=clean(notes) or None)
-        except IntegrityError:
-            found = Item.get(Item.name_key == lower)
+        except IntegrityError:      # the same name, or now the same URL as well
+            found = (Item.get_or_none(Item.name_key == lower)
+                     or Item.get_or_none(Item.url == url))
+            if found is None:       # neither key matches: never blame a lead there isn't
+                return "NOT recorded: the database refused it as a duplicate."
             settle(key, DUPLICATE, found.name, sess.token, url=url)
             return (f"Already tracked ({'archived' if found.archived_at else found.state}): "
                     f"{found.name}.")
@@ -1848,7 +1852,7 @@ def main(argv=None):
     if fuzz is None:            # the fuzzy finder is what makes the matching "by meaning"
         print("itempipe: rapidfuzz is missing, so questions match on shared words only; "
               "`uv sync` in py/ (or `nix develop`) installs it.", file=sys.stderr)
-    path = open_db(args.db)
+    path = init_db(args.db) if args.command == "init" else open_db(args.db)
     back = unhold()                 # answers given since the last run release their leads
     if args.command == "init":
         forgotten, learned = prune(), remember_leads()

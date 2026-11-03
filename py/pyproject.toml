@@ -29,4 +29,4 @@ itempipe = "itempipe:main"
 packages = ["itempipe"]
 
 [tool.setuptools.package-data]
-itempipe = ["prompts/*.md", "search.toml"]
+itempipe = ["prompts/*.md", "search.toml", "schema.sql"]

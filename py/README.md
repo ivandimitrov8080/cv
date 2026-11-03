@@ -6,7 +6,7 @@ as many parallel workers as you ask for.
 
 ```sh
 nix develop
-python -m itempipe init                        # create/upgrade the db, show the queue
+python -m itempipe init                        # create the db from itempipe/schema.sql
 python -m itempipe search -n 4                 # until Ctrl-C; see itempipe/search.toml
 python -m itempipe apply -n 2
 python -m itempipe questions                   # open headings as file:line, for Emacs
@@ -15,10 +15,10 @@ python -m itempipe questions                   # open headings as file:line, for
 
 That is the whole interface. The program is `itempipe/__init__.py` — one peewee model,
 five apply tools and three search tools, two coroutines — plus the two prompts in
-`itempipe/prompts/`, `itempipe/status.py`, the progress board, and
-`itempipe/search.toml`, which holds **everything about the job market**. The module knows
-how to search, never what to look for: no stack, country, site or job title appears in
-the Python.
+`itempipe/prompts/`, `itempipe/status.py`, the progress board, `itempipe/schema.sql`, which
+is the database in full, and `itempipe/search.toml`, which holds **everything about the
+job market**. The module knows how to search, never what to look for: no stack, country,
+site or job title appears in the Python.
 
 ## What to look for is a file
 
@@ -61,7 +61,22 @@ the CV, so all the context about the person and the target lives in data.
 * Claiming also picks up rows whose lease expired, and the apply loop waits on
   `claimable()` rather than only `NEW`, so a killed worker's work is picked up too.
 
-Inspect the queue with `sqlite3 py/itempipe.db 'select id, state, name from items'`.
+Inspect the queue with `sqlite3 py/itempipe.db 'select id, state, name from item'`.
+
+## The database is one file
+
+`itempipe/schema.sql` is the whole schema — three tables, their indexes, and the unique
+keys on `item.name_key`, `item.url`, `seen.key` and `hold(item, key)`. `itempipe init`
+reads it and hands it to SQLite as written. There are **no migrations**: no `ALTER TABLE`,
+no "add this column if it is missing", no shape of the database remembered in the Python.
+Every other command just connects, so a database that does not match the file fails on its
+first query instead of being quietly patched up.
+
+That puts one obligation on you, and it is deliberate: keep the development database equal
+to what `init` declares. When the schema changes, edit `schema.sql`, delete the old file
+(`rm py/itempipe.db*`) and run `itempipe init` again. Rewriting the models to match is the
+only thing to keep in step — `unique=True` in the model is documentation; the index in
+`schema.sql` is what the database enforces.
 
 ## Search is many small sessions, and it does not finish
 

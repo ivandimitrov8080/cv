@@ -12,7 +12,7 @@ import itempipe as ip
 class QueueTest(unittest.TestCase):
     def setUp(self):
         self.tmp = tempfile.TemporaryDirectory()
-        ip.open_db(Path(self.tmp.name) / "t.db")
+        ip.init_db(Path(self.tmp.name) / "t.db")   # the schema is a file, not the models
         ip.Item.delete().execute()
 
     def tearDown(self):
@@ -29,6 +29,12 @@ class QueueTest(unittest.TestCase):
         self.assertIsNotNone(self.add().id)
         with self.assertRaises(ip.IntegrityError):
             self.add(url="https://b")
+
+    def test_create_is_unique_by_url(self):
+        """The index, not the tool, is what refuses a second copy of one posting."""
+        self.add(url="https://a/jobs/1")
+        with self.assertRaises(ip.IntegrityError):
+            self.add(name="B", url="https://a/jobs/1")
 
     def test_claim_is_exclusive_and_moves_to_the_next_lead(self):
         for name in ("A", "B"):
