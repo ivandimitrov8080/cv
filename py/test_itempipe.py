@@ -33,10 +33,11 @@ class QueueTest(unittest.TestCase):
     def test_claim_is_exclusive_and_moves_to_the_next_lead(self):
         for name in ("A", "B"):
             self.add(name, url=f"https://{name.lower()}")
-        one, two = ip.Worker(), ip.Worker()
+        one, two, three = ip.Worker(), ip.Worker(), ip.Worker()
         self.assertIn("Name: A", one.claim())
         self.assertIn("Name: B", two.claim())
-        self.assertEqual(two.claim(), "No leads left. Stop.")
+        self.assertIn("Already claimed", two.claim())   # B, not a third lead
+        self.assertEqual(three.claim(), "No leads left. Stop.")
         self.assertNotEqual(one.item.id, two.item.id)
 
     def test_expired_claim_returns_to_the_queue(self):
@@ -79,6 +80,68 @@ class QueueTest(unittest.TestCase):
         w.claim()
         self.tool(w, "finish_item").invoke({"outcome": "archive", "reason": "closed"})
         self.assertEqual((ip.Item.get().archive_reason, ip.queued()), ("closed", 0))
+
+    def test_one_worker_holds_at_most_one_claim(self):
+        for name in ("A", "B"):
+            self.add(name, url=f"https://{name.lower()}")
+        w = ip.Worker()
+        self.assertIn("Name: A", w.claim())
+        out = w.claim()             # a second claim must not move on to B
+        self.assertIn("Already claimed", out)
+        self.assertEqual(w.item.name, "A")
+        self.assertEqual(ip.Item.get(ip.Item.name == "B").state, ip.NEW)
+
+    def test_renew_keeps_a_live_claim_out_of_other_workers_hands(self):
+        self.add()
+        one, two = ip.Worker(), ip.Worker()
+        one.claim()
+        ip.Item.update(claimed_until=ip.now() - ip.LEASE).execute()
+        self.assertTrue(one.renew())
+        self.assertEqual(ip.claimable(), 0)
+        self.assertEqual(two.claim(), "No leads left. Stop.")
+
+    def test_an_expired_unfinished_claim_is_still_claimable(self):
+        self.add()
+        ip.Worker().claim()
+        ip.Item.update(claimed_until=ip.now() - ip.LEASE).execute()
+        self.assertEqual(ip.queued(), 0)          # NEW only
+        self.assertEqual(ip.claimable(), 1)       # but free() can still pick it up
+
+    def test_begin_submission_is_fenced_after_the_claim_is_taken(self):
+        self.add()
+        w = ip.Worker()
+        w.claim()
+        ip.Item.update(claim_token="someone-else").execute()
+        self.assertEqual(self.tool(w, "begin_submission").invoke({}), ip.FENCED)
+        self.assertFalse(ip.Item.get().submitting)
+
+    def test_applied_is_fenced_if_the_claim_was_taken_before_finishing(self):
+        self.add()
+        w = ip.Worker()
+        w.claim()
+        self.tool(w, "begin_submission").invoke({})
+        ip.Item.update(claim_token="someone-else").execute()
+        self.assertEqual(self.tool(w, "finish_item").invoke({"outcome": "applied"}),
+                         ip.FENCED)
+        row = ip.Item.get()
+        self.assertEqual((row.state, row.submitting), (ip.WORKING, True))
+
+    def test_heartbeat_renews_a_claim_while_the_agent_is_running(self):
+        self.add()
+        w = ip.Worker()
+        w.claim()
+        ip.Item.update(claimed_until=ip.now() - ip.LEASE).execute()
+
+        async def beat():
+            task = asyncio.create_task(ip.heartbeat(w))
+            await asyncio.sleep(0.05)
+            task.cancel()
+            await asyncio.gather(task, return_exceptions=True)
+
+        with mock.patch.object(ip, "RENEW", 0.01):
+            asyncio.run(beat())
+        self.assertGreater(ip.Item.get().claimed_until, ip.now())
+        self.assertFalse(ip.claimable())
 
 
 class SeenTest(unittest.TestCase):
@@ -298,7 +361,7 @@ class StatusTest(unittest.TestCase):
 
 
 class BrowserTest(unittest.TestCase):
-    """One browser, one session (and so one tab) per worker.
+    """One browser and one MCP session; one tab per worker inside it.
 
     Unit level only: these read the data handed to the MCP client and the error paths.
     Nothing starts chromium, spawns playwright-mcp or speaks MCP — `itempipe apply` is
@@ -306,15 +369,96 @@ class BrowserTest(unittest.TestCase):
     """
 
     def test_workers_attach_to_one_shared_browser(self):
-        # `mcp_config` is data only: the fields `mcp.StdioServerParameters` wants, so a
-        # worker's playwright-mcp attaches to the shared CDP browser and owns no profile
+        # `mcp_config` is data only: the fields `mcp.StdioServerParameters` wants, so the
+        # one playwright-mcp server attaches to the shared CDP browser and owns no profile
         # of its own. Nothing here starts a browser or speaks MCP.
         cfg = ip.mcp_config(ip.cdp_endpoint())
         self.assertEqual(cfg["command"], "playwright-mcp")
         self.assertIn("--cdp-endpoint", cfg["args"])
         self.assertIn(ip.cdp_endpoint(), cfg["args"])
         self.assertNotIn("--user-data-dir", cfg["args"])   # the browser owns the profile
+        self.assertNotIn("--shared-browser-context", cfg["args"])  # tab pool, not HTTP
         self.assertEqual(ip.cdp_endpoint(9333), "http://127.0.0.1:9333")
+
+    def test_the_tab_listing_parser_knows_the_current_tab(self):
+        listing = "- 0: [](about:blank)\n- 1: (current) [Acme](https://acme.dev)"
+        self.assertEqual(ip.tab_indices(listing), [0, 1])
+        self.assertEqual(ip.current_tab(listing), 1)
+        self.assertIsNone(ip.current_tab("no tabs"))
+
+    def playwright(self):
+        """A stand-in for one playwright-mcp client with real tab bookkeeping."""
+        class Client:
+            def __init__(self):
+                self.tabs, self.current, self.calls = ["about:blank"], 0, []
+
+            def listing(self):
+                return "\n".join(
+                    f"- {i}: {'(current) ' if i == self.current else ''}"
+                    f"[{url}]({url})" for i, url in enumerate(self.tabs))
+
+            async def call_tool(self, name, arguments):
+                self.calls.append((name, dict(arguments)))
+                if name == "browser_tabs":
+                    action = arguments["action"]
+                    if action == "new":
+                        self.tabs.append("about:blank")
+                        self.current = len(self.tabs) - 1
+                        text = "new tab snapshot"
+                    elif action == "select":
+                        self.current = arguments["index"]
+                        text = self.listing()
+                    else:
+                        text = self.listing()
+                else:
+                    text = f"{name}@{self.current}"
+                return SimpleNamespace(content=[SimpleNamespace(text=text)], isError=False)
+        return Client()
+
+    def remote_tools(self):
+        return [SimpleNamespace(name="browser_navigate", description="Go",
+                                inputSchema={"type": "object", "properties": {}}),
+                SimpleNamespace(name="browser_tabs", description="Tabs",
+                                inputSchema={"type": "object", "properties": {}}),
+                SimpleNamespace(name="browser_close", description="Close",
+                                inputSchema={"type": "object", "properties": {}})]
+
+    def test_two_workers_get_two_tabs_in_one_browser(self):
+        client = self.playwright()
+
+        async def claim():
+            shared = ip.SharedBrowser(client, self.remote_tools())
+            return await shared.claim_tab(), await shared.claim_tab()
+
+        first, second = asyncio.run(claim())
+        self.assertEqual((first.index, second.index), (0, 1))
+        self.assertEqual(len(client.tabs), 2)       # one browser, two tabs
+        self.assertEqual(len({id(tab.browser) for tab in (first, second)}), 1)
+
+    def test_each_workers_tool_call_selects_its_own_tab(self):
+        client = self.playwright()
+
+        async def drive():
+            shared = ip.SharedBrowser(client, self.remote_tools())
+            first, second = await shared.claim_tab(), await shared.claim_tab()
+            one = {tool.name: tool for tool in shared.tools(first)}
+            two = {tool.name: tool for tool in shared.tools(second)}
+            a = await one["browser_navigate"].ainvoke({"url": "https://a"})
+            b = await two["browser_navigate"].ainvoke({"url": "https://b"})
+            c = await one["browser_navigate"].ainvoke({"url": "https://c"})
+            return a, b, c
+
+        self.assertEqual(asyncio.run(drive()),
+                         ("browser_navigate@0", "browser_navigate@1",
+                          "browser_navigate@0"))
+        selects = [call for call in client.calls
+                   if call[0] == "browser_tabs" and call[1]["action"] == "select"]
+        self.assertEqual([call[1]["index"] for call in selects[-3:]], [0, 1, 0])
+
+    def test_tab_management_tools_are_not_offered_to_the_model(self):
+        shared = ip.SharedBrowser(self.playwright(), self.remote_tools())
+        tab = asyncio.run(shared.claim_tab())
+        self.assertEqual({tool.name for tool in shared.tools(tab)}, {"browser_navigate"})
 
     def test_a_missing_mcp_client_is_a_sentence_not_a_traceback(self):
         async def enter():
@@ -343,6 +487,75 @@ class BrowserTest(unittest.TestCase):
         self.assertIn("display", ip.chrome_hint("Missing X server or $DISPLAY"))
         self.assertIn("9222", ip.chrome_hint("Address already in use"))
         self.assertIn("No recognised cause", ip.chrome_hint(""))
+
+
+class ApplyTest(unittest.TestCase):
+    """The apply loop itself: one browser, one tab per worker, one claim per agent."""
+
+    def setUp(self):
+        self.tmp = tempfile.TemporaryDirectory()
+        ip.open_db(Path(self.tmp.name) / "t.db")
+        ip.Item.delete().execute()
+
+    def tearDown(self):
+        ip.db.close()
+        self.tmp.cleanup()
+
+    def add(self, name):
+        return ip.Item.create(name=name, name_key=name.lower(), title="T",
+                              url=f"https://{name.lower()}.dev/1")
+
+    def test_two_workers_share_one_browser_and_get_one_tab_each(self):
+        self.add("Acme")
+        self.add("Beta")
+        entered, shared, claimed_ids = [], None, []
+
+        class Browser:
+            def __init__(self):
+                self.tabs = []
+
+            async def claim_tab(self):
+                self.tabs.append(len(self.tabs))
+                return ip.Tab(self, self.tabs[-1])
+
+            def tools(self, tab):
+                return []
+
+        @contextlib.asynccontextmanager
+        async def one_browser(endpoint):
+            nonlocal shared
+            entered.append(endpoint)
+            shared = Browser()
+            yield shared
+
+        async def no_chromium():
+            return None
+
+        def fake_agent(role, tools):
+            return {tool.name: tool for tool in tools}
+
+        async def fake_run(tools, text, tag="·", finish=True, limit=60):
+            claimed = tools["claim_next_item"].invoke({})
+            if not claimed.startswith("Id:"):
+                return f"{tag}: nothing claimed"
+            claimed_ids.append(int(claimed.splitlines()[0].split(":", 1)[1]))
+            tools["begin_submission"].invoke({})
+            tools["finish_item"].invoke({"outcome": "applied"})
+            return f"{tag}: applied"
+
+        with mock.patch.object(ip, "chromium", no_chromium), \
+             mock.patch.object(ip, "browser", one_browser), \
+             mock.patch.object(ip, "agent", fake_agent), \
+             mock.patch.object(ip, "run", fake_run), \
+             mock.patch.object(ip.status, "worker", lambda *args, **kwargs: None):
+            reports = asyncio.run(ip.apply(workers=2))
+
+        self.assertEqual(len(entered), 1)             # one MCP/browser session
+        self.assertEqual(shared.tabs, [0, 1])         # two tabs in it
+        self.assertEqual(len(claimed_ids), len(set(claimed_ids)))  # no job twice
+        self.assertEqual(sorted(claimed_ids), [1, 2])
+        self.assertEqual(ip.Item.select().where(ip.Item.state == ip.ACTIVE).count(), 2)
+        self.assertIn("applied", " ".join(reports))
 
 
 class McpTest(unittest.TestCase):
@@ -377,6 +590,14 @@ class McpTest(unittest.TestCase):
         out = asyncio.run(made.ainvoke({"url": "https://a"}))
         self.assertIn("NOT done", out)
         self.assertIn("Connection closed", out)
+
+    def test_a_failed_tab_switch_is_a_sentence_not_an_exception(self):
+        async def dead_tab(name, arguments):
+            raise RuntimeError("that tab is gone")
+        made = ip.mcp_tool(self.tool(), mock.Mock(), invoke=dead_tab)
+        out = asyncio.run(made.ainvoke({"url": "https://a"}))
+        self.assertIn("NOT done", out)
+        self.assertIn("tab is gone", out)
 
     def test_an_error_result_is_reported_as_such(self):
         async def call_tool(name, arguments):

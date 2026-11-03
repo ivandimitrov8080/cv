@@ -48,13 +48,18 @@ the CV, so all the context about the person and the target lives in data.
 
 * `claim_next_item` is a compare-and-swap: read the next free row, then claim it with one
   conditional `UPDATE` guarded by the token it had. The database is the lock; a lost race
-  just means looking again.
-* Every later write is fenced by the claim token, so a worker whose lease expired can never
-  finish someone else's lead.
+  just means looking again. A worker that already holds a claim gets that lead back
+  instead of a second one.
+* A live worker renews its lease from the database every `LEASE/3`, so a long form cannot
+  expire mid-application and be handed to a second agent.
+* Every later write is fenced by the claim token, and `begin_submission`/`finish_item`
+  check that their own `UPDATE` actually changed the row, so a worker whose lease expired
+  can never finish someone else's lead.
 * `begin_submission` is written *before* the irreversible submit. A worker that dies
   mid-submit leaves the lead in `NEEDS_REVIEW` on the next claim, never in a second
   application.
-* Claiming also picks up rows whose lease expired, so a killed worker costs nothing.
+* Claiming also picks up rows whose lease expired, and the apply loop waits on
+  `claimable()` rather than only `NEW`, so a killed worker's work is picked up too.
 
 Inspect the queue with `sqlite3 py/itempipe.db 'select id, state, name from items'`.
 
@@ -132,10 +137,12 @@ A session that raises does not end the run: the worker logs it on the board and 
 ## The browser
 
 `apply` starts **one** Chromium — headed by default, so you can watch it — with
-`--remote-debugging-port` (9222 by default, `ITEMPIPE_CDP_PORT` to change it) and then
-gives each worker its own `playwright-mcp` process attached to it with `--cdp-endpoint`.
-So there is one browser, one profile, one set of logins, and one tab per worker: a
-worker's tools only ever see its own page.
+`--remote-debugging-port` (9222 by default, `ITEMPIPE_CDP_PORT` to change it), then
+starts **one** `playwright-mcp` process attached to it with `--cdp-endpoint`. The server
+gives each worker a numbered tab in that one window, and every browser tool call selects
+the caller's tab under a lock before touching it. So there is one browser, one window,
+one profile, one set of logins, and one tab per worker: a worker's tools only ever see
+its own page, and `browser_tabs`/`browser_close` are hidden from the model.
 
 * A Chromium already listening on that port is adopted and left running; one we started
   is terminated when `apply` exits.
@@ -151,19 +158,20 @@ worker's tools only ever see its own page.
 * The profile is `/tmp/itempipe-chromium` (`ITEMPIPE_PROFILE` to change it). Under
   `chromium-sandboxed` that is inside the sandbox's tmpfs, so logins do not survive a
   reboot; bind-mount a profile path into the wrapper if you want them to.
-* Playwright's MCP server is documented as giving each client its own browser context
-  unless `--shared-browser-context` is passed (that flag is HTTP-only). Tab isolation is
-  what we rely on; if you need one cookie jar across all workers, verify it rather than
-  assume it.
-* The MCP connection itself is twenty lines in `browser()`: the official `mcp` SDK's
+* Spawning one `playwright-mcp` per worker would create one Playwright browser context per
+  worker — visibly, a new window for each. One server with a tab pool avoids that: all
+  tabs share the browser and its logins. The model never sees the tab tools, and workers
+  cannot switch, open or close each other's tabs.
+* The MCP connection itself is short: the official `mcp` SDK's
   `Client(StdioServerParameters(command="playwright-mcp", args=["--cdp-endpoint", …]))`
-  spawns the server over stdio, handshakes and lists its tools, and each tool is wrapped in
-  a LangChain `StructuredTool` whose `args_schema` is the tool's own JSON Schema dict —
-  passed through, not rebuilt, so the model sees exactly what the server declared.
-  The connection is held open for as long as the worker runs, because those tools call back
-  through it. LangChain 1 can do the same conversion via `langchain.mcp.MCPAdapter`, but
-  that namespace is FastMCP underneath (`fastmcp>=4`), so it is not used and neither
-  `fastmcp` nor the old `langchain-mcp-adapters` is a dependency. `search` never touches MCP.
+  spawns the one server over stdio, handshakes and lists its tools, and each tool is
+  wrapped in a LangChain `StructuredTool` whose `args_schema` is the tool's own JSON
+  Schema dict — passed through, not rebuilt, so the model sees exactly what the server
+  declared. `SharedBrowser` binds each wrapper to one tab and serialises the select+call
+  pair. The connection is held open for as long as any worker runs. LangChain 1 can do
+  the same conversion via `langchain.mcp.MCPAdapter`, but that namespace is FastMCP
+  underneath (`fastmcp>=4`), so it is not used and neither `fastmcp` nor the old
+  `langchain-mcp-adapters` is a dependency. `search` never touches MCP.
 * playwright-mcp's own stderr goes to `/tmp/itempipe-mcp-9222.log` (`ITEMPIPE_MCP_LOG`)
   rather than the terminal, which the progress board is drawing on. Each tool result is
   capped at `ITEMPIPE_MCP_OUTPUT` (20000) characters, because a page snapshot can be

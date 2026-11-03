@@ -39,6 +39,7 @@ NEW, WORKING, ACTIVE, REVIEW = "NEW", "WORKING", "ACTIVE", "NEEDS_REVIEW"
 HOLD = "HOLD"                       # waiting for the user to answer a question
 FENCED = "This lead is no longer yours; stop."
 LEASE = timedelta(minutes=30)
+RENEW = max(1.0, LEASE.total_seconds() / 3)   # heartbeat: never let a live claim expire
 RETRY = timedelta(days=7)           # a dead posting may be a bad deploy: look once more
 RETENTION = timedelta(days=int(os.environ.get("ITEMPIPE_SEEN_DAYS", "365")))
 DB = Path(os.environ.get("ITEMPIPE_DB", ROOT / "py/itempipe.db"))
@@ -290,6 +291,16 @@ def free():
                                ((Item.state == WORKING) & (Item.claimed_until < now())))
 
 
+def claimable():
+    """Leads a worker could claim right now, including expired but unfinished claims.
+
+    `queued()` is only the NEW rows. Using it as the apply loop's stop condition would
+    leave a crashed worker's expired claims invisible, so `apply` would exit without
+    ever giving another worker the chance to pick them up.
+    """
+    return free().count()
+
+
 def tally():
     """Counts per state for the board's footer; archived leads are not counted."""
     counts = {state: 0 for state in (NEW, WORKING, ACTIVE, HOLD, REVIEW)}
@@ -305,7 +316,13 @@ open_db()   # so `import itempipe` is usable; the CLI re-points it at --db
 
 @dataclass
 class Worker:
-    """One claim: the token stored in the row is the only authority to write it."""
+    """One claim: the token stored in the row is the only authority to write it.
+
+    An apply conversation always holds at most one claim. If the model calls
+    `claim_next_item` a second time, it gets the lead it already has rather than a
+    second row: two tabs may never work on two claims from one agent, and one worker
+    can never accidentally leave its first lead claimed while moving on to another.
+    """
     item: Item | None = None
 
     def claim(self):
@@ -313,15 +330,21 @@ class Worker:
         (Item.update(state=REVIEW, submitting=False, claim_token=None, claimed_until=None)
          .where(Item.state == WORKING, Item.submitting == True, Item.claimed_until < now())
          .execute())
+        if self.item is not None:
+            mine = self.mine()
+            if mine is not None:
+                return (f"Already claimed: {mine.name} <{mine.url}>. Finish this lead "
+                        "before claiming another; one worker applies to one lead at a time.")
+            self.item = None        # the old claim was lost or completed elsewhere
         token = uuid.uuid4().hex
         for _ in range(24):         # compare-and-swap; losing the race means looking again
             row = free().order_by(Item.id).first()
             if row is None:
                 return "No leads left. Stop."
-            guard = (Item.claim_token.is_null() if row.claim_token is None
-                     else Item.claim_token == row.claim_token)
+            token_guard = (Item.claim_token.is_null() if row.claim_token is None
+                           else Item.claim_token == row.claim_token)
             won = (Item.update(state=WORKING, claim_token=token, claimed_until=now() + LEASE)
-                   .where(Item.id == row.id, guard).execute())
+                   .where(Item.id == row.id, Item.state == row.state, token_guard).execute())
             if won:
                 self.item = Item.get(Item.claim_token == token)
                 return (f"Id: {self.item.id}\nName: {self.item.name}\n"
@@ -329,8 +352,24 @@ class Worker:
                         f"Notes: {self.item.notes or '-'}")
         return "Too much contention. Stop."
 
+    def renew(self):
+        """Push the lease out while this worker is still alive.
+
+        A form can take longer than one LEASE. Without a heartbeat the row becomes
+        claimable again half-way through, and two workers can submit the same job.
+        Renewal is fenced by the token, so a worker that lost its claim cannot revive it.
+        """
+        if self.item is None:
+            return False
+        return (Item.update(claimed_until=now() + LEASE)
+                .where(Item.id == self.item.id, Item.state == WORKING,
+                       Item.claim_token == self.item.claim_token).execute()) == 1
+
     def mine(self):
         if self.item is None:
+            return None
+        if not self.renew():
+            self.item = None
             return None
         return Item.get_or_none(Item.id == self.item.id, Item.state == WORKING,
                                 Item.claim_token == self.item.claim_token)
@@ -1217,9 +1256,12 @@ def tools_for(w=None, sess=None):
         item = w.mine()
         if item is None:
             return FENCED
-        Item.update(submitting=True).where(Item.id == item.id,
-                                           Item.claim_token == item.claim_token).execute()
-        return "Submission guard set."
+        guarded = (Item.update(submitting=True, claimed_until=now() + LEASE)
+                   .where(Item.id == item.id, Item.state == WORKING,
+                          Item.claim_token == item.claim_token).execute())
+        # The update is the fence. Reporting success when it changed no row would let
+        # the model submit a form after another worker had already taken the lead.
+        return "Submission guard set." if guarded == 1 else FENCED
 
     @tool
     def finish_item(outcome: str, reason: str = "") -> str:
@@ -1231,12 +1273,13 @@ def tools_for(w=None, sess=None):
         if item is None:
             return FENCED
         ident = item.id
+        message = f"{item.name}: {outcome} ({clean(reason) or 'no reason'})."
         if outcome == "applied":
             if not item.submitting:
                 return "NOT done: call begin_submission immediately before the final submit."
-            w.end(state=ACTIVE, submitting=False, advanced_on=now())
+            ended = w.end(state=ACTIVE, submitting=False, advanced_on=now())
         elif outcome == "retry":
-            w.end(state=REVIEW if item.submitting else NEW, submitting=False)
+            ended = w.end(state=REVIEW if item.submitting else NEW, submitting=False)
         elif outcome == "hold":
             if clean(reason):
                 saved, note = remember(reason, item)
@@ -1247,22 +1290,26 @@ def tools_for(w=None, sess=None):
                 return ("NOT held: no unanswered question is saved for this lead. Call "
                         "save_question for each one the form asks, then finish_item(\"hold\").")
             if item.submitting:
-                w.end(state=REVIEW, submitting=False)
+                ended = w.end(state=REVIEW, submitting=False)
+                if not ended:
+                    return FENCED
                 return (f"{item.name}: the submission had already started, so it needs "
                         f"review; its question(s) are in {QUESTIONS.name}.")
-            w.end(state=HOLD, submitting=False)
-            return (f"{item.name}: on hold until the user answers {len(open_now)} "
-                    f"question(s) in {QUESTIONS.name}. It goes back in the queue on the "
-                    "next run, once every one of them is answered.")
+            ended = w.end(state=HOLD, submitting=False)
+            message = (f"{item.name}: on hold until the user answers {len(open_now)} "
+                       f"question(s) in {QUESTIONS.name}. It goes back in the queue on "
+                       "the next run, once every one of them is answered.")
         elif outcome == "archive":
-            w.end(archived_at=now(), submitting=False,
-                  archive_reason=clean(reason) or "abandoned")
+            ended = w.end(archived_at=now(), submitting=False,
+                          archive_reason=clean(reason) or "abandoned")
         else:                   # a typo must not archive a lead
             return ('NOT done: outcome must be "applied", "retry", "hold" or "archive"; '
                     "nothing was changed and the lead is still yours.")
+        if not ended:
+            return FENCED
         if outcome != "hold":
             drop_holds(ident)   # a finished lead waits on nothing
-        return f"{item.name}: {outcome} ({clean(reason) or 'no reason'})."
+        return message
 
     return ([claim_next_item, lookup_answer, save_question, begin_submission, finish_item]
             if w else [create_item, web_search, fetch_page])
@@ -1468,13 +1515,13 @@ async def stop_proc(proc, timeout=5.0):
 
 
 async def chromium(port=CDP_PORT, timeout=20.0):
-    """Start one Chromium — headed unless ITEMPIPE_HEADLESS is set — that every worker's
+    """Start one Chromium — headed unless ITEMPIPE_HEADLESS is set — that the shared
     playwright-mcp attaches to.
 
     Returns the process when we started it, or None when a Chromium was already
     listening (a previous run, or one you started yourself): in that case it is not
-    ours to kill. Every worker gets its own MCP session against this browser, so each
-    holds its own tab; nothing else is shared but the process and its profile.
+    ours to kill. One playwright-mcp session attaches to this browser and gives every
+    worker a tab; nothing else is shared but the process and its profile.
 
     Chromium's stderr goes to CHROME_LOG rather than the terminal, because a browser
     that refuses to start is silent on stdout and its last lines name the reason.
@@ -1512,7 +1559,7 @@ async def chromium(port=CDP_PORT, timeout=20.0):
 
 
 def mcp_config(endpoint):
-    """One worker's MCP server: no browser of its own, a CDP seat in the shared one.
+    """The one playwright-mcp server that owns the shared browser and all its tabs.
 
     Exactly the fields `mcp.StdioServerParameters` takes, so it can be passed straight to
     it. The environment is inherited whole because playwright-mcp needs more of it than
@@ -1523,12 +1570,55 @@ def mcp_config(endpoint):
             "env": dict(os.environ)}
 
 
-def mcp_tool(tool, client):
-    """One MCP tool as a LangChain tool that calls back through the worker's session.
+TAB_LINE = re.compile(r"^\s*-\s*(\d+):\s*(.*)$")
+HIDDEN_BROWSER_TOOLS = frozenset({"browser_tabs", "browser_close"})
+
+
+def result_text(result):
+    """Flatten an MCP CallToolResult's content blocks into one string."""
+    parts = []
+    for block in field_of(result, "content") or ():
+        if (text := field_of(block, "text")) is not None:
+            parts.append(text_of(text))
+        else:                   # a screenshot or a resource: name it, never inline it
+            parts.append(f"[{field_of(block, 'type', 'other')} content]")
+    return "\n".join(part for part in parts if part).strip()
+
+
+def result_failed(result):
+    return bool(field_of(result, "is_error") or field_of(result, "isError"))
+
+
+def tab_indices(listing):
+    """The tab numbers in playwright-mcp's `browser_tabs` listing."""
+    return [int(match.group(1)) for match in TAB_LINE.finditer(listing or "")]
+
+
+def current_tab(listing):
+    """The number of the tab marked `(current)`, or None when the listing has none."""
+    for match in TAB_LINE.finditer(listing or ""):
+        if "(current)" in match.group(2):
+            return int(match.group(1))
+    return None
+
+
+@dataclass(frozen=True)
+class Tab:
+    """One worker's seat in the shared browser."""
+    browser: "SharedBrowser"
+    index: int
+
+
+def mcp_tool(tool, client, invoke=None):
+    """One MCP tool as a LangChain tool that calls back through the shared session.
 
     The server's own JSON Schema is handed straight over as `args_schema`: LangChain takes
     a plain schema dict and gives it to the model verbatim, so there is no pydantic model
     to build and nothing that can drift from what the server declared.
+
+    `invoke` is how a worker's tools select that worker's tab immediately before the
+    call. It is passed separately so tests can still exercise the MCP adaptation without
+    a browser, and so the same client can serve all workers safely.
 
     Like every other tool here it answers instead of raising: a tool that fails, or a
     server that has gone away, comes back as a `NOT done: …` sentence the model can act
@@ -1542,17 +1632,12 @@ def mcp_tool(tool, client):
 
     async def call(**arguments):
         try:
-            result = await client.call_tool(name, arguments)
+            result = await (invoke(name, arguments) if invoke is not None
+                            else client.call_tool(name, arguments))
         except Exception as exc:        # a dead subprocess must not kill the worker
             return f"NOT done: {type(exc).__name__}: {clean(exc)}. The browser may be gone."
-        parts = []
-        for block in field_of(result, "content") or ():
-            if (text := field_of(block, "text")) is not None:
-                parts.append(text_of(text))
-            else:               # a screenshot or a resource: name it, never inline it
-                parts.append(f"[{field_of(block, 'type', 'other')} content]")
-        text = "\n".join(part for part in parts if part).strip()
-        if field_of(result, "is_error") or field_of(result, "isError"):
+        text = result_text(result)
+        if result_failed(result):
             return f"NOT done: {text or 'the tool reported an error without saying why.'}"
         if len(text) > MCP_OUTPUT:      # a page snapshot can outgrow the context it lands in
             text = text[:MCP_OUTPUT] + "\n[truncated]"
@@ -1562,19 +1647,74 @@ def mcp_tool(tool, client):
                           args_schema=schema, coroutine=call)
 
 
+class SharedBrowser:
+    """One playwright-mcp connection and one tab per worker.
+
+    Spawning one MCP server per worker makes each server a separate Playwright browser
+    context: a second window for every extra worker. Instead there is one server for the
+    whole run, and each worker is assigned a tab by index. Every tool call selects that
+    tab and runs under one lock, so two workers can never drive the same page even though
+    they share the MCP process.
+    """
+
+    def __init__(self, client, remote_tools):
+        self.client = client
+        self.remote_tools = list(remote_tools)
+        self.lock = asyncio.Lock()
+        self.started = False
+
+    async def _tabs(self, action, **arguments):
+        result = await self.client.call_tool("browser_tabs",
+                                             {"action": action, **arguments})
+        if result_failed(result):
+            raise RuntimeError(result_text(result) or f"browser_tabs {action} failed")
+        return result_text(result)
+
+    async def claim_tab(self):
+        """Give a worker its own tab, reusing the browser's initial tab for the first."""
+        async with self.lock:
+            if not self.started:
+                listing = await self._tabs("list")
+                found = tab_indices(listing)
+                if found:
+                    await self._tabs("select", index=found[0])
+                    self.started = True
+                    return Tab(self, found[0])
+            await self._tabs("new")
+            listing = await self._tabs("list")
+            index = current_tab(listing)
+            if index is None:
+                found = tab_indices(listing)
+                if not found:
+                    raise RuntimeError("playwright-mcp opened no tab")
+                index = found[-1]
+            self.started = True
+            return Tab(self, index)
+
+    async def run(self, tab, name, arguments):
+        """Select `tab`, call one browser tool, and keep the selection atomic."""
+        async with self.lock:
+            await self._tabs("select", index=tab.index)
+            return await self.client.call_tool(name, arguments)
+
+    def tools(self, tab):
+        """The browser tools, bound to `tab`, with tab management hidden from the model."""
+        return [mcp_tool(tool, self.client,
+                         invoke=lambda name, arguments, tab=tab: self.run(tab, name, arguments))
+                for tool in self.remote_tools
+                if field_of(tool, "name") not in HIDDEN_BROWSER_TOOLS]
+
+
 @contextlib.asynccontextmanager
 async def browser(endpoint):
-    """A worker's own playwright-mcp subprocess, held open while that worker runs.
+    """The one playwright-mcp process all apply workers share.
 
     The client is the official `mcp` SDK — `mcp.Client` spawns the server over stdio,
-    does the initialize handshake and lists its tools — and each tool is converted to a
-    LangChain tool here. LangChain 1's `langchain.mcp` would do the same conversion, but
-    it is FastMCP underneath (`fastmcp>=4`), which this environment does not have and
-    does not need: the protocol is the SDK's, the adaptation is twenty lines.
-
-    The subprocess has to outlive the loop that uses the tools, so this is a context
-    manager rather than a function returning a list. Server stderr goes to MCP_LOG
-    instead of the terminal, which the progress board is busy drawing on.
+    does the initialize handshake and lists its tools. The server attaches to the one
+    Chromium started by `chromium()`; `SharedBrowser` then gives every worker a tab in
+    that browser. The subprocess has to outlive all workers, so this is a context manager
+    rather than a function returning a list. Server stderr goes to MCP_LOG instead of the
+    terminal, which the progress board is busy drawing on.
     """
     try:
         from mcp import Client, StdioServerParameters, stdio_client
@@ -1589,11 +1729,26 @@ async def browser(endpoint):
         # aside; `Client(params)` would send it to our stderr, over the board.
         async with Client(stdio_client(params, errlog=errlog)) as client:
             remote = await client.list_tools()
-            yield [mcp_tool(tool, client) for tool in remote.tools]
+            yield SharedBrowser(client, remote.tools)
+
+
+async def heartbeat(w):
+    """Renew a live claim while its agent is still thinking or filling a form."""
+    while True:
+        await asyncio.sleep(RENEW)
+        try:
+            w.renew()
+        except Exception:       # a transient DB lock must not kill the heartbeat
+            pass
 
 
 async def apply(workers=2):
     """Apply to the queue in parallel, one lead at a time per worker.
+
+    One Chromium and one playwright-mcp process serve every worker; `SharedBrowser`
+    gives each worker its own tab in that one window. Claims are compare-and-swap, kept
+    alive by a heartbeat, and every write is fenced by the claim token, so two workers
+    can never submit the same lead.
 
     Nothing that goes wrong with one lead is allowed to end the run: a graph that hits the
     recursion limit, a crashed tab or a dead MCP session is reported on the board, the
@@ -1602,42 +1757,48 @@ async def apply(workers=2):
     `ExceptionGroup`, so the catching happens *inside* the `browser()` block and again
     around it — the group never reaches the terminal.
     """
-    slots, reports = asyncio.Semaphore(2), []
+    reports = []
     proc = await chromium()
     try:
-        async def one(i):
-            tag, w = f"w{i + 1}", Worker()
-            async with slots:
+        async with browser(cdp_endpoint()) as shared:
+            async def one(i):
+                tag, w = f"w{i + 1}", Worker()
                 try:
                     status.worker(tag, "state", "attaching to browser", state="browser")
-                    async with browser(cdp_endpoint()) as mcp_tools:
-                        a = agent("apply", tools_for(w) + mcp_tools)
-                        stuck = 0
-                        while before := queued():
-                            failed = False
-                            try:
-                                reports.append(await run(a, APPLY, tag=tag,
-                                                         limit=APPLY_STEPS))
-                            except BaseException as exc:   # one stuck lead, not the run
-                                if isinstance(exc, (asyncio.CancelledError,
-                                                    KeyboardInterrupt, SystemExit)):
-                                    raise
-                                failed = True
-                                note = f"{type(exc).__name__}: {clean(exc)}"
-                                status.worker(tag, "state", note, state="retry")
-                                reports.append(f"[{tag}] gave up on a lead: {note}")
-                            finally:  # a worker that stopped mid-claim must not hold a lock
-                                if item := w.mine():
-                                    drop_holds(item.id)
-                                    w.end(state=REVIEW if item.submitting else NEW,
-                                          submitting=False)
-                            stuck = stuck + 1 if failed else 0
-                            if stuck >= 3:      # three in a row: this is not going to work
-                                reports.append(f"[{tag}] stopping after {stuck} failed "
-                                               "leads in a row; the queue is untouched")
-                                return
-                            if not failed and queued() >= before:
-                                return  # no progress: that lead is stuck, do not spin
+                    tab = await shared.claim_tab()
+                    status.worker(tag, "state", f"ready in tab {tab.index}", state="browser")
+                    a = agent("apply", tools_for(w) + shared.tools(tab))
+                    stuck = 0
+                    while claimable():
+                        before, failed = claimable(), False
+                        beat = asyncio.create_task(heartbeat(w))
+                        try:
+                            reports.append(await run(a, APPLY, tag=tag,
+                                                     limit=APPLY_STEPS))
+                        except BaseException as exc:   # one stuck lead, not the run
+                            if isinstance(exc, (asyncio.CancelledError,
+                                                KeyboardInterrupt, SystemExit)):
+                                raise
+                            failed = True
+                            note = f"{type(exc).__name__}: {clean(exc)}"
+                            status.worker(tag, "state", note, state="retry")
+                            reports.append(f"[{tag}] gave up on a lead: {note}")
+                        finally:  # a worker that stopped mid-claim must not hold a lock
+                            beat.cancel()
+                            await asyncio.gather(beat, return_exceptions=True)
+                            if item := w.mine():
+                                drop_holds(item.id)
+                                w.end(state=REVIEW if item.submitting else NEW,
+                                      submitting=False)
+                        stuck = stuck + 1 if failed else 0
+                        if stuck >= 3:      # three in a row: this is not going to work
+                            reports.append(f"[{tag}] stopping after {stuck} failed "
+                                           "leads in a row; the queue is untouched")
+                            return
+                        # Compare claimable work, not only NEW: an expired claim that was
+                        # just released is progress too, and a stuck lead is not.
+                        if not failed and claimable() >= before:
+                            return
                 except BaseException as exc:
                     if isinstance(exc, (asyncio.CancelledError, KeyboardInterrupt,
                                         SystemExit)):
@@ -1646,13 +1807,13 @@ async def apply(workers=2):
                     status.worker(tag, "state", f"stopped: {note}", state="done")
                     reports.append(f"[{tag}] stopped: {note}")
 
-        results = await asyncio.gather(*(one(i) for i in range(workers)),
-                                       return_exceptions=True)
-        for result in results:
-            if isinstance(result, BaseException) and not isinstance(
-                    result, asyncio.CancelledError):
-                reports.append(f"[itempipe] worker crashed: {type(result).__name__}: "
-                               f"{clean(result)}")
+            results = await asyncio.gather(*(one(i) for i in range(workers)),
+                                           return_exceptions=True)
+            for result in results:
+                if isinstance(result, BaseException) and not isinstance(
+                        result, asyncio.CancelledError):
+                    reports.append(f"[itempipe] worker crashed: {type(result).__name__}: "
+                                   f"{clean(result)}")
     finally:
         if proc is not None:
             status.worker("··", "state", "closing browser")
