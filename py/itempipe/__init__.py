@@ -583,6 +583,8 @@ QUESTIONS_HEAD = """#+TITLE: Application Questions and Answers
 # answer serves every application. :SOURCE: lists the forms that asked it.
 # :DECLINE: t instead of an answer means you will not answer that field: the
 # agent leaves it blank and never invents a value, and no lead is held for it.
+# :ALIASES: lists the other wordings one heading answers to (relocating, move,
+# Portugal), so a short general heading covers every form that asks the field.
 # A heading with neither an :ANSWER: nor a :DECLINE: is still open: `itempipe
 # apply` appends it when a form asks what this file cannot answer, and holds.
 #
@@ -594,7 +596,17 @@ QUESTIONS_HEAD = """#+TITLE: Application Questions and Answers
 
 HEADING = re.compile(r"^(\*+)\s+(.*?)\s*$")
 PROPERTY = re.compile(r"^\s*:([A-Za-z][\w@#%+-]*):\s*(.*?)\s*$")
-STOPWORDS = frozenset("""a an and any are as at be been by can could do does for from
+# Words that make a question a question rather than name its subject. Dropped before two
+# questions are compared, so "Are you open to relocating?" and "Relocating?" agree.
+STOPWORDS = frozenset("""a able about an and any are as at available based be been by
+    can consider considering could current currently do does enter for from has have how
+    i if in is it its me my of on open or please prefer preferred provide should specify
+    tell that the their them this to us was we were what when where which who why will
+    willing with would you your yours""".split())
+# The subset `question_key` folds with, frozen: the key is a hold's link to a heading, so
+# it must keep meaning what it meant when the hold was written. Widening STOPWORDS above
+# changes matching; it must not change a key.
+KEY_STOPWORDS = frozenset("""a an and any are as at be been by can could do does for from
     has have how i if in is it its me my of on or please should tell that the their
     them this to us was we were what when where which who why will with would you your
     yours""".split())
@@ -606,12 +618,15 @@ class Question:
 
     `decline` is the user's refusal to answer at all (`:DECLINE: t`): it settles the
     question without supplying a value, so nothing is invented and no lead waits on it.
+    `aliases` are the other wordings this one heading answers to (`:ALIASES:`), so a short
+    generic heading covers every form that asks the field its own way.
     """
     title: str
     answer: str = ""
     decline: bool = False
     note: str = ""
     source: str = ""
+    aliases: str = ""
     level: int = 2
     line: int = 0              # where the heading is, so a report can point at it
 
@@ -644,12 +659,12 @@ def tokens_of(text):
 def question_key(text):
     """One heading, one identity: case, punctuation, stopwords and spacing folded away.
 
-    Kept apart from `tokens_of` on purpose: the key is a hold's link to a heading, so it
-    must keep meaning what it meant when the hold was written — a `hold` table written by
-    an older version still points at the same heading.
+    Kept apart from `tokens_of` on purpose, and folded with the frozen KEY_STOPWORDS: the
+    key is a hold's link to a heading, so it must keep meaning what it meant when the
+    hold was written — a `hold` table written by an older version still points here.
     """
     words = re.findall(r"[a-z0-9]+", str(text or "").lower())
-    return " ".join(word for word in words if word not in STOPWORDS)
+    return " ".join(word for word in words if word not in KEY_STOPWORDS)
 
 
 def questions(path=None):
@@ -679,6 +694,8 @@ def questions(path=None):
             found[-1] = replace(entry, answer=value)
         elif name == "DECLINE":
             found[-1] = replace(entry, decline=truthy(value))
+        elif name == "ALIASES":           # other wordings this heading answers to
+            found[-1] = replace(entry, aliases=f"{entry.aliases} {value}".strip())
         elif name in ("NOTE", "FORMAT"):
             note = f"{entry.note}; {value}" if entry.note else value
             found[-1] = replace(entry, note=note)
@@ -724,6 +741,18 @@ def keywords(text, n=KEYWORDS):
     return [word for _, word in ranked[:n]]
 
 
+def words_of(item):
+    """The words a question answers to: its own, plus the `:ALIASES:` it lists.
+
+    Takes a `Question` or a plain string. This is what makes one short heading able to
+    cover the dozen wordings a dozen forms use for the same field — the synonyms live in
+    the file, next to the heading, not in the Python.
+    """
+    if isinstance(item, Question):
+        return set(tokens_of(item.title)) | set(tokens_of(item.aliases))
+    return set(tokens_of(item))
+
+
 def closest(query="", limit=3, entries=None, min_score=NEAR):
     """The questions nearest in meaning to `query`, best first.
 
@@ -741,9 +770,10 @@ def closest(query="", limit=3, entries=None, min_score=NEAR):
     asked = set(words)
     ranked = []
     for entry in rows:
-        score = max(similarity(needle, entry.title) for needle in needles)
+        known = words_of(entry)
+        score = max(similarity(needle, " ".join(sorted(known))) for needle in needles)
         if score >= min_score:
-            shared = len(asked & set(tokens_of(entry.title)))
+            shared = len(asked & known)
             ranked.append((score, shared, entry.decline, entry))
     ranked.sort(key=lambda hit: hit[:3], reverse=True)
     return [hit[-1] for hit in ranked[:limit]]
@@ -753,12 +783,17 @@ def same_question(a, b):
     """Is one of these two questions just a shorter way of asking the other?
 
     Deliberately strict: every meaningful word of one has to appear in the other, once
-    parentheticals and numbers are gone. That keeps "experience with Go" and "experience
-    with Node.js" apart, and "current salary" away from "salary expectation". It is the
-    predicate that decides whether a question is saved twice, so a false yes either asks
-    the user twice or answers a field they never answered.
+    parentheticals, numbers and the filler words are gone. That keeps "experience with
+    Go" and "experience with Node.js" apart, and "current salary" away from "salary
+    expectation". It is the predicate that decides whether a question is saved twice, so
+    a false yes either asks the user twice or answers a field they never answered.
+
+    A short heading is therefore the safe shape: what it says is contained in any form's
+    longer wording of the same field, while a heading that carries one form's paperwork
+    matches nothing but that form. `:ALIASES:` adds the synonyms it needs — one word per
+    wording, `relocating` as well as `relocation`.
     """
-    words_a, words_b = set(tokens_of(a)), set(tokens_of(b))
+    words_a, words_b = words_of(a), words_of(b)
     return bool(words_a and words_b) and (words_a <= words_b or words_b <= words_a)
 
 
@@ -778,14 +813,24 @@ def best_answer(query):
     This is what refuses a hold, so it asks `same_question` rather than settling for the
     closest heading (`lookup_answer` shows those): a question is only taken as answered
     when the file's own wording covers every word of it.
+
+    Where several headings qualify, the one whose *title* the question spells out wins
+    (an alias-only match is the weakest), then an answer over a refusal, then the more
+    specific heading. So a form asking just "City" gets the saved city, not the address
+    refusal that happens to list `city` among its aliases.
     """
-    if not tokens_of(query):
+    words = set(tokens_of(query))
+    if not words:
         return None
+
+    def rank(entry):
+        return (set(tokens_of(entry.title)) <= words,      # the heading, spelled out
+                not entry.decline,                          # an answer beats a refusal
+                len(words_of(entry)))                       # the more specific one
+
     found = [entry for entry in questions()
-             if entry.settled and same_question(query, entry.title)]
-    # A refusal outranks an answer, and a more specific heading outranks a broader one.
-    return max(found, key=lambda entry: (entry.decline,
-                                         len(tokens_of(entry.title)))) if found else None
+             if entry.settled and same_question(query, entry)]
+    return max(found, key=rank) if found else None
 
 
 def repeats():
@@ -798,7 +843,7 @@ def repeats():
     groups = []
     for entry in questions():
         for group in groups:
-            if any(same_question(entry.title, other.title) for other in group):
+            if any(same_question(entry, other) for other in group):
                 group.append(entry)
                 break
         else:
@@ -893,7 +938,7 @@ def ask(question, source=""):
     """
     question, source = clean(question), clean(source)
     for entry in questions():
-        if same_question(question, entry.title):
+        if same_question(question, entry):
             return entry, False
     label = field_label(question)
     path = Path(QUESTIONS)

@@ -6,6 +6,8 @@
 # answer serves every application. :SOURCE: lists the forms that asked it.
 # :DECLINE: t instead of an answer means you will not answer that field: the
 # agent leaves it blank and never invents a value, and no lead is held for it.
+# :ALIASES: lists the other wordings one heading answers to (relocating, move,
+# Portugal), so a short general heading covers every form that asks the field.
 # A heading with neither an :ANSWER: nor a :DECLINE: is still open: `itempipe
 # apply` appends it when a form asks what this file cannot answer, and holds.
 #
@@ -15,6 +17,7 @@
 # ones as file:line, and `itempipe questions postal` finds a heading by words.
 #
 # Keep one heading per question, short, with the form's paperwork in :SOURCE:.
+# `C-c D` (see the README) marks the heading at point :DECLINE: t.
 
 * Recurring answers
 
@@ -153,7 +156,8 @@
    :PROPERTIES:
    :DECLINE: t
    :ANSWER: N/A
-   :NOTE: One heading for every address field: the street address is not in the CV/profile and is not given out. DECLINE means leave it blank; N/A is what to type where the form refuses to submit without it.
+   :ALIASES: address, address line, city, state, province, zip, postal code, postcode, town, home address
+   :NOTE: One heading for every address field: the street address is not in the CV/profile and is not given out. DECLINE means leave it blank; N/A is what to type where the form refuses to submit without it. A form that asks only "City" still gets the saved current location, not this.
    :SOURCE: Hazelcast (Home address: Address Line 1, Town, Postcode), Dynatrace (Address Line 1 / City / State/Province / Zip), Taulia (SAP - Address, City, ZIP required), Graphwise/Ontotext (Address / City / Province / Postal Code)
    :END:
 
@@ -184,16 +188,12 @@
    :ANSWER:   No, remote only.
    :END:
 
-** Are you open to relocating to Spain if you are currently based elsewhere?
+** Relocation
    :PROPERTIES:
-   :ANSWER:   No, remote only.
-   :SOURCE: Qualifyze GmbH
-   :END:
-
-** Available for Realocation to Portugal (Not supported by HumanIT):
-   :PROPERTIES:
-   :ANSWER:
-   :SOURCE: HumanIT
+   :ANSWER: No, remote only.
+   :ALIASES: relocate, relocating, relocation, realocation, moving, move, spain, portugal, elsewhere
+   :NOTE: One heading for every "are you open to relocating" field: not open to relocation, remote or B2B only.
+   :SOURCE: Qualifyze (relocating to Spain), HumanIT (relocation to Portugal)
    :END:
 
 ** What second languages do you speak?: *

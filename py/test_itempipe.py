@@ -707,8 +707,8 @@ class QuestionsTest(unittest.TestCase):
 class MatchingTest(unittest.TestCase):
     """Questions are found by meaning — the words of a question, not its wording.
 
-    The file this stands in for is the real one: the same address field saved a dozen
-    times in a dozen wordings, each with the company's own paperwork on the end.
+    The file stands in for the real one: short headings, the form's paperwork kept out of
+    them, and `:ALIASES:` carrying the synonyms a dozen forms use for the same field.
     """
 
     FILE = """#+TITLE: Application Questions and Answers
@@ -720,9 +720,10 @@ class MatchingTest(unittest.TestCase):
    :ANSWER: 100 000 EUR / year
    :END:
 
-** Address Line 1: / City: / State/Province: / Zip/Postal Code: (all marked required on the Dynatrace SAP SuccessFactors application form)
+** Address
    :PROPERTIES:
    :DECLINE: t
+   :ALIASES: address line, postal address, city, state, province, zip, postal code
    :END:
 
 ** Address Line 1 (also City, State/Province and Zip/Postal Code are required)
@@ -732,6 +733,12 @@ class MatchingTest(unittest.TestCase):
 ** Years of Java experience
    :PROPERTIES:
    :ANSWER: Eight years
+   :END:
+
+** Relocation
+   :PROPERTIES:
+   :ANSWER: Remote only.
+   :ALIASES: relocate, relocating, relocation, realocation, moving, spain, portugal, elsewhere
    :END:
 
 ** Do you have experience with Go?
@@ -758,6 +765,9 @@ class MatchingTest(unittest.TestCase):
         return ip.Item.create(name=name, name_key=name.lower(), title="T",
                               url=f"https://{name.lower()}.dev/1")
 
+    def entry(self, title):
+        return next(q for q in ip.questions() if q.title == title)
+
     def save(self, question):
         w = ip.Worker()
         self.add()
@@ -765,15 +775,44 @@ class MatchingTest(unittest.TestCase):
         tool = next(t for t in ip.tools_for(w) if t.name == "save_question")
         return tool.invoke({"question": question})
 
-    def test_a_long_form_question_finds_the_short_heading_that_answers_it(self):
-        # The user declines one address heading; a form words the same field its own way.
+    def test_a_short_heading_answers_every_wording_of_the_field(self):
         asked = ("What is your full postal address - Address Line 1, City, "
                  "State/Province and Zip or Postal Code?")
+        self.assertTrue(ip.same_question(asked, self.entry("Address")))
         out = ip.answer_text("postal address")
         self.assertIn("DECLINED", out)
-        self.assertTrue(ip.same_question(asked, "Address Line 1: / City: / "
-                                                 "State/Province: / Zip/Postal Code: "
-                                                 "(all marked required)"))
+        self.assertIn("Address", out)
+
+    def test_a_heading_carrying_one_forms_paperwork_matches_only_that_form(self):
+        # Why the heading has to be short: this one is nobody else's wording.
+        long_heading = ("Address Line 1: / City: / State/Province: / Zip/Postal Code: "
+                        "(all marked required on the Dynatrace SAP SuccessFactors form)")
+        self.assertFalse(ip.same_question("What is your full postal address?", long_heading))
+        self.assertTrue(ip.same_question("Address Line 1: / City: / Zip/Postal Code",
+                                         long_heading))
+
+    def test_aliases_cover_the_synonyms_a_form_may_use(self):
+        # One general Relocation heading answers the Spain and Portugal forms alike.
+        for asked in ("Are you open to relocating to Spain if you are currently based "
+                      "elsewhere?",
+                      "Available for Realocation to Portugal",
+                      "Are you willing to relocate?",
+                      "Would you consider relocation?"):
+            self.assertTrue(ip.same_question(asked, self.entry("Relocation")), asked)
+        self.assertIn("Remote only.", ip.answer_text("relocating to spain"))
+
+    def test_aliases_do_not_merge_unrelated_questions(self):
+        relocation = self.entry("Relocation")
+        self.assertFalse(ip.same_question("Which office location would you choose?",
+                                          relocation))
+        self.assertFalse(ip.same_question("Years of Java experience", relocation))
+
+    def test_a_declined_alias_answers_a_reworded_field_without_appending(self):
+        before = self.path.read_text(encoding="utf-8")
+        out = self.save("What is your postal address?")
+        self.assertIn("Declined", out)
+        self.assertIn("do not ask again", out)
+        self.assertEqual(self.path.read_text(encoding="utf-8"), before)
 
     def test_the_paperwork_is_not_part_of_the_question(self):
         # Parentheticals, links and bare numbers are where the form came from, not what
@@ -822,7 +861,7 @@ class MatchingTest(unittest.TestCase):
         out = io.StringIO()
         with contextlib.redirect_stdout(out):
             ip.print_questions()
-        entry = next(q for q in ip.questions() if q.title == "Notice period at a new job")
+        entry = self.entry("Notice period at a new job")
         self.assertIn(f"{self.path}:{entry.line}:", out.getvalue())
         self.assertIn("2 open", out.getvalue())
         self.assertIn("1 declined", out.getvalue())
@@ -831,8 +870,13 @@ class MatchingTest(unittest.TestCase):
         lines = [entry.line for entry in ip.questions()]
         self.assertTrue(all(line > 1 for line in lines))
         self.assertEqual(lines, sorted(lines))
-        entry = next(q for q in ip.questions() if q.title.startswith("Salary"))
+        entry = self.entry("Salary expectation")
         self.assertEqual(self.FILE.splitlines()[entry.line - 1], "** Salary expectation")
+
+    def test_a_hold_key_does_not_change_when_the_matching_vocabulary_widens(self):
+        # `question_key` is a hold's link to a heading: widening STOPWORDS must not move it.
+        self.assertEqual(ip.question_key("Are you open to relocating to Spain?"),
+                         "open relocating spain")
 
 
 if __name__ == "__main__":

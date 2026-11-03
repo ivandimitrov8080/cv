@@ -249,13 +249,36 @@ forgiven, and a heading whose words all appear in the question scores 100 howeve
 the question is. Two words of the form's question are also searched on their own, because
 a long sentence otherwise drowns them; the three closest headings come back.
 
-That is what keeps the file from growing: `** Address Line 1: / City: / Zip` answers
-"What is your full postal address - Address Line 1, City, State/Province and Zip or
-Postal Code?" and `save_question` refuses to append a second heading for a question the
-file already asks. Parenthetical asides, links and bare numbers are dropped before
-matching — a form's provenance is already in `:SOURCE:`, and it is the part that made ten
-address headings out of one field — and an appended heading keeps only the form's own
-name for the field.
+That is what keeps the file from growing: `** Postal address` answers "What is your full
+postal address - Address Line 1, City, State/Province and Zip or Postal Code?" and
+`save_question` refuses to append a second heading for a question the file already asks.
+Parenthetical asides, links and bare numbers are dropped before matching — a form's
+provenance is already in `:SOURCE:`, and it is the part that made ten address headings
+out of one field — and an appended heading keeps only the form's own name for the field.
+
+### One heading, every wording: `:ALIASES:`
+
+A short heading is only half of it: forms use different words for the same field. The
+synonyms live in the entry, next to the heading, never in the Python:
+
+```org
+** Relocation
+   :PROPERTIES:
+   :ANSWER: No, remote only.
+   :ALIASES: relocate, relocating, relocation, realocation, moving, spain, portugal, elsewhere
+   :SOURCE: Qualifyze (relocating to Spain), HumanIT (relocation to Portugal)
+   :END:
+```
+
+That one heading answers "Are you open to relocating to Spain if you are currently based
+elsewhere?", "Available for Realocation to Portugal" (typo included), and "Are you
+willing to relocate?" alike — which is how two relocations became one question. The same
+trick keeps one `** Postal address` covering Hazelcast, Dynatrace, Taulia and Graphwise.
+
+Where several headings fit a question, the one the question spells out wins, then an
+answer over a refusal, then the more specific heading — so a form asking just "City"
+gets the saved current location rather than the address refusal whose aliases list
+`city`.
 
 Matches are deliberately *strict* when they decide something: one wording has to cover
 every meaningful word of the other before it counts as the same question, so "experience
@@ -275,8 +298,8 @@ form that will not submit without the field is archived with that reason; a lead
 held for a refusal you have already made.
 
 Keep a declined heading **short and generic** — `** Postal address`, not one form's whole
-sentence. A two-word heading is contained in every form's wording of that field, which is
-exactly what makes one refusal cover all of them.
+sentence, with its synonyms in `:ALIASES:`. A two-word heading is contained in every
+form's wording of that field, which is exactly what makes one refusal cover all of them.
 
 ### Answering from Emacs
 
@@ -298,6 +321,29 @@ Tucked into your init file, that is one command:
   (interactive "sWords (empty for every open question): ")
   (grep (string-trim (concat "itempipe questions " words))))
 ```
+
+Marking the heading at point as a refusal is one key, and writes the drawer for you:
+
+```elisp
+(defun itempipe-decline-question (&optional undecline)
+  "Mark the question at point `:DECLINE: t' — I will not answer this field.
+With a prefix argument, remove the decline instead."
+  (interactive "P")
+  (unless (derived-mode-p 'org-mode) (user-error "Not an Org buffer"))
+  (org-back-to-heading t)
+  (if undecline
+      (org-entry-delete nil "DECLINE")
+    (org-entry-put nil "DECLINE" "t"))
+  (message "%s: %s" (if undecline "Undecided" "Declined") (org-get-heading t t t t)))
+
+(with-eval-after-load 'org
+  (define-key org-mode-map (kbd "C-c D") #'itempipe-decline-question))
+```
+
+`C-c D` on the heading, save, run `itempipe init`: the leads waiting on it come back to
+the queue and the field is never asked again — with `:ANSWER:` kept as the value the
+agent may type where a form refuses to submit empty (that is what `N/A` is in `Postal
+address`). `C-u C-c D` removes the decline.
 
 Which questions a lead is waiting on is bookkeeping, not content: a small `hold` table
 maps the lead's id to the question's normalised wording, and the question itself lives
