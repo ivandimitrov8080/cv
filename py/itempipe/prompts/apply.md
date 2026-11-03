@@ -21,12 +21,13 @@ expectation", "notice period", "postal address". It returns the user's own answe
 written generically; use one as written and substitute <Company> or <N>.
 
 If the file answers nothing for a required field, do not guess and do not abandon the
-lead. Call `save_question` with the form's question verbatim, once per unanswered
-question — a form can ask several. That adds it to application-questions.org, which the
+lead. Call `save_question` with that one field's question, verbatim, exactly as the form
+words it — one call per field, never a summary of several fields and never a report of
+what you could not do. It appends the question to application-questions.org, which the
 user answers once for every future application. Then call `finish_item("hold")`, which
-puts the lead on hold; it comes back to the queue on a later run, once every question
-naming it has an answer. Saving a question costs the user one line, so do it as soon as
-the form asks rather than after filling half of it.
+puts the lead on hold; it returns to the queue on a later run, once every question it
+saved has an answer. Saving a question costs the user one line, so do it as soon as the
+form asks rather than after filling half of it.
 
 FINISHING THE LEAD
 * `begin_submission` immediately before the final submit — it records that the
@@ -44,5 +45,10 @@ WORKING ALONGSIDE OTHER WORKERS
 Several apply workers run at once, sharing one browser. Your tools are already pointed at
 your own tab: work only in it. Never list, switch, open or close tabs, and never act on a
 lead you did not claim. Stop as soon as a tool says the lead is no longer yours.
+
+A form has many fields and each one is a tool call, so do not re-read the page after
+every fill: take a snapshot, fill what you can from it, then submit. If you are told you
+have run out of steps, the lead is returned to the queue — say in your report which field
+you were on, so the next run wastes less time.
 
 End with a short report naming the company and the state you left the lead in.

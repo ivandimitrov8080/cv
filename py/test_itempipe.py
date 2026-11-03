@@ -484,6 +484,28 @@ class QuestionsTest(unittest.TestCase):
     def tool(self, w, name):
         return next(t for t in ip.tools_for(w) if t.name == name)
 
+    def edit(self, question, answer=None, rename=None):
+        """Do what the user does: fill in an :ANSWER:, and/or rename the heading."""
+        lines = self.path.read_text(encoding="utf-8").splitlines()
+        heading = next((i for i, line in enumerate(lines)
+                        if line.startswith("*")
+                        and ip.question_key(line.lstrip("* ")) == ip.question_key(question)),
+                       None)
+        if heading is None:
+            raise AssertionError(f"no heading for {question!r}")
+        if rename:
+            lines[heading] = f"** {rename}"
+        if answer:
+            after = heading + 1
+            while after < len(lines) and not lines[after].strip():
+                after += 1
+            if after < len(lines) and lines[after].strip().upper() == ":PROPERTIES:":
+                lines.insert(after + 1, f":ANSWER: {answer}")
+            else:
+                lines[heading + 1:heading + 1] = [":PROPERTIES:", f":ANSWER: {answer}",
+                                                 ":END:"]
+        self.path.write_text("\n".join(lines) + "\n", encoding="utf-8")
+
     def add(self, name):
         return ip.Item.create(name=name, name_key=name.lower(), title="T",
                               url=f"https://{name.lower()}.dev/1")
@@ -505,21 +527,6 @@ class QuestionsTest(unittest.TestCase):
     def state(self, name="Acme"):
         return ip.Item.get(ip.Item.name == name).state
 
-    def edit(self, question, answer=None, rename=None):
-        """Do what the user does: fill in an :ANSWER:, or rename the heading."""
-        lines = self.path.read_text(encoding="utf-8").splitlines()
-        inside = False
-        for index, line in enumerate(lines):
-            if line.startswith("*"):
-                inside = ip.question_key(line.lstrip("* ")) == ip.question_key(question)
-                if inside and rename:
-                    lines[index] = f"** {rename}"
-                continue
-            if inside and answer and line.strip().upper() == ":PROPERTIES:":
-                lines.insert(index + 1, f":ANSWER: {answer}")
-                inside = False
-        self.path.write_text("\n".join(lines) + "\n", encoding="utf-8")
-
     def test_a_stored_answer_is_found_by_keyword_not_wording(self):
         # The form says "What is your salary expectation?"; the file says "Salary expectation".
         out = ip.answer_text("salary expectation")
@@ -532,6 +539,7 @@ class QuestionsTest(unittest.TestCase):
         self.assertIn("hold", ip.answer_text("node.js"))
 
     def test_a_hold_saves_the_question_and_stops_the_lead(self):
+        before = self.path.read_text(encoding="utf-8")
         out = self.hold(self.worker(), "What is your notice period?")
         self.assertEqual(self.state(), ip.HOLD)
         self.assertEqual(ip.queued(), 0)             # out of the queue, not archived
@@ -539,7 +547,17 @@ class QuestionsTest(unittest.TestCase):
         self.assertIn("on hold", out)
         saved = self.path.read_text(encoding="utf-8")
         self.assertIn("** What is your notice period?", saved)
-        self.assertIn(":SOURCE: Acme (T)", saved)    # who asked it, for the user
+        self.assertTrue(saved.startswith(before))    # appended to, never rewritten
+
+    def test_saving_never_touches_the_entries_already_in_the_file(self):
+        before = self.path.read_text(encoding="utf-8")
+        w = self.worker()
+        self.save(w, "What is your notice period?")
+        self.save(w, "Are you willing to relocate?")
+        after = self.path.read_text(encoding="utf-8")
+        self.assertTrue(after.startswith(before))
+        self.assertEqual(after.count("** Salary expectation"), 1)
+        self.assertEqual(len(ip.questions()), 5)      # the 3 in the fixture, and 2 new
 
     def test_a_lead_can_wait_on_several_questions(self):
         w = self.worker()
@@ -547,9 +565,8 @@ class QuestionsTest(unittest.TestCase):
         self.assertIn("Saved", self.save(w, "Are you willing to relocate?"))
         self.assertIn("2 question(s)", self.hold(w))
         self.assertEqual(self.state(), ip.HOLD)
-        asked = [entry for entry in ip.questions() if ip.asks_of(entry, "Acme")]
-        self.assertEqual(len(asked), 2)              # the Node.js heading names Delta
-        self.assertTrue(all(not entry.answer for entry in asked))
+        self.assertEqual([entry.title for entry in ip.waiting(ip.Item.get().id)],
+                         ["What is your notice period?", "Are you willing to relocate?"])
 
     def test_nothing_is_stored_on_the_lead_itself(self):
         self.hold(self.worker(), "What is your notice period?")
@@ -571,12 +588,12 @@ class QuestionsTest(unittest.TestCase):
     def test_an_unanswered_question_cannot_be_saved_without_a_name(self):
         self.assertIn("NOT saved", self.save(self.worker(), "  "))
 
-    def test_two_leads_on_one_question_leave_one_heading_and_two_sources(self):
+    def test_two_leads_on_one_question_leave_one_heading(self):
         self.hold(self.worker("Acme"), "What is your notice period?")
         self.hold(self.worker("Beta"), "What is your notice period?")
         saved = self.path.read_text(encoding="utf-8")
         self.assertEqual(saved.count("** What is your notice period?"), 1)
-        self.assertIn(":SOURCE: Acme (T), Beta (T)", saved)
+        self.assertNotIn(":SOURCE:", saved.split("What is your notice period?")[1])
 
     def test_answering_a_question_releases_only_the_leads_that_asked_it(self):
         self.hold(self.worker("Acme"), "What is your notice period?")
@@ -603,11 +620,13 @@ class QuestionsTest(unittest.TestCase):
         self.assertIn("#+TITLE", self.path.read_text(encoding="utf-8"))
         self.assertEqual(ip.questions()[0].title, "What is your notice period?")
 
-    def test_a_question_added_by_hand_can_be_sourced_in_place(self):
-        ip.annotate(ip.question_key("Do you have experience with Node.js?"), "Gamma (T)")
-        entry = ip.questions()[-1]
-        self.assertEqual(entry.source, "Delta, Gamma (T)")
-        self.assertEqual(entry.answer, "")          # still open, still unanswered
+    def test_a_question_added_by_hand_is_found_without_being_rewritten(self):
+        appended = self.path.read_text(encoding="utf-8") + (
+            "\n** Do you have experience with Go?\n:PROPERTIES:\n"
+            ":ANSWER: Yes, two years\n:END:\n")
+        self.path.write_text(appended, encoding="utf-8")
+        self.assertIn("Yes, two years", ip.answer_text("Go experience"))
+        self.assertEqual(self.path.read_text(encoding="utf-8"), appended)
 
 
 if __name__ == "__main__":

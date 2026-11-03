@@ -225,20 +225,27 @@ differently; a heading with no `:ANSWER:` is an open question and matches nothin
 The file is plain Q/A and nothing about a question is stored on a lead: one answer serves
 every application that asks it, and a lead can be waiting on several questions at once.
 When a required field asks something no heading answers, the worker calls `save_question`
-(once per question, verbatim) and then `finish_item("hold")`. That appends the question
-to the file — under `**:SOURCE:**` goes the company whose form asked it, appended to a
-heading that is already there instead of duplicating it — and moves the lead to `HOLD`,
-out of the queue but not archived.
+for that one field and then `finish_item("hold")`. `save_question` **only ever appends
+to the file** — it never rewrites, reorders or edits an existing entry, so nothing you
+wrote can be lost — and a question already in the file is reported instead of added twice.
+The lead moves to `HOLD`: out of the queue, not archived.
 
-The file is the only link between a held lead and its questions, which is what makes the
-loop simple: fill in an `:ANSWER:`, and the next run releases every lead whose name no
-longer appears under an open question (`unhold`, at startup). A lead waiting on two
-questions waits for both. `itempipe init` counts both sides:
+Which questions a lead is waiting on is bookkeeping, not content: a small `hold` table
+maps the lead's id to the question's normalised wording, and the question itself lives
+only in the file. That is what lets one lead wait on several questions and two leads wait
+on the same one. Fill in an `:ANSWER:` and the next run releases every lead held on it
+(`unhold`, at startup); a lead held on two questions waits for both. `itempipe init`
+counts both sides and names what each held lead is waiting for:
 
 ```
 py/itempipe.db: 41 lead(s), 3 queued, 812 seen row(s), ...
 /home/ivand/src/cv/application-questions.org: 24 answered, 2 open; 2 lead(s) on hold
+  on hold: HumanIT — waiting on What is your notice period?
 ```
+
+Each application gets `ITEMPIPE_APPLY_STEPS` (120) LangGraph steps, because a form is
+many tool calls. Hitting that limit, a dead tab or a dead MCP session is reported on the
+board and puts the lead back in the queue; it never ends the run or the traceback.
 
 ## State
 

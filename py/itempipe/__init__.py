@@ -24,8 +24,8 @@ from pathlib import Path
 from urllib.parse import urlsplit
 
 from langchain_core.tools import StructuredTool, tool
-from peewee import (BooleanField, CharField, DateTimeField, IntegrityError, Model,
-                    SqliteDatabase, TextField, fn)
+from peewee import (BooleanField, CharField, DateTimeField, IntegerField, IntegrityError,
+                    Model, SqliteDatabase, TextField, fn)
 
 from . import status
 
@@ -49,6 +49,7 @@ MCP_OUTPUT = int(os.environ.get("ITEMPIPE_MCP_OUTPUT", "20000"))  # chars kept p
 SEARCH_TRIES = int(os.environ.get("ITEMPIPE_SEARCH_TRIES", "3"))
 SESSIONS = int(os.environ.get("ITEMPIPE_SESSIONS", "0"))        # 0 = until you stop it
 STEPS = int(os.environ.get("ITEMPIPE_SESSION_STEPS", "26"))     # graph steps per session
+APPLY_STEPS = int(os.environ.get("ITEMPIPE_APPLY_STEPS", "120"))  # graph steps per application
 BUDGET = int(os.environ.get("ITEMPIPE_TOOL_BUDGET", "12"))      # tool calls per session
 SEEDS = int(os.environ.get("ITEMPIPE_BOARD_SEEDS", "2"))        # board tasks per session
 PAUSE = float(os.environ.get("ITEMPIPE_PAUSE", "2"))            # breather between sessions
@@ -209,6 +210,22 @@ class Seen(Model):
         database = db
 
 
+class Hold(Model):
+    """One question a held lead is waiting on: the link, never the question.
+
+    The question itself lives in `application-questions.org` and nowhere else; this table
+    only says which of those headings a waiting lead needs answered, so one lead can wait
+    on several, and two leads can wait on the same one. It is bookkeeping, not content:
+    the file stays the single place a question is written or read.
+    """
+    item = IntegerField()                   # the lead, by id
+    key = CharField()                       # question_key() of the heading
+
+    class Meta:
+        database = db
+        indexes = ((('item', 'key'), True),)
+
+
 def flag(name):
     """An env var read as a switch: unset, 0, false, no, off all mean no."""
     return os.environ.get(name, "").strip().lower() not in ("", "0", "false", "no", "off")
@@ -245,6 +262,7 @@ def open_db(path=DB):
     db.connect()
     Item.create_table(safe=True)
     Seen.create_table(safe=True)
+    Hold.create_table(safe=True)
     migrate()
     return path
 
@@ -548,10 +566,10 @@ QUESTIONS_HEAD = """#+TITLE: Application Questions and Answers
 
 # One entry per question, with the answer in an :ANSWER: property.
 # Questions are phrased generically (<Company>, <N> days, ...) so the same
-# answer serves every application. :SOURCE: lists the forms that asked it.
-# A heading with no :ANSWER: is still open: `itempipe apply` adds it when a form
-# asks something this file cannot answer, and holds the lead until you fill it in.
-# Answer it and the next run releases every lead whose name is in its :SOURCE:.
+# answer serves every application.
+# A heading with no :ANSWER: is still open: `itempipe apply` appends it when a form
+# asks something this file cannot answer, and holds that lead until you fill it in.
+# This file is only ever appended to by the agent; your entries are never rewritten.
 """
 
 HEADING = re.compile(r"^\*+\s+(.*?)\s*$")
@@ -673,93 +691,63 @@ def open_questions():
     return [entry for entry in questions() if not entry.answer]
 
 
-def asks_of(entry, company):
-    """Was this question asked by that company? Its `:SOURCE:` line is the only link.
+def ask(question):
+    """Append one unanswered question to the file. Returns (entry, was_new).
 
-    Nothing about a question is stored on a lead: the file is general Q/A, and a lead is
-    named in `:SOURCE:` only so the file says who is waiting on the answer.
+    The file is only ever appended to — never rewritten — so nothing that is already in it
+    can be lost, and two workers adding questions at once cannot clobber each other. A
+    question already there (answered or not) is reported instead of being appended twice.
     """
-    company = clean(company).lower()
-    return bool(company) and company in (entry.source or "").lower()
-
-
-def annotate(key, source):
-    """Add `source` to an existing heading's `:SOURCE:` property, in place.
-
-    Two leads that stop on the same question must not leave two headings for the user to
-    answer, but the second company still deserves to be named in the first one's source.
-    """
-    source = clean(source)
-    path = Path(QUESTIONS)
-    try:
-        lines = path.read_text(encoding="utf-8").splitlines()
-    except OSError:
-        return False
-    inside, end = False, None
-    for index, line in enumerate(lines):
-        if match := HEADING.match(line):
-            if inside:
-                break
-            inside = question_key(clean(match.group(1))) == key
-            continue
-        if not inside or not (match := PROPERTY.match(line)):
-            continue
-        name, value = match.group(1).upper(), match.group(2)
-        if name == "SOURCE":
-            if source.lower() in value.lower():
-                return False
-            indent = line[:len(line) - len(line.lstrip())]
-            lines[index] = f"{indent}:SOURCE: {', '.join(filter(None, (value, source)))}"
-            path.write_text("\n".join(lines) + "\n", encoding="utf-8")
-            return True
-        if name == "END":
-            end = index
-    if end is None:                 # no drawer to write into; leave the file alone
-        return False
-    lines.insert(end, f":SOURCE: {source}")
-    path.write_text("\n".join(lines) + "\n", encoding="utf-8")
-    return True
-
-
-def ask(question, source=""):
-    """Record an unanswered question in the file. Returns (entry, was_new).
-
-    Idempotent by wording: a question already in the file comes back unchanged (only its
-    `:SOURCE:` gains the new company), so two workers stopping on the same field leave one
-    heading for the user, not two.
-    """
-    question, source = clean(question), clean(source)
-    known = {entry.key: entry for entry in questions()}
-    if (found := known.get(question_key(question))) is not None:
-        if source:
-            annotate(found.key, source)
-        return found, False
+    question = clean(question)
+    key = question_key(question)
+    for entry in questions():
+        if entry.key == key:
+            return entry, False
     path = Path(QUESTIONS)
     path.parent.mkdir(parents=True, exist_ok=True)
-    try:
-        text = path.read_text(encoding="utf-8")
-    except OSError:
-        text = QUESTIONS_HEAD
-    if text and not text.endswith("\n"):
-        text += "\n"
-    block = (f"\n** {question}\n:PROPERTIES:\n"
-             f":SOURCE:{f' {source}' if source else ''}\n:END:\n")
-    path.write_text(text + block, encoding="utf-8")
-    return Question(question, source=source), True
+    fresh = not path.exists() or path.stat().st_size == 0
+    with open(path, "a", encoding="utf-8") as out:      # 'a' is the whole safety story
+        if fresh:
+            out.write(QUESTIONS_HEAD)
+        out.write(f"\n** {question}\n")
+        out.flush()
+    return Question(question), True
+
+
+def hold(item, keys):
+    """Record that a lead is waiting on these question keys."""
+    for key in keys:
+        with contextlib.suppress(IntegrityError):
+            Hold.create(item=item, key=key)
+
+
+def drop_holds(ident=None):
+    """Forget a lead's waits, or every wait, once they no longer apply."""
+    query = Hold.delete()
+    if ident is not None:
+        query = query.where(Hold.item == ident)
+    return query.execute()
+
+
+def waiting(ident):
+    """The questions a held lead still needs answered: open in the file, and its own."""
+    open_now = {entry.key: entry for entry in open_questions()}
+    keys = [row.key for row in Hold.select(Hold.key).where(Hold.item == ident)]
+    return [open_now[key] for key in keys if key in open_now]
 
 
 def unhold():
-    """Release every held lead that no open question in the file still names.
+    """Release every held lead that no longer has an open question waiting on it.
 
-    The file, not the lead, is what ties the two together: a lead waits while some heading
-    is still unanswered and says in `:SOURCE:` that its form asked it. Answer it and the
-    next run puts the lead back in the queue; a lead held on two questions waits for both.
+    Answering a heading releases exactly the leads that were held for it, and a lead held
+    on two questions waits until both are answered. Called at startup: hold, you answer,
+    run again.
     """
-    open_now = open_questions()
     back = 0
     for item in list(Item.select().where(Item.state == HOLD)):
-        if any(asks_of(entry, item.name) for entry in open_now):
+        if waiting(item.id):
             continue
+        drop_holds(item.id)
         back += (Item.update(state=NEW)
                  .where(Item.id == item.id, Item.state == HOLD).execute())
     return back
@@ -943,7 +931,7 @@ def tools_for(w=None, sess=None):
         return answer_text(query)
 
     def remember(question, item):
-        """Save one unanswered question, named after the lead whose form asked it.
+        """Save one unanswered question and record that this lead waits on it.
 
         Returns (saved, message): `saved` is False when the file already answers it, in
         which case the model is told to use that answer rather than hold the lead.
@@ -951,19 +939,24 @@ def tools_for(w=None, sess=None):
         question = clean(question)
         if not question_key(question):
             return False, "NOT saved: give the form's question verbatim, as it is worded."
+        if len(question) > 300:      # `clean` has already folded the whitespace away
+            return False, ("NOT saved: one field's question, verbatim, not a summary of "
+                           "several. Call this once per field.")
         if found := best_answer(question):
             return False, (f"Already answered in {QUESTIONS.name} — {found.title}: "
                            f"{found.answer}. Use it; do not hold for this one.")
-        entry, new = ask(question, f"{item.name} ({item.title})")
+        entry, new = ask(question)
+        hold(item.id, [entry.key])
         return True, (f"{'Saved' if new else 'Already open'}: {entry.title!r} in "
                       f"{QUESTIONS.name}. The user answers it once, for every application.")
 
     @tool
     def save_question(question: str) -> str:
         """Save one required form question that the stored answers do not cover, so the
-        user can answer it once for every application. Call it for each such question, then
-        finish_item("hold") — a lead may be waiting on several of them. Never invent an
-        answer, and never archive a lead over a question the user can answer."""
+        user can answer it once for every application. One question per call, verbatim and
+        on one line — never a summary of several fields. Then finish_item("hold") when you
+        have saved them all; a lead may wait on several. Never invent an answer, and never
+        archive a lead over a question the user can answer."""
         item = w.mine()
         if item is None:
             return FENCED
@@ -988,6 +981,7 @@ def tools_for(w=None, sess=None):
         item = w.mine()
         if item is None:
             return FENCED
+        ident = item.id
         if outcome == "applied":
             if not item.submitting:
                 return "NOT done: call begin_submission immediately before the final submit."
@@ -999,7 +993,7 @@ def tools_for(w=None, sess=None):
                 saved, note = remember(reason, item)
                 if not saved:
                     return note          # an answer exists: finish the form instead
-            open_now = [entry for entry in open_questions() if asks_of(entry, item.name)]
+            open_now = waiting(ident)
             if not open_now:
                 return ("NOT held: no unanswered question is saved for this lead. Call "
                         "save_question for each one the form asks, then finish_item(\"hold\").")
@@ -1010,13 +1004,15 @@ def tools_for(w=None, sess=None):
             w.end(state=HOLD, submitting=False)
             return (f"{item.name}: on hold until the user answers {len(open_now)} "
                     f"question(s) in {QUESTIONS.name}. It goes back in the queue on the "
-                    "next run, once every question naming it is answered.")
+                    "next run, once every one of them is answered.")
         elif outcome == "archive":
             w.end(archived_at=now(), submitting=False,
                   archive_reason=clean(reason) or "abandoned")
         else:                   # a typo must not archive a lead
             return ('NOT done: outcome must be "applied", "retry", "hold" or "archive"; '
                     "nothing was changed and the lead is still yours.")
+        if outcome != "hold":
+            drop_holds(ident)   # a finished lead waits on nothing
         return f"{item.name}: {outcome} ({clean(reason) or 'no reason'})."
 
     return ([claim_next_item, lookup_answer, save_question, begin_submission, finish_item]
@@ -1348,34 +1344,77 @@ async def browser(endpoint):
 
 
 async def apply(workers=2):
+    """Apply to the queue in parallel, one lead at a time per worker.
+
+    Nothing that goes wrong with one lead is allowed to end the run: a graph that hits the
+    recursion limit, a crashed tab or a dead MCP session is reported on the board, the
+    claim is released, and the worker takes the next lead. The MCP client tears itself
+    down inside an anyio task group, which re-raises any escaping exception as an
+    `ExceptionGroup`, so the catching happens *inside* the `browser()` block and again
+    around it — the group never reaches the terminal.
+    """
     slots, reports = asyncio.Semaphore(2), []
     proc = await chromium()
     try:
         async def one(i):
             tag, w = f"w{i + 1}", Worker()
             async with slots:
-                status.worker(tag, "state", "attaching to browser", state="browser")
-                async with browser(cdp_endpoint()) as mcp_tools:
-                    a = agent("apply", tools_for(w) + mcp_tools)
-                    while before := queued():
-                        try:
-                            reports.append(await run(a, APPLY, tag=tag))
-                        finally:    # a worker that stopped mid-claim must not hold a lock
-                            if item := w.mine():
-                                w.end(state=REVIEW if item.submitting else NEW,
-                                      submitting=False)
-                        if queued() >= before:
-                            return  # no progress: that lead is stuck, do not spin
+                try:
+                    status.worker(tag, "state", "attaching to browser", state="browser")
+                    async with browser(cdp_endpoint()) as mcp_tools:
+                        a = agent("apply", tools_for(w) + mcp_tools)
+                        stuck = 0
+                        while before := queued():
+                            failed = False
+                            try:
+                                reports.append(await run(a, APPLY, tag=tag,
+                                                         limit=APPLY_STEPS))
+                            except BaseException as exc:   # one stuck lead, not the run
+                                if isinstance(exc, (asyncio.CancelledError,
+                                                    KeyboardInterrupt, SystemExit)):
+                                    raise
+                                failed = True
+                                note = f"{type(exc).__name__}: {clean(exc)}"
+                                status.worker(tag, "state", note, state="retry")
+                                reports.append(f"[{tag}] gave up on a lead: {note}")
+                            finally:  # a worker that stopped mid-claim must not hold a lock
+                                if item := w.mine():
+                                    drop_holds(item.id)
+                                    w.end(state=REVIEW if item.submitting else NEW,
+                                          submitting=False)
+                            stuck = stuck + 1 if failed else 0
+                            if stuck >= 3:      # three in a row: this is not going to work
+                                reports.append(f"[{tag}] stopping after {stuck} failed "
+                                               "leads in a row; the queue is untouched")
+                                return
+                            if not failed and queued() >= before:
+                                return  # no progress: that lead is stuck, do not spin
+                except BaseException as exc:
+                    if isinstance(exc, (asyncio.CancelledError, KeyboardInterrupt,
+                                        SystemExit)):
+                        raise
+                    note = f"{type(exc).__name__}: {clean(exc)}"
+                    status.worker(tag, "state", f"stopped: {note}", state="done")
+                    reports.append(f"[{tag}] stopped: {note}")
 
-        await asyncio.gather(*(one(i) for i in range(workers)))
+        results = await asyncio.gather(*(one(i) for i in range(workers)),
+                                       return_exceptions=True)
+        for result in results:
+            if isinstance(result, BaseException) and not isinstance(
+                    result, asyncio.CancelledError):
+                reports.append(f"[itempipe] worker crashed: {type(result).__name__}: "
+                               f"{clean(result)}")
     finally:
         if proc is not None:
             status.worker("··", "state", "closing browser")
             await stop_proc(proc)            # tolerates a browser that already died
-    held = Item.select().where(Item.state == HOLD).count()
+    held = list(Item.select().where(Item.state == HOLD))
     if held:                                 # the run is over, but not for these
-        reports.append(f"{held} lead(s) on hold: answer the open questions in "
-                       f"{QUESTIONS} and they go back in the queue.")
+        reports.append(f"{len(held)} lead(s) on hold: answer the open questions in "
+                       f"{QUESTIONS} and they go back in the queue:")
+        for item in held:
+            waiting_on = ", ".join(entry.title for entry in waiting(item.id)) or "?"
+            reports.append(f"  {item.name} — waiting on {waiting_on}")
     return reports
 
 
@@ -1403,6 +1442,9 @@ def main(argv=None):
         print(f"{QUESTIONS}: {sum(1 for q in stored if q.answer)} answered, "
               f"{sum(1 for q in stored if not q.answer)} open; "
               f"{Item.select().where(Item.state == HOLD).count()} lead(s) on hold")
+        for item in Item.select().where(Item.state == HOLD):
+            on = ", ".join(entry.title for entry in waiting(item.id)) or "no open question"
+            print(f"  on hold: {item.name} — waiting on {on}")
         return 0
     if args.command == "search" and not (SEED_TASKS or space_for()):
         print(f"itempipe: {CONFIG} has no roles, regions or boards to search for. "
