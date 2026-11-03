@@ -17,7 +17,7 @@ about stacks, countries or companies.
 """
 
 import argparse, asyncio, contextlib, os, re, shutil, sys, time, tomllib, uuid
-from dataclasses import dataclass, field
+from dataclasses import dataclass, field, replace
 from datetime import datetime, timedelta, timezone
 from functools import lru_cache
 from pathlib import Path
@@ -563,16 +563,16 @@ def remember_leads():
 # `unhold` write to it, which makes it both the memory and the inbox.
 
 QUESTIONS_HEAD = """#+TITLE: Application Questions and Answers
+#+STARTUP: indent
 
 # One entry per question, with the answer in an :ANSWER: property.
 # Questions are phrased generically (<Company>, <N> days, ...) so the same
-# answer serves every application.
-# A heading with no :ANSWER: is still open: `itempipe apply` appends it when a form
-# asks something this file cannot answer, and holds that lead until you fill it in.
-# This file is only ever appended to by the agent; your entries are never rewritten.
+# answer serves every application. :SOURCE: lists the forms that asked it.
+# A heading with no :ANSWER: value is still open: `itempipe apply` appends it
+# when a form asks something this file cannot answer, and holds that lead.
 """
 
-HEADING = re.compile(r"^\*+\s+(.*?)\s*$")
+HEADING = re.compile(r"^(\*+)\s+(.*?)\s*$")
 PROPERTY = re.compile(r"^\s*:([A-Za-z][\w@#%+-]*):\s*(.*?)\s*$")
 STOPWORDS = frozenset("""a an and any are as at be been by can could do does for from
     has have how i if in is it its me my of on or please should tell that the their
@@ -587,6 +587,7 @@ class Question:
     answer: str = ""
     note: str = ""
     source: str = ""
+    level: int = 2
 
     @property
     def key(self):
@@ -605,11 +606,11 @@ def question_key(text):
 
 
 def questions(path=None):
-    """Every entry in the questions file, in file order: answered and open alike.
+    """Every question in the file, in file order: answered and open alike.
 
-    Org is read by hand rather than by a parser because only two things matter here: the
-    heading, and the properties under it. A heading with no properties at all (`*
-    Recurring answers`) is a section title, and simply matches nothing.
+    A heading is a question; a `*` section title is not, so it is left out. Org is read
+    by hand rather than by a parser because only two things matter here: the heading, and
+    the drawer under it — whatever else the entry holds is the user's business.
     """
     try:
         text = Path(path or QUESTIONS).read_text(encoding="utf-8")
@@ -618,7 +619,8 @@ def questions(path=None):
     found = []
     for line in text.splitlines():
         if match := HEADING.match(line):
-            found.append(Question(clean(match.group(1))))
+            found.append(Question(clean(match.group(2)),
+                                  level=len(match.group(1))))
             continue
         if not found or not (match := PROPERTY.match(line)):
             continue
@@ -627,12 +629,13 @@ def questions(path=None):
             continue
         entry = found[-1]
         if name == "ANSWER":
-            found[-1] = Question(entry.title, value, entry.note, entry.source)
-        elif name == "NOTE":
-            found[-1] = Question(entry.title, entry.answer, value, entry.source)
+            found[-1] = replace(entry, answer=value)
+        elif name in ("NOTE", "FORMAT"):
+            note = f"{entry.note}; {value}" if entry.note else value
+            found[-1] = replace(entry, note=note)
         elif name == "SOURCE":
-            found[-1] = Question(entry.title, entry.answer, entry.note, value)
-    return found
+            found[-1] = replace(entry, source=value)
+    return [entry for entry in found if entry.level > 1]      # a `*` heading is a section
 
 
 def answer_score(title, tokens):
@@ -691,14 +694,33 @@ def open_questions():
     return [entry for entry in questions() if not entry.answer]
 
 
-def ask(question):
+def entry_text(question, source=""):
+    """One entry, in exactly the shape the file already uses.
+
+    The same heading/drawer layout as the answers a human writes, with three-space
+    indentation, an empty `:ANSWER:` to fill in, and the form that asked it in `:SOURCE:`:
+
+        ** What is your notice period?
+           :PROPERTIES:
+           :ANSWER:
+           :SOURCE: Acme (Senior Java Engineer)
+           :END:
+    """
+    lines = [f"** {clean(question)}", "   :PROPERTIES:", "   :ANSWER:"]
+    if clean(source):
+        lines.append(f"   :SOURCE: {clean(source)}")
+    lines.append("   :END:")
+    return "\n".join(lines) + "\n"
+
+
+def ask(question, source=""):
     """Append one unanswered question to the file. Returns (entry, was_new).
 
     The file is only ever appended to — never rewritten — so nothing that is already in it
     can be lost, and two workers adding questions at once cannot clobber each other. A
     question already there (answered or not) is reported instead of being appended twice.
     """
-    question = clean(question)
+    question, source = clean(question), clean(source)
     key = question_key(question)
     for entry in questions():
         if entry.key == key:
@@ -709,9 +731,9 @@ def ask(question):
     with open(path, "a", encoding="utf-8") as out:      # 'a' is the whole safety story
         if fresh:
             out.write(QUESTIONS_HEAD)
-        out.write(f"\n** {question}\n")
+        out.write("\n" + entry_text(question, source))
         out.flush()
-    return Question(question), True
+    return Question(question, source=source), True
 
 
 def hold(item, keys):
@@ -945,7 +967,7 @@ def tools_for(w=None, sess=None):
         if found := best_answer(question):
             return False, (f"Already answered in {QUESTIONS.name} — {found.title}: "
                            f"{found.answer}. Use it; do not hold for this one.")
-        entry, new = ask(question)
+        entry, new = ask(question, f"{item.name} ({item.title})")
         hold(item.id, [entry.key])
         return True, (f"{'Saved' if new else 'Already open'}: {entry.title!r} in "
                       f"{QUESTIONS.name}. The user answers it once, for every application.")

@@ -218,17 +218,28 @@ stdout only ever gets the report, so `itempipe apply > out.txt` still works; wit
 `apply` never guesses. Before filling a required free-text or personal-detail field it
 calls `lookup_answer`, which reads `application-questions.org` (`ITEMPIPE_QUESTIONS`) —
 the same file a human edits: one heading per question, the answer in an `:ANSWER:`
-property, `:NOTE:`/`:SOURCE:` for context. Answers are matched by keyword, so
+property, `:NOTE:`/`:FORMAT:`/`:SOURCE:` for context. Answers are matched by keyword, so
 `"salary expectation"` finds `** Salary expectation` even though the form words it
-differently; a heading with no `:ANSWER:` is an open question and matches nothing.
+differently; a heading whose `:ANSWER:` is empty is an open question and matches nothing.
+Every entry — yours and the agent's — has the same shape, three-space drawer and all:
+
+```org
+** What is your notice period?
+   :PROPERTIES:
+   :ANSWER: One month
+   :NOTE: From the day the contract is signed.
+   :SOURCE: Acme (Senior Java Engineer)
+   :END:
+```
 
 The file is plain Q/A and nothing about a question is stored on a lead: one answer serves
 every application that asks it, and a lead can be waiting on several questions at once.
 When a required field asks something no heading answers, the worker calls `save_question`
-for that one field and then `finish_item("hold")`. `save_question` **only ever appends
-to the file** — it never rewrites, reorders or edits an existing entry, so nothing you
-wrote can be lost — and a question already in the file is reported instead of added twice.
-The lead moves to `HOLD`: out of the queue, not archived.
+for that one field and then `finish_item("hold")`. `save_question` writes that block
+with an empty `:ANSWER:` and the company in `:SOURCE:`, so answering it is typing after
+the colon — and it **only ever appends**, never rewriting, reordering or editing an
+existing entry, so nothing you wrote can be lost. A question already in the file is
+reported instead of added twice. The lead moves to `HOLD`: out of the queue, not archived.
 
 Which questions a lead is waiting on is bookkeeping, not content: a small `hold` table
 maps the lead's id to the question's normalised wording, and the question itself lives

@@ -485,7 +485,7 @@ class QuestionsTest(unittest.TestCase):
         return next(t for t in ip.tools_for(w) if t.name == name)
 
     def edit(self, question, answer=None, rename=None):
-        """Do what the user does: fill in an :ANSWER:, and/or rename the heading."""
+        """Do what the user does: type into the entry's `:ANSWER:`, and/or rename it."""
         lines = self.path.read_text(encoding="utf-8").splitlines()
         heading = next((i for i, line in enumerate(lines)
                         if line.startswith("*")
@@ -496,14 +496,14 @@ class QuestionsTest(unittest.TestCase):
         if rename:
             lines[heading] = f"** {rename}"
         if answer:
-            after = heading + 1
-            while after < len(lines) and not lines[after].strip():
-                after += 1
-            if after < len(lines) and lines[after].strip().upper() == ":PROPERTIES:":
-                lines.insert(after + 1, f":ANSWER: {answer}")
+            filled = next((i for i in range(heading + 1, len(lines))
+                           if lines[i].lstrip().upper().startswith(":ANSWER:")), None)
+            if filled is not None:
+                indent = lines[filled][:len(lines[filled]) - len(lines[filled].lstrip())]
+                lines[filled] = f"{indent}:ANSWER: {answer}"
             else:
-                lines[heading + 1:heading + 1] = [":PROPERTIES:", f":ANSWER: {answer}",
-                                                 ":END:"]
+                lines[heading + 1:heading + 1] = ["   :PROPERTIES:",
+                                                 f"   :ANSWER: {answer}", "   :END:"]
         self.path.write_text("\n".join(lines) + "\n", encoding="utf-8")
 
     def add(self, name):
@@ -557,7 +557,28 @@ class QuestionsTest(unittest.TestCase):
         after = self.path.read_text(encoding="utf-8")
         self.assertTrue(after.startswith(before))
         self.assertEqual(after.count("** Salary expectation"), 1)
-        self.assertEqual(len(ip.questions()), 5)      # the 3 in the fixture, and 2 new
+        self.assertEqual(len(ip.questions()), 4)      # the fixture's 2, and the 2 new ones
+        self.assertNotIn("Recurring answers", [q.title for q in ip.questions()])
+
+    def test_an_appended_question_has_the_files_own_shape(self):
+        self.save(self.worker(), "What is your notice period?")
+        text = self.path.read_text(encoding="utf-8")
+        self.assertTrue(text.endswith("\n** What is your notice period?\n"
+                                      "   :PROPERTIES:\n"
+                                      "   :ANSWER:\n"
+                                      "   :SOURCE: Acme (T)\n"
+                                      "   :END:\n"), text[-200:])
+        entry = ip.questions()[-1]
+        self.assertEqual((entry.title, entry.answer, entry.source),
+                         ("What is your notice period?", "", "Acme (T)"))
+
+    def test_filling_in_the_appended_entry_is_all_the_user_does(self):
+        self.hold(self.worker(), "What is your notice period?")
+        self.assertEqual(ip.unhold(), 0)
+        self.edit("What is your notice period?", answer="One month")
+        self.assertEqual(ip.unhold(), 1)
+        self.assertEqual(self.state(), ip.NEW)
+        self.assertIn("One month", ip.answer_text("notice period"))
 
     def test_a_lead_can_wait_on_several_questions(self):
         w = self.worker()
@@ -593,7 +614,8 @@ class QuestionsTest(unittest.TestCase):
         self.hold(self.worker("Beta"), "What is your notice period?")
         saved = self.path.read_text(encoding="utf-8")
         self.assertEqual(saved.count("** What is your notice period?"), 1)
-        self.assertNotIn(":SOURCE:", saved.split("What is your notice period?")[1])
+        self.assertEqual(saved.count(":SOURCE: Acme (T)"), 1)   # appended once, not edited
+        self.assertEqual(len(ip.waiting(ip.Item.get(ip.Item.name == "Beta").id)), 1)
 
     def test_answering_a_question_releases_only_the_leads_that_asked_it(self):
         self.hold(self.worker("Acme"), "What is your notice period?")
