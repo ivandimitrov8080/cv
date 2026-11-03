@@ -198,42 +198,40 @@
 
 ** What second languages do you speak?: *
    :PROPERTIES:
-   :ANSWER:
+   :ANSWER:   English.
    :END:
 
 ** Nationality: *
    :PROPERTIES:
-   :ANSWER:
+   :ANSWER:   Bulgaria
    :END:
 
 ** What is your tech stack?: *
    :PROPERTIES:
-   :ANSWER:
+   :ANSWER:   Mathematics paired with a relentless need to create quality software.
    :END:
 
 ** What is your current job title?: *
    :PROPERTIES:
-   :ANSWER:
+   :ANSWER:   IT Consultant
    :END:
 
 ** Are you currently employed? If ye, where?:
    :PROPERTIES:
    :ANSWER:
+   :DECLINE:  t
    :END:
 
 ** 3 References (1 Direct Manager)
    :PROPERTIES:
    :ANSWER:
+   :DECLINE:  t
    :END:
 
 ** Arbeitszeugnis
    :PROPERTIES:
    :ANSWER:
    :NOTE: Required upload: the employment reference letter (Arbeitszeugnis).
+   :DECLINE:  t
    :END:
 
-** Resume
-   :PROPERTIES:
-   :ANSWER:
-   :NOTE: Required upload. The PDF is result/Ivan_Dimitrov_Resume_IT_Consultant.pdf under ~/src/cv, and https://idimitrov.dev serves it publicly; an earlier upload tool could not reach the local path, so a public URL is the safe answer.
-   :END:
