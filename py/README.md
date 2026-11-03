@@ -161,7 +161,9 @@ its own page, and `browser_tabs`/`browser_close` are hidden from the model.
 * Spawning one `playwright-mcp` per worker would create one Playwright browser context per
   worker — visibly, a new window for each. One server with a tab pool avoids that: all
   tabs share the browser and its logins. The model never sees the tab tools, and workers
-  cannot switch, open or close each other's tabs.
+  cannot switch, open or close each other's tabs. A page that opens a popup moves its
+  worker's tab number; the shared browser re-reads the list after every call, so the next
+  tool call follows the worker to the page it actually opened.
 * The MCP connection itself is short: the official `mcp` SDK's
   `Client(StdioServerParameters(command="playwright-mcp", args=["--cdp-endpoint", …]))`
   spawns the one server over stdio, handshakes and lists its tools, and each tool is

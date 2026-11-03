@@ -410,6 +410,10 @@ class BrowserTest(unittest.TestCase):
                         text = self.listing()
                     else:
                         text = self.listing()
+                elif name == "browser_click" and arguments.get("target") == "popup":
+                    self.tabs.append("https://popup")
+                    self.current = len(self.tabs) - 1      # target=_blank lands here
+                    text = "popup opened"
                 else:
                     text = f"{name}@{self.current}"
                 return SimpleNamespace(content=[SimpleNamespace(text=text)], isError=False)
@@ -417,6 +421,8 @@ class BrowserTest(unittest.TestCase):
 
     def remote_tools(self):
         return [SimpleNamespace(name="browser_navigate", description="Go",
+                                inputSchema={"type": "object", "properties": {}}),
+                SimpleNamespace(name="browser_click", description="Click",
                                 inputSchema={"type": "object", "properties": {}}),
                 SimpleNamespace(name="browser_tabs", description="Tabs",
                                 inputSchema={"type": "object", "properties": {}}),
@@ -455,10 +461,59 @@ class BrowserTest(unittest.TestCase):
                    if call[0] == "browser_tabs" and call[1]["action"] == "select"]
         self.assertEqual([call[1]["index"] for call in selects[-3:]], [0, 1, 0])
 
+    def test_calls_through_the_shared_client_never_overlap(self):
+        # The stdio MCP client has one pipe and one "current tab"; two workers' calls
+        # must therefore be serialised, not interleaved, or they would race each other.
+        inner = self.playwright()
+
+        class Slow:
+            def __init__(self):
+                self.peak, self.racing = 0, 0
+
+            async def call_tool(self, name, arguments):
+                self.racing += 1
+                self.peak = max(self.peak, self.racing)
+                try:
+                    await asyncio.sleep(0.005)
+                    return await inner.call_tool(name, arguments)
+                finally:
+                    self.racing -= 1
+
+        client = Slow()
+
+        async def drive():
+            shared = ip.SharedBrowser(client, self.remote_tools())
+            tabs = [await shared.claim_tab() for _ in range(2)]
+            calls = {i: {tool.name: tool for tool in shared.tools(tab)}
+                     for i, tab in enumerate(tabs)}
+            await asyncio.gather(*(calls[n % 2]["browser_navigate"].ainvoke(
+                {"url": f"https://{n}"}) for n in range(6)))
+
+        asyncio.run(drive())
+        self.assertEqual(client.peak, 1)
+
+    def test_a_workers_tab_follows_it_to_a_popup(self):
+        client = self.playwright()
+
+        async def drive():
+            shared = ip.SharedBrowser(client, self.remote_tools())
+            first, second = await shared.claim_tab(), await shared.claim_tab()
+            mine = {tool.name: tool for tool in shared.tools(first)}
+            other = {tool.name: tool for tool in shared.tools(second)}
+            await mine["browser_click"].ainvoke({"target": "popup"})
+            here = await mine["browser_navigate"].ainvoke({"url": "https://a"})
+            there = await other["browser_navigate"].ainvoke({"url": "https://b"})
+            return first.index, second.index, here, there
+
+        first, second, here, there = asyncio.run(drive())
+        self.assertEqual((first, second), (2, 1))       # worker A now drives the popup
+        self.assertEqual((here, there), ("browser_navigate@2", "browser_navigate@1"))
+
     def test_tab_management_tools_are_not_offered_to_the_model(self):
         shared = ip.SharedBrowser(self.playwright(), self.remote_tools())
         tab = asyncio.run(shared.claim_tab())
-        self.assertEqual({tool.name for tool in shared.tools(tab)}, {"browser_navigate"})
+        self.assertEqual({tool.name for tool in shared.tools(tab)},
+                         {"browser_navigate", "browser_click"})
 
     def test_a_missing_mcp_client_is_a_sentence_not_a_traceback(self):
         async def enter():

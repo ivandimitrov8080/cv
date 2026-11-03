@@ -1570,7 +1570,7 @@ def mcp_config(endpoint):
             "env": dict(os.environ)}
 
 
-TAB_LINE = re.compile(r"^\s*-\s*(\d+):\s*(.*)$")
+TAB_LINE = re.compile(r"^\s*-\s*(\d+):\s*(.*)$", re.M)
 HIDDEN_BROWSER_TOOLS = frozenset({"browser_tabs", "browser_close"})
 
 
@@ -1602,9 +1602,15 @@ def current_tab(listing):
     return None
 
 
-@dataclass(frozen=True)
+@dataclass
 class Tab:
-    """One worker's seat in the shared browser."""
+    """One worker's seat in the shared browser.
+
+    `index` is mutable on purpose: a page that opens a popup, or a tab that crashes and is
+    removed, moves where this worker's page sits in playwright-mcp's numbered list. The
+    browser re-reads the list after each call and keeps this number pointing at the page
+    the worker was actually driving.
+    """
     browser: "SharedBrowser"
     index: int
 
@@ -1672,6 +1678,10 @@ class SharedBrowser:
 
     async def claim_tab(self):
         """Give a worker its own tab, reusing the browser's initial tab for the first."""
+        if not any(field_of(tool, "name") == "browser_tabs" for tool in self.remote_tools):
+            raise Startup("this playwright-mcp offers no browser_tabs tool, so one tab per "
+                          "worker cannot be guaranteed. Upgrade playwright-mcp; a single "
+                          "shared tab would let two agents work the same page.")
         async with self.lock:
             if not self.started:
                 listing = await self._tabs("list")
@@ -1692,10 +1702,21 @@ class SharedBrowser:
             return Tab(self, index)
 
     async def run(self, tab, name, arguments):
-        """Select `tab`, call one browser tool, and keep the selection atomic."""
+        """Select `tab`, call one browser tool, and keep the selection atomic.
+
+        The worker's page can move: a `target=_blank` link opens a new tab, a crashed tab
+        disappears and shifts the numbering. So the tab list is re-read after the call,
+        while the lock is still held, and `tab.index` follows the page that was just
+        driven. Otherwise the next call would select whatever had slid into that slot.
+        """
         async with self.lock:
             await self._tabs("select", index=tab.index)
-            return await self.client.call_tool(name, arguments)
+            result = await self.client.call_tool(name, arguments)
+            with contextlib.suppress(Exception):
+                moved = current_tab(await self._tabs("list"))
+                if moved is not None:
+                    tab.index = moved
+            return result
 
     def tools(self, tab):
         """The browser tools, bound to `tab`, with tab management hidden from the model."""
