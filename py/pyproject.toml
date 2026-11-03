@@ -3,10 +3,9 @@ requires = ["setuptools>=68"]
 build-backend = "setuptools.build_meta"
 
 [project]
-name = "itempipe"
-version = "0.1.0"
-description = "Two agents, one SQLite queue: search leads, apply to them"
-readme = "README.md"
+name = "webpipe"
+version = "0.2.0"
+description = "One agent ingests rows into a sqlite queue, another works them"
 requires-python = ">=3.11"
 dependencies = [
   "ddgs>=9.0",
@@ -14,19 +13,14 @@ dependencies = [
   "langchain>=1.0",
   "langchain-core>=1.0",
   "langchain-openai>=1.0",
-  "langgraph>=1.0",
-  "mcp>=2.3",                # the MCP client `itempipe apply` spawns playwright-mcp with
+  "mcp>=2.3",
   "peewee>=3.17",
-  "rapidfuzz>=3.9",          # the fuzzy finder application questions are matched with
-  "rich>=13.7",
+  "rapidfuzz>=3.9",
   "trafilatura>=1.9",
 ]
 
 [project.scripts]
-itempipe = "itempipe:main"
+webpipe = "lib:main"
 
 [tool.setuptools]
-packages = ["itempipe"]
-
-[tool.setuptools.package-data]
-itempipe = ["prompts/*.md", "search.toml", "schema.sql"]
+packages = ["lib"]

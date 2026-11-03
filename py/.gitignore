@@ -3,9 +3,8 @@ __pycache__/
 .pytest_cache/
 .ruff_cache/
 .trash/
-itempipe.db
-itempipe.db-wal
-itempipe.db-shm
-.playwright-profiles/
-.env
+*.db
+*.db-wal
+*.db-shm
 .venv/
+.env

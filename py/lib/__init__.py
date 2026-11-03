@@ -1,0 +1,38 @@
+import argparse
+import asyncio
+import dataclasses
+import sys
+
+from . import act, config, db, ingest
+
+
+def main(argv=None):
+    parser = argparse.ArgumentParser(prog="webpipe")
+    parser.add_argument("command", choices=["init", "status", "ingest", "act"])
+    parser.add_argument("-c", "--config", default="config/tool.toml")
+    parser.add_argument("-n", "--workers", type=int)
+    args = parser.parse_args(argv)
+    cfg = config.load(args.config)
+    if args.workers:
+        cfg = dataclasses.replace(
+            cfg,
+            ingest=dataclasses.replace(cfg.ingest, workers=args.workers),
+            act=dataclasses.replace(cfg.act, workers=args.workers))
+    if args.command == "init":
+        store = db.Store(cfg).create()
+        print(f"{cfg.db}: {store.row.select().count()} item(s)")
+        return 0
+    if args.command == "status":
+        store = db.Store(cfg).connect()
+        counts = " ".join(f"{state}={count}" for state, count in sorted(store.counts().items()))
+        print(f"{cfg.db}: {counts or 'empty'}")
+        return 0
+    try:
+        reports = asyncio.run(ingest.run(cfg) if args.command == "ingest" else act.run(cfg))
+    except KeyboardInterrupt:
+        return 130
+    except Exception as exc:
+        print(f"webpipe: {type(exc).__name__}: {exc}", file=sys.stderr)
+        return 1
+    print("\n".join(reports or []) or "nothing to report")
+    return 0
