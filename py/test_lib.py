@@ -93,13 +93,21 @@ class ClaimTest(Base):
         one.end(state="DONE")
         self.assertEqual(one.take().label, "b")
 
-    def test_expired_claim_comes_back(self):
+    def test_expired_claim_goes_to_another_worker(self):
         self.add("a")
         one, two = db.Claim(self.store), db.Claim(self.store)
         one.take()
         self.store.row.update(claimed_until=db.now() - db.timedelta(seconds=1)).execute()
-        self.assertIsNone(one.mine())
         self.assertEqual(two.take().label, "a")
+        self.assertIsNone(one.mine())
+
+    def test_mine_renews_a_claim_nobody_took(self):
+        self.add("a")
+        one = db.Claim(self.store)
+        one.take()
+        self.store.row.update(claimed_until=db.now() - db.timedelta(seconds=1)).execute()
+        self.assertIsNotNone(one.mine())
+        self.assertIsNone(db.Claim(self.store).take())
 
     def test_renew_holds_the_lease(self):
         self.add("a")
