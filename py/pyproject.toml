@@ -17,6 +17,7 @@ dependencies = [
   "langgraph>=1.0",
   "mcp>=2.3",                # the MCP client `itempipe apply` spawns playwright-mcp with
   "peewee>=3.17",
+  "rapidfuzz>=3.9",          # the fuzzy finder application questions are matched with
   "rich>=13.7",
   "trafilatura>=1.9",
 ]

@@ -41,6 +41,7 @@
         "pydantic"
         "httpx"
         "peewee"
+        "rapidfuzz"
         "trafilatura"
         "ddgs"
         "rich"

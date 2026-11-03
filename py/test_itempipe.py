@@ -704,5 +704,136 @@ class QuestionsTest(unittest.TestCase):
         self.assertIn("where the form insists", out)
 
 
+class MatchingTest(unittest.TestCase):
+    """Questions are found by meaning — the words of a question, not its wording.
+
+    The file this stands in for is the real one: the same address field saved a dozen
+    times in a dozen wordings, each with the company's own paperwork on the end.
+    """
+
+    FILE = """#+TITLE: Application Questions and Answers
+
+* Recurring answers
+
+** Salary expectation
+   :PROPERTIES:
+   :ANSWER: 100 000 EUR / year
+   :END:
+
+** Address Line 1: / City: / State/Province: / Zip/Postal Code: (all marked required on the Dynatrace SAP SuccessFactors application form)
+   :PROPERTIES:
+   :DECLINE: t
+   :END:
+
+** Address Line 1 (also City, State/Province and Zip/Postal Code are required)
+
+** Notice period at a new job
+
+** Years of Java experience
+   :PROPERTIES:
+   :ANSWER: Eight years
+   :END:
+
+** Do you have experience with Go?
+   :PROPERTIES:
+   :ANSWER: Yes, two years
+   :END:
+"""
+
+    def setUp(self):
+        self.tmp = tempfile.TemporaryDirectory()
+        ip.open_db(Path(self.tmp.name) / "t.db")
+        ip.Item.delete().execute()
+        self.path = Path(self.tmp.name) / "application-questions.org"
+        self.path.write_text(self.FILE, encoding="utf-8")
+        self.patch = mock.patch.object(ip, "QUESTIONS", self.path)
+        self.patch.start()
+
+    def tearDown(self):
+        self.patch.stop()
+        ip.db.close()
+        self.tmp.cleanup()
+
+    def add(self, name="Acme"):
+        return ip.Item.create(name=name, name_key=name.lower(), title="T",
+                              url=f"https://{name.lower()}.dev/1")
+
+    def save(self, question):
+        w = ip.Worker()
+        self.add()
+        w.claim()
+        tool = next(t for t in ip.tools_for(w) if t.name == "save_question")
+        return tool.invoke({"question": question})
+
+    def test_a_long_form_question_finds_the_short_heading_that_answers_it(self):
+        # The user declines one address heading; a form words the same field its own way.
+        asked = ("What is your full postal address - Address Line 1, City, "
+                 "State/Province and Zip or Postal Code?")
+        out = ip.answer_text("postal address")
+        self.assertIn("DECLINED", out)
+        self.assertTrue(ip.same_question(asked, "Address Line 1: / City: / "
+                                                 "State/Province: / Zip/Postal Code: "
+                                                 "(all marked required)"))
+
+    def test_the_paperwork_is_not_part_of_the_question(self):
+        # Parentheticals, links and bare numbers are where the form came from, not what
+        # it asked, so the same address field cannot grow a heading per application.
+        self.assertEqual(ip.tokens_of("Address Line 1 (all marked required on the Acme form)"),
+                         ["address", "line"])
+        self.assertEqual(ip.tokens_of("See https://acme.dev/jobs/42 for the postcode"),
+                         ["see", "postcode"])
+
+    def test_two_different_skills_stay_two_questions(self):
+        self.assertFalse(ip.same_question("Do you have experience with Go?",
+                                          "Do you have experience with Node.js?"))
+        self.assertFalse(ip.same_question("Years of React experience",
+                                          "Years of Java experience"))
+
+    def test_a_reworded_question_is_never_appended_twice(self):
+        before = self.path.read_text(encoding="utf-8")
+        out = self.save("What is your notice period?")
+        self.assertIn("Already asked", out)
+        self.assertIn("nothing is asked twice", out)
+        self.assertEqual(self.path.read_text(encoding="utf-8"), before)
+        self.assertEqual(ip.Item.select().where(ip.Item.state == ip.HOLD).count(), 0)
+
+    def test_a_new_question_is_stored_without_its_paperwork(self):
+        self.save("What is your current job title? (as it appears on LinkedIn)")
+        self.assertIn("** What is your current job title?\n",
+                      self.path.read_text(encoding="utf-8"))
+
+    def test_the_two_keywords_are_content_words(self):
+        words = ip.keywords("What is your full postal address - Address Line 1, City, "
+                            "State/Province and Zip or Postal Code?")
+        self.assertEqual(len(words), 2)
+        self.assertTrue(all(word not in ip.STOPWORDS for word in words))
+
+    def test_at_most_three_headings_come_back(self):
+        self.assertLessEqual(len(ip.answered("address")), 3)
+
+    def test_repeats_finds_the_same_question_in_two_wordings(self):
+        groups = ip.repeats()
+        self.assertTrue(groups)
+        titles = {entry.title for group in groups for entry in group}
+        self.assertIn("Address Line 1 (also City, State/Province and Zip/Postal Code are "
+                      "required)", titles)
+
+    def test_the_report_points_at_the_line_to_edit(self):
+        out = io.StringIO()
+        with contextlib.redirect_stdout(out):
+            ip.print_questions()
+        entry = next(q for q in ip.questions() if q.title == "Notice period at a new job")
+        self.assertIn(f"{self.path}:{entry.line}:", out.getvalue())
+        self.assertIn("2 open", out.getvalue())
+        self.assertIn("1 declined", out.getvalue())
+
+    def test_headings_know_their_line(self):
+        lines = [entry.line for entry in ip.questions()]
+        self.assertTrue(all(line > 1 for line in lines))
+        self.assertEqual(lines, sorted(lines))
+        entry = next(q for q in ip.questions() if q.title.startswith("Salary"))
+        self.assertEqual(self.FILE.splitlines()[entry.line - 1], "** Salary expectation")
+
+
 if __name__ == "__main__":
     unittest.main()

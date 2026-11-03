@@ -27,6 +27,11 @@ from langchain_core.tools import StructuredTool, tool
 from peewee import (BooleanField, CharField, DateTimeField, IntegerField, IntegrityError,
                     Model, SqliteDatabase, TextField, fn)
 
+try:                    # the fuzzy finder the questions file is searched with
+    from rapidfuzz import fuzz
+except ImportError:     # still usable without it, just less forgiving
+    fuzz = None
+
 from . import status
 
 ROOT = Path(__file__).resolve().parents[2]
@@ -56,6 +61,8 @@ PAUSE = float(os.environ.get("ITEMPIPE_PAUSE", "2"))            # breather betwe
 IDLE = float(os.environ.get("ITEMPIPE_IDLE", "300"))            # wait when no query is left
 BOARD_TTL = timedelta(days=float(os.environ.get("ITEMPIPE_BOARD_DAYS", "3")))
 QUERY_TTL = timedelta(days=float(os.environ.get("ITEMPIPE_QUERY_DAYS", "30")))
+KEYWORDS = 2        # words of a form question searched on their own, not the sentence
+NEAR = 60           # `lookup_answer` shows headings at least this close (0..100)
 
 
 @dataclass(frozen=True)
@@ -578,6 +585,11 @@ QUESTIONS_HEAD = """#+TITLE: Application Questions and Answers
 # agent leaves it blank and never invents a value, and no lead is held for it.
 # A heading with neither an :ANSWER: nor a :DECLINE: is still open: `itempipe
 # apply` appends it when a form asks what this file cannot answer, and holds.
+#
+# Questions are matched by meaning, not by wording: word order, filler words and
+# parenthetical asides do not matter, so one short heading ("Postal address")
+# answers every form that asks about it. `itempipe questions` lists the open
+# ones as file:line, and `itempipe questions postal` finds a heading by words.
 """
 
 HEADING = re.compile(r"^(\*+)\s+(.*?)\s*$")
@@ -601,6 +613,7 @@ class Question:
     note: str = ""
     source: str = ""
     level: int = 2
+    line: int = 0              # where the heading is, so a report can point at it
 
     @property
     def settled(self):
@@ -612,15 +625,31 @@ class Question:
         return question_key(self.title)
 
 
+NOISE = re.compile(r"\([^)]*\)|\[[^\]]*\]|https?://\S+")
+
+
 def tokens_of(text):
-    """The words that carry the meaning of a question: lowercase, no stopwords."""
-    return [token for token in re.findall(r"[a-z0-9]+", str(text or "").lower())
+    """The words that carry the meaning of a question.
+
+    Lowercased, stopwords gone, and the paperwork dropped: parenthetical asides ("all
+    marked required on the … application form"), bracketed links and bare numbers are
+    provenance, not question. Without that, one address field saved from ten forms looks
+    like ten different questions instead of one.
+    """
+    text = NOISE.sub(" ", str(text or "").lower())
+    return [token for token in re.findall(r"[a-z][a-z0-9]*", text)
             if token not in STOPWORDS]
 
 
 def question_key(text):
-    """One question, one identity: case, punctuation, stopwords and spacing folded away."""
-    return " ".join(tokens_of(text))
+    """One heading, one identity: case, punctuation, stopwords and spacing folded away.
+
+    Kept apart from `tokens_of` on purpose: the key is a hold's link to a heading, so it
+    must keep meaning what it meant when the hold was written — a `hold` table written by
+    an older version still points at the same heading.
+    """
+    words = re.findall(r"[a-z0-9]+", str(text or "").lower())
+    return " ".join(word for word in words if word not in STOPWORDS)
 
 
 def questions(path=None):
@@ -635,9 +664,9 @@ def questions(path=None):
     except OSError:
         return []
     found = []
-    for line in text.splitlines():
+    for number, line in enumerate(text.splitlines(), 1):
         if match := HEADING.match(line):
-            found.append(Question(clean(match.group(2)),
+            found.append(Question(clean(match.group(2)), line=number,
                                   level=len(match.group(1))))
             continue
         if not found or not (match := PROPERTY.match(line)):
@@ -658,47 +687,137 @@ def questions(path=None):
     return [entry for entry in found if entry.level > 1]      # a `*` heading is a section
 
 
-def answer_score(title, tokens):
-    """3 per matching token, plus 1 when every token matched: specific beats broad."""
-    lowered = str(title or "").lower()
-    hits = sum(1 for token in tokens if token in lowered)
-    return hits * 3 + (1 if tokens and hits == len(tokens) else 0)
+def similarity(a, b):
+    """How alike two questions are, 0..100, by words rather than by string.
+
+    rapidfuzz's token-set ratio compares the two sets of words, so word order, filler and
+    the words only one side has are forgiven, and a heading whose words are all in the
+    question scores 100 however long the question is. That is what lets one short heading
+    answer every form that words the field its own way. Without rapidfuzz the same idea
+    is computed as containment, so the reader keeps working on a bare python.
+    """
+    words_a, words_b = tokens_of(a), tokens_of(b)
+    if not words_a or not words_b:
+        return 0.0
+    if fuzz is not None:
+        return float(fuzz.token_set_ratio(" ".join(words_a), " ".join(words_b)))
+    return 100.0 * len(set(words_a) & set(words_b)) / min(len(set(words_a)),
+                                                          len(set(words_b)))
 
 
-def answered(query="", limit=5):
-    """The settled questions that best match `query`, best first.
+def keywords(text, n=KEYWORDS):
+    """The n words a question is really about: rare in the file first, longest next.
+
+    A form asks "What is your full postal address - Address Line 1, City, State/Province
+    and Zip or Postal Code?". Searching that sentence finds nothing; searching its two
+    most telling words finds the heading that already answers it. Rarity is a crude
+    inverse document frequency over the headings in the file, so words this file uses
+    everywhere (address, experience) give way to the ones that say which question it is.
+    """
+    words = tokens_of(text)
+    if len(words) <= n:
+        return words
+    titles = [entry.title.lower() for entry in questions()]
+    counts = {word: sum(1 for title in titles if word in title) for word in words}
+    ranked = sorted(enumerate(words),
+                    key=lambda pair: (counts[pair[1]], -len(pair[1]), pair[0]))
+    return [word for _, word in ranked[:n]]
+
+
+def closest(query="", limit=3, entries=None, min_score=NEAR):
+    """The questions nearest in meaning to `query`, best first.
+
+    The fuzzy finder on its own already ignores word order and extra words; the two
+    keywords are tried as a second query because a form's long sentence otherwise drowns
+    them. Among equally close headings, the one sharing more of the question's words wins,
+    and a declined heading wins a tie: "I will not answer that" is the decision the agent
+    must not talk itself out of.
+    """
+    rows = list(entries if entries is not None else questions())
+    words = tokens_of(query)
+    if not rows or not words:
+        return rows[:limit]
+    needles = [" ".join(words), " ".join(keywords(query))]
+    asked = set(words)
+    ranked = []
+    for entry in rows:
+        score = max(similarity(needle, entry.title) for needle in needles)
+        if score >= min_score:
+            shared = len(asked & set(tokens_of(entry.title)))
+            ranked.append((score, shared, entry.decline, entry))
+    ranked.sort(key=lambda hit: hit[:3], reverse=True)
+    return [hit[-1] for hit in ranked[:limit]]
+
+
+def same_question(a, b):
+    """Is one of these two questions just a shorter way of asking the other?
+
+    Deliberately strict: every meaningful word of one has to appear in the other, once
+    parentheticals and numbers are gone. That keeps "experience with Go" and "experience
+    with Node.js" apart, and "current salary" away from "salary expectation". It is the
+    predicate that decides whether a question is saved twice, so a false yes either asks
+    the user twice or answers a field they never answered.
+    """
+    words_a, words_b = set(tokens_of(a)), set(tokens_of(b))
+    return bool(words_a and words_b) and (words_a <= words_b or words_b <= words_a)
+
+
+def answered(query="", limit=3):
+    """The settled questions nearest in meaning to `query`, best first.
 
     Declined entries are included: "the user will not answer this" is a decision the
     agent has to obey, and showing it is what stops that field being asked about again.
     A heading the user has not decided on never matches.
     """
-    tokens = tokens_of(query)
-    rows = [entry for entry in questions() if entry.settled]
-    if not tokens:
-        return rows[:limit]
-    ranked = sorted(((answer_score(entry.title, tokens), entry) for entry in rows),
-                    key=lambda pair: pair[0], reverse=True)
-    return [entry for score, entry in ranked if score >= 3][:limit]
+    return closest(query, limit, entries=[entry for entry in questions() if entry.settled])
 
 
 def best_answer(query):
-    """The one stored entry that covers every word of `query`, if there is one.
+    """The one settled entry that is the same question as `query`, if there is one.
 
-    A declined entry counts: the user has decided not to answer that field, so the agent
-    must neither ask again nor hold the lead for it. Strict on purpose — this is what
-    refuses a hold, so a partial match (a salary question against "current salary") must
-    not be taken as an answer.
+    This is what refuses a hold, so it asks `same_question` rather than settling for the
+    closest heading (`lookup_answer` shows those): a question is only taken as answered
+    when the file's own wording covers every word of it.
     """
-    tokens = tokens_of(query)
-    if not tokens:
+    if not tokens_of(query):
         return None
-    full = [entry for entry in questions()
-            if entry.settled and all(token in entry.title.lower() for token in tokens)]
-    return max(full, key=lambda entry: len(entry.title)) if full else None
+    found = [entry for entry in questions()
+             if entry.settled and same_question(query, entry.title)]
+    # A refusal outranks an answer, and a more specific heading outranks a broader one.
+    return max(found, key=lambda entry: (entry.decline,
+                                         len(tokens_of(entry.title)))) if found else None
 
 
-def answer_text(query="", limit=5):
-    """What `lookup_answer` hands the model: numbered questions with their answers.
+def repeats():
+    """Groups of headings that ask the same thing, so a pile of variants can be merged.
+
+    Read-only: `save_question` only ever appends, so merging is the user's edit. Until
+    then every variant already answers to the others, because matching is by the words of
+    a question and not by its wording.
+    """
+    groups = []
+    for entry in questions():
+        for group in groups:
+            if any(same_question(entry.title, other.title) for other in group):
+                group.append(entry)
+                break
+        else:
+            groups.append([entry])
+    return [group for group in groups if len(group) > 1]
+
+
+def declined_note(entry):
+    """What the agent is told when the user has refused a field."""
+    fallback = (f" Where a form insists on text, {entry.answer!r} is the value the user "
+                "allows." if entry.answer else "")
+    return (f"Declined in {QUESTIONS.name} — {entry.title!r} — the user will not answer "
+            "this: do not ask again and never invent a value; leave the field blank."
+            f"{fallback} If the form will not submit without it, finish_item(\"archive\", "
+            "\"required field declined\").")
+
+
+def answer_text(query="", limit=3):
+    """What `lookup_answer` hands the model: the three nearest questions, best first.
 
     A declined entry is reported as DECLINED rather than as a value: the field is left
     blank (or given the quoted fallback where the form insists), never invented.
@@ -731,6 +850,19 @@ def open_questions():
     return [entry for entry in questions() if not entry.settled]
 
 
+def field_label(question):
+    """The form's own name for the field: the question without its paperwork.
+
+    A form writes "Address Line 1: / City: / State/Province: / Zip/Postal Code: (all
+    marked required on the Dynatrace SAP SuccessFactors application form)". The
+    parenthetical is provenance, and `:SOURCE:` already holds it, so the heading keeps the
+    part that names the field. That is what stops the tenth address field from becoming
+    the tenth address heading.
+    """
+    text = re.sub(r"\s*\([^)]*\)", " ", clean(question)).strip(" :;-–—/")
+    return clean(text) or clean(question)
+
+
 def entry_text(question, source=""):
     """One entry, in exactly the shape the file already uses.
 
@@ -753,24 +885,26 @@ def entry_text(question, source=""):
 def ask(question, source=""):
     """Append one unanswered question to the file. Returns (entry, was_new).
 
-    The file is only ever appended to — never rewritten — so nothing that is already in it
-    can be lost, and two workers adding questions at once cannot clobber each other. A
-    question already there (answered or not) is reported instead of being appended twice.
+    The file is only ever appended to — never rewritten — so nothing already in it can be
+    lost, and two workers adding questions at once cannot clobber each other. A question
+    the file already asks is returned as it stands rather than appended again: the same
+    wording, a longer or shorter one (`same_question`), or a heading the user has already
+    answered or declined. That is what stops a form from growing a second Address Line 1.
     """
     question, source = clean(question), clean(source)
-    key = question_key(question)
     for entry in questions():
-        if entry.key == key:
+        if same_question(question, entry.title):
             return entry, False
+    label = field_label(question)
     path = Path(QUESTIONS)
     path.parent.mkdir(parents=True, exist_ok=True)
     fresh = not path.exists() or path.stat().st_size == 0
     with open(path, "a", encoding="utf-8") as out:      # 'a' is the whole safety story
         if fresh:
             out.write(QUESTIONS_HEAD)
-        out.write("\n" + entry_text(question, source))
+        out.write("\n" + entry_text(label, source))
         out.flush()
-    return Question(question, source=source), True
+    return Question(label, source=source), True
 
 
 def hold(item, keys):
@@ -995,7 +1129,8 @@ def tools_for(w=None, sess=None):
         """Save one unanswered question and record that this lead waits on it.
 
         Returns (saved, message): `saved` is False when the file already answers it, in
-        which case the model is told to use that answer rather than hold the lead.
+        which case the model is told to use that answer rather than hold the lead — and
+        also when the user has declined the field, so nothing is asked twice.
         """
         question = clean(question)
         if not question_key(question):
@@ -1005,19 +1140,19 @@ def tools_for(w=None, sess=None):
                            "several. Call this once per field.")
         if found := best_answer(question):
             if found.decline:
-                fallback = (f", or enter {found.answer!r} where the form insists"
-                            if found.answer else "")
-                return False, (
-                    f"Declined in {QUESTIONS.name} — {found.title} — the user will not "
-                    "answer it: do not ask again and do not invent a value; leave that "
-                    f"field blank{fallback}. If the form will not submit without it, "
-                    'finish_item("archive", "required field declined")')
+                return False, declined_note(found)
             return False, (f"Already answered in {QUESTIONS.name} — {found.title}: "
                            f"{found.answer}. Use it; do not hold for this one.")
         entry, new = ask(question, f"{item.name} ({item.title})")
+        if entry.decline:           # a shorter way of asking a field the user refuses
+            return False, declined_note(entry)
         hold(item.id, [entry.key])
-        return True, (f"{'Saved' if new else 'Already open'}: {entry.title!r} in "
-                      f"{QUESTIONS.name}. The user answers it once, for every application.")
+        if new:
+            return True, (f"Saved: {entry.title!r} in {QUESTIONS.name}. The user answers "
+                          "it once, for every application.")
+        return True, (f"Already asked in {QUESTIONS.name} — {entry.title!r} (line "
+                      f"{entry.line}); this lead waits on that one, and nothing is "
+                      "asked twice.")
 
     @tool
     def save_question(question: str) -> str:
@@ -1480,20 +1615,61 @@ async def apply(workers=2):
     held = list(Item.select().where(Item.state == HOLD))
     if held:                                 # the run is over, but not for these
         reports.append(f"{len(held)} lead(s) on hold: answer the open questions in "
-                       f"{QUESTIONS} and they go back in the queue:")
+                       f"{QUESTIONS} and they go back in the queue "
+                       "(`itempipe questions` lists them with line numbers):")
         for item in held:
             waiting_on = ", ".join(entry.title for entry in waiting(item.id)) or "?"
             reports.append(f"  {item.name} — waiting on {waiting_on}")
     return reports
 
 
+def question_state(entry):
+    """One word for where a heading stands, for a report line."""
+    return "declined" if entry.decline else ("answered" if entry.answer else "open")
+
+
+def print_questions(limit=10):
+    """Report the questions file: its tally, the holds, the open to-dos and the repeats.
+
+    Headings are printed as `path:line: …`, which is the format Emacs' grep and compile
+    modes turn into jumps — `itempipe questions` is how you get from the tracker to the
+    line you edit, and the file stays the only place a question is answered.
+    """
+    stored = questions()
+    print(f"{QUESTIONS}: {sum(1 for q in stored if q.answer and not q.decline)} "
+          f"answered, {sum(1 for q in stored if q.decline)} declined, "
+          f"{sum(1 for q in stored if not q.settled)} open; "
+          f"{Item.select().where(Item.state == HOLD).count()} lead(s) on hold")
+    for item in Item.select().where(Item.state == HOLD):
+        on = ", ".join(entry.title for entry in waiting(item.id)) or "no open question"
+        print(f"  on hold: {item.name} — waiting on {on}")
+    pending = open_questions()
+    for entry in pending[:limit]:
+        print(f"  open {QUESTIONS}:{entry.line}: {entry.title}")
+    if len(pending) > limit:
+        print(f"  ... {len(pending) - limit} more open: itempipe questions")
+    groups = repeats()
+    for group in groups[:5]:               # `save_question` cannot merge them: only you can
+        first = group[0]
+        for entry in group[1:]:
+            print(f"  repeat {QUESTIONS}:{entry.line}: {entry.title}")
+            print(f"     same as {QUESTIONS}:{first.line}: {first.title}")
+    if len(groups) > 5:
+        print(f"  ... {len(groups) - 5} more group(s) of repeats")
+
+
 def main(argv=None):
     p = argparse.ArgumentParser(prog="itempipe", description=__doc__.splitlines()[0])
     p.add_argument("--db", default=str(DB))
-    p.add_argument("command", choices=["init", "search", "apply"])
-    p.add_argument("brief", nargs="?", default="")
+    p.add_argument("command", choices=["init", "search", "apply", "questions"])
+    p.add_argument("brief", nargs="*", default=[],
+                   help="search brief, or words to find a question by (questions)")
     p.add_argument("-n", type=int, default=2, help="parallel workers")
     args = p.parse_args(argv)
+    brief = " ".join(args.brief)
+    if fuzz is None:            # the fuzzy finder is what makes the matching "by meaning"
+        print("itempipe: rapidfuzz is missing, so questions match on shared words only; "
+              "`uv sync` in py/ (or `nix develop`) installs it.", file=sys.stderr)
     path = open_db(args.db)
     back = unhold()                 # answers given since the last run release their leads
     if args.command == "init":
@@ -1507,14 +1683,17 @@ def main(argv=None):
               + (f", {forgotten} old one(s) forgotten" if forgotten else "")
               + (f", {learned} lead(s) marked recorded" if learned else "")
               + (f", {back} lead(s) back from hold" if back else ""))
-        stored = questions()
-        print(f"{QUESTIONS}: {sum(1 for q in stored if q.answer and not q.decline)} "
-              f"answered, {sum(1 for q in stored if q.decline)} declined, "
-              f"{sum(1 for q in stored if not q.settled)} open; "
-              f"{Item.select().where(Item.state == HOLD).count()} lead(s) on hold")
-        for item in Item.select().where(Item.state == HOLD):
-            on = ", ".join(entry.title for entry in waiting(item.id)) or "no open question"
-            print(f"  on hold: {item.name} — waiting on {on}")
+        print_questions()
+        return 0
+    if args.command == "questions":
+        # `path:line: …` on stdout, so in Emacs `M-x grep RET itempipe questions RET`
+        # (or `M-x compile`) makes every heading a jump: answer where you edit.
+        rows = closest(brief, limit=10) if brief else open_questions()
+        for entry in rows:
+            print(f"{QUESTIONS}:{entry.line}: {question_state(entry)} {entry.title}")
+        print(f"{len(rows)} question(s)" + (f" matching {brief!r}" if brief else
+                                            " open (add :ANSWER: or :DECLINE: t)"),
+              file=sys.stderr)
         return 0
     if args.command == "search" and not (SEED_TASKS or space_for()):
         print(f"itempipe: {CONFIG} has no roles, regions or boards to search for. "
@@ -1539,7 +1718,7 @@ def main(argv=None):
         poller = asyncio.create_task(tick())
         try:
             if args.command == "search":
-                return await search(args.brief, workers=args.n, progress=progress)
+                return await search(brief, workers=args.n, progress=progress)
             return await apply(workers=args.n)
         finally:
             poller.cancel()

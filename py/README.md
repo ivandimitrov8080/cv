@@ -9,6 +9,7 @@ nix develop
 python -m itempipe init                        # create/upgrade the db, show the queue
 python -m itempipe search -n 4                 # until Ctrl-C; see itempipe/search.toml
 python -m itempipe apply -n 2
+python -m itempipe questions                   # open headings as file:line, for Emacs
 (cd py && python -m unittest -v test_itempipe)  # queue tests, no model or network needed
 ```
 
@@ -219,9 +220,7 @@ stdout only ever gets the report, so `itempipe apply > out.txt` still works; wit
 calls `lookup_answer`, which reads `application-questions.org` (`ITEMPIPE_QUESTIONS`) —
 the same file a human edits: one heading per question, the answer in an `:ANSWER:`
 property, `:NOTE:`/`:FORMAT:`/`:SOURCE:` for context, `:DECLINE: t` to refuse the field.
-Answers are matched by keyword, so `"salary expectation"` finds `** Salary expectation`
-even though the form words it differently; a heading with neither an `:ANSWER:` nor a
-`:DECLINE:` is an open question and matches nothing.
+A heading with neither an `:ANSWER:` nor a `:DECLINE:` is an open question.
 Every entry — yours and the agent's — has the same shape, three-space drawer and all:
 
 ```org
@@ -239,24 +238,74 @@ When a required field asks something no heading answers, the worker calls `save_
 for that one field and then `finish_item("hold")`. `save_question` writes that block
 with an empty `:ANSWER:` and the company in `:SOURCE:`, so answering it is typing after
 the colon — and it **only ever appends**, never rewriting, reordering or editing an
-existing entry, so nothing you wrote can be lost. A question already in the file is
-reported instead of added twice. The lead moves to `HOLD`: out of the queue, not archived.
+existing entry, so nothing you wrote can be lost. The lead moves to `HOLD`: out of the
+queue, not archived.
+
+### One question, however it is worded
+
+The file is searched with [rapidfuzz](https://github.com/rapidfuzz/RapidFuzz)'s token-set
+ratio, not by comparing strings: word order, filler and the words only one side has are
+forgiven, and a heading whose words all appear in the question scores 100 however long
+the question is. Two words of the form's question are also searched on their own, because
+a long sentence otherwise drowns them; the three closest headings come back.
+
+That is what keeps the file from growing: `** Address Line 1: / City: / Zip` answers
+"What is your full postal address - Address Line 1, City, State/Province and Zip or
+Postal Code?" and `save_question` refuses to append a second heading for a question the
+file already asks. Parenthetical asides, links and bare numbers are dropped before
+matching — a form's provenance is already in `:SOURCE:`, and it is the part that made ten
+address headings out of one field — and an appended heading keeps only the form's own
+name for the field.
+
+Matches are deliberately *strict* when they decide something: one wording has to cover
+every meaningful word of the other before it counts as the same question, so "experience
+with Go" and "experience with Node.js" stay apart, and "current salary" is not answered
+by "salary expectation". Loose matches only ever *show* the agent the three nearest
+headings; they never answer a field on their own.
+
+### Declining a field
 
 A heading that says `:DECLINE: t` instead of carrying an `:ANSWER:` is a field you will
 not answer at all. It counts as settled, not open: `lookup_answer` reports it as DECLINED
-and tells the agent to leave the field blank, `save_question` refuses to ask it again,
-and a lead held on it is released like any other answer. Give the entry an `:ANSWER:`
-as well and that value is the fallback the agent may type where a form insists on
-text — still nothing invented. A form that will not submit without the field is
-archived with that reason; a lead is never held for a refusal you have already made.
+and tells the agent to leave the field blank, `save_question` refuses to ask it again (a
+reworded question that a declined heading covers is declined too), and a lead held on it
+is released like any other answer. Give the entry an `:ANSWER:` as well and that value is
+the fallback the agent may type where a form insists on text — still nothing invented. A
+form that will not submit without the field is archived with that reason; a lead is never
+held for a refusal you have already made.
+
+Keep a declined heading **short and generic** — `** Postal address`, not one form's whole
+sentence. A two-word heading is contained in every form's wording of that field, which is
+exactly what makes one refusal cover all of them.
+
+### Answering from Emacs
+
+The file is the interface; `itempipe` only points at it. `itempipe questions` prints every
+open heading as `path:line: …`, so
+
+* `M-x grep RET itempipe questions RET` (or `M-x compile`) makes each line a jump, and
+  `C-x \`` walks the open ones: answer where you edit, no other UI to learn;
+* `itempipe questions postal` fuzzy-finds the headings matching those words — the same
+  search `lookup_answer` uses — which is how you find the entry to decline;
+* `itempipe init` reports the tally, the open headings, and groups of headings that ask
+  the same thing, so a pile of old variants can be merged by hand.
+
+Tucked into your init file, that is one command:
+
+```elisp
+(defun itempipe-questions (words)
+  "Jump to the questions `words' describe, from `itempipe questions'."
+  (interactive "sWords (empty for every open question): ")
+  (grep (string-trim (concat "itempipe questions " words))))
+```
 
 Which questions a lead is waiting on is bookkeeping, not content: a small `hold` table
 maps the lead's id to the question's normalised wording, and the question itself lives
 only in the file. That is what lets one lead wait on several questions and two leads wait
 on the same one. Fill in an `:ANSWER:` (or mark the heading `:DECLINE: t`) and the next
-run releases every lead held on it
-(`unhold`, at startup); a lead held on two questions waits for both. `itempipe init`
-counts both sides and names what each held lead is waiting for:
+run releases every lead held on it (`unhold`, at startup); a lead held on two questions
+waits for both. `itempipe init` counts both sides and names what each held lead is
+waiting for:
 
 ```
 py/itempipe.db: 41 lead(s), 3 queued, 812 seen row(s), ...

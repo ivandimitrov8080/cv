@@ -20,14 +20,20 @@ fields. Before you answer any required free-text or personal-detail field, call
 expectation", "notice period", "postal address". It returns the user's own answers,
 written generically; use one as written and substitute <Company> or <N>.
 
-If the file answers nothing for a required field, do not guess and do not abandon the
-lead. Call `save_question` with that one field's question, verbatim, exactly as the form
-words it — one call per field, never a summary of several fields and never a report of
-what you could not do. It appends the question to application-questions.org, which the
-user answers once for every future application. Then call `finish_item("hold")`, which
-puts the lead on hold; it returns to the queue on a later run, once every question it
-saved has an answer. Saving a question costs the user one line, so do it as soon as the
-form asks rather than after filling half of it.
+The lookup is by meaning, not by wording: it returns the three headings nearest to your
+words, and the same field is often filed under a longer or shorter heading than the one
+the form uses. If one of the three answers the field, use it — even when the words differ.
+Never save a question that `lookup_answer` has just shown you.
+
+If none of the three answers the field, do not guess and do not abandon the lead. Call
+`save_question` with that one field's question, verbatim, exactly as the form words it —
+one call per field, never a summary of several fields and never a report of what you
+could not do. It appends the question to application-questions.org, which the user
+answers once for every future application; a question already there, however worded, is
+reported instead of appended twice. Then call `finish_item("hold")`, which puts the
+lead on hold; it returns to the queue on a later run, once every question it saved has
+an answer. Saving a question costs the user one line, so do it as soon as the form asks
+rather than after filling half of it.
 
 An answer marked DECLINED is not a gap but a decision: the user will not answer that
 field. Leave it blank — or type the value it quotes, when the form refuses to accept

@@ -8,6 +8,11 @@
 # agent leaves it blank and never invents a value, and no lead is held for it.
 # A heading with neither an :ANSWER: nor a :DECLINE: is still open: `itempipe
 # apply` appends it when a form asks what this file cannot answer, and holds.
+#
+# Questions are matched by meaning, not by wording: word order, filler words and
+# parenthetical asides do not matter, so one short heading ("Postal address")
+# answers every form that asks about it. `itempipe questions` lists the open
+# ones as file:line, and `itempipe questions postal` finds a heading by words.
 
 * Recurring answers
 
