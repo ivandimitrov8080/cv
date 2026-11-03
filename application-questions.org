@@ -4,6 +4,10 @@
 # One entry per question, with the answer in an :ANSWER: property.
 # Questions are phrased generically (<Company>, <N> days, ...) so the same
 # answer serves every application. :SOURCE: lists the forms that asked it.
+# :DECLINE: t instead of an answer means you will not answer that field: the
+# agent leaves it blank and never invents a value, and no lead is held for it.
+# A heading with neither an :ANSWER: nor a :DECLINE: is still open: `itempipe
+# apply` appends it when a form asks what this file cannot answer, and holds.
 
 * Recurring answers
 

@@ -484,8 +484,9 @@ class QuestionsTest(unittest.TestCase):
     def tool(self, w, name):
         return next(t for t in ip.tools_for(w) if t.name == name)
 
-    def edit(self, question, answer=None, rename=None):
-        """Do what the user does: type into the entry's `:ANSWER:`, and/or rename it."""
+    def edit(self, question, answer=None, rename=None, decline=None):
+        """Do what the user does: type into the entry's `:ANSWER:`, mark it `:DECLINE:`,
+        and/or rename it."""
         lines = self.path.read_text(encoding="utf-8").splitlines()
         heading = next((i for i, line in enumerate(lines)
                         if line.startswith("*")
@@ -504,6 +505,14 @@ class QuestionsTest(unittest.TestCase):
             else:
                 lines[heading + 1:heading + 1] = ["   :PROPERTIES:",
                                                  f"   :ANSWER: {answer}", "   :END:"]
+        if decline:
+            filled = next((i for i in range(heading + 1, len(lines))
+                           if lines[i].lstrip().upper().startswith((":ANSWER:", ":END:"))),
+                          None)
+            if filled is None:
+                raise AssertionError(f"no drawer under {question!r}")
+            indent = lines[filled][:len(lines[filled]) - len(lines[filled].lstrip())]
+            lines[filled:filled] = [f"{indent}:DECLINE: {decline}"]
         self.path.write_text("\n".join(lines) + "\n", encoding="utf-8")
 
     def add(self, name):
@@ -649,6 +658,50 @@ class QuestionsTest(unittest.TestCase):
         self.path.write_text(appended, encoding="utf-8")
         self.assertIn("Yes, two years", ip.answer_text("Go experience"))
         self.assertEqual(self.path.read_text(encoding="utf-8"), appended)
+
+    def test_a_declined_field_is_reported_as_a_refusal_not_as_a_value(self):
+        self.edit("Do you have experience with Node.js?", decline="t")
+        out = ip.answer_text("node.js experience")
+        self.assertIn("DECLINED", out)
+        self.assertIn("leave the field blank", out)
+        self.assertIn("never invent", out.lower())
+        self.assertTrue(ip.questions()[-1].decline)
+        self.assertEqual(ip.open_questions(), [])              # decided, not open
+
+    def test_decline_off_leaves_the_question_open(self):
+        self.edit("Do you have experience with Node.js?", decline="no")
+        self.assertFalse(ip.questions()[-1].decline)
+        self.assertEqual([q.title for q in ip.open_questions()],
+                         ["Do you have experience with Node.js?"])
+
+    def test_a_declined_question_releases_the_lead_that_waited_on_it(self):
+        self.hold(self.worker(), "What is your notice period?")
+        self.assertEqual(ip.unhold(), 0)                     # still open
+        self.edit("What is your notice period?", decline="t")
+        self.assertEqual(ip.unhold(), 1)
+        self.assertEqual(self.state(), ip.NEW)
+
+    def test_a_declined_field_is_not_asked_again_and_not_appended(self):
+        self.edit("Do you have experience with Node.js?", decline="t")
+        before = self.path.read_text(encoding="utf-8")
+        out = self.save(self.worker(), "Do you have experience with Node JS?")
+        self.assertIn("Declined", out)
+        self.assertIn("do not ask again", out)
+        self.assertEqual(self.path.read_text(encoding="utf-8"), before)
+
+    def test_a_hold_is_refused_for_a_declined_field(self):
+        self.edit("Do you have experience with Node.js?", decline="t")
+        out = self.hold(self.worker(), "Do you have experience with Node.js?")
+        self.assertIn("Declined", out)
+        self.assertEqual(self.state(), ip.WORKING)            # untouched, not held
+        self.assertEqual(ip.Hold.select().count(), 0)
+
+    def test_a_decline_may_carry_the_fallback_to_type(self):
+        self.edit("Do you have experience with Node.js?", decline="t", answer="N/A")
+        out = ip.answer_text("node.js experience")
+        self.assertIn("DECLINED", out)
+        self.assertIn("N/A", out)                             # a fallback, not an answer
+        self.assertIn("where the form insists", out)
 
 
 if __name__ == "__main__":

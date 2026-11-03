@@ -218,9 +218,10 @@ stdout only ever gets the report, so `itempipe apply > out.txt` still works; wit
 `apply` never guesses. Before filling a required free-text or personal-detail field it
 calls `lookup_answer`, which reads `application-questions.org` (`ITEMPIPE_QUESTIONS`) —
 the same file a human edits: one heading per question, the answer in an `:ANSWER:`
-property, `:NOTE:`/`:FORMAT:`/`:SOURCE:` for context. Answers are matched by keyword, so
-`"salary expectation"` finds `** Salary expectation` even though the form words it
-differently; a heading whose `:ANSWER:` is empty is an open question and matches nothing.
+property, `:NOTE:`/`:FORMAT:`/`:SOURCE:` for context, `:DECLINE: t` to refuse the field.
+Answers are matched by keyword, so `"salary expectation"` finds `** Salary expectation`
+even though the form words it differently; a heading with neither an `:ANSWER:` nor a
+`:DECLINE:` is an open question and matches nothing.
 Every entry — yours and the agent's — has the same shape, three-space drawer and all:
 
 ```org
@@ -241,16 +242,25 @@ the colon — and it **only ever appends**, never rewriting, reordering or editi
 existing entry, so nothing you wrote can be lost. A question already in the file is
 reported instead of added twice. The lead moves to `HOLD`: out of the queue, not archived.
 
+A heading that says `:DECLINE: t` instead of carrying an `:ANSWER:` is a field you will
+not answer at all. It counts as settled, not open: `lookup_answer` reports it as DECLINED
+and tells the agent to leave the field blank, `save_question` refuses to ask it again,
+and a lead held on it is released like any other answer. Give the entry an `:ANSWER:`
+as well and that value is the fallback the agent may type where a form insists on
+text — still nothing invented. A form that will not submit without the field is
+archived with that reason; a lead is never held for a refusal you have already made.
+
 Which questions a lead is waiting on is bookkeeping, not content: a small `hold` table
 maps the lead's id to the question's normalised wording, and the question itself lives
 only in the file. That is what lets one lead wait on several questions and two leads wait
-on the same one. Fill in an `:ANSWER:` and the next run releases every lead held on it
+on the same one. Fill in an `:ANSWER:` (or mark the heading `:DECLINE: t`) and the next
+run releases every lead held on it
 (`unhold`, at startup); a lead held on two questions waits for both. `itempipe init`
 counts both sides and names what each held lead is waiting for:
 
 ```
 py/itempipe.db: 41 lead(s), 3 queued, 812 seen row(s), ...
-/home/ivand/src/cv/application-questions.org: 24 answered, 2 open; 2 lead(s) on hold
+/home/ivand/src/cv/application-questions.org: 24 answered, 3 declined, 2 open; 2 lead(s) on hold
   on hold: HumanIT — waiting on What is your notice period?
 ```
 

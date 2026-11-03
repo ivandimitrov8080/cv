@@ -226,9 +226,14 @@ class Hold(Model):
         indexes = ((('item', 'key'), True),)
 
 
+def truthy(value):
+    """A switch read from text: unset, 0, false, no and off all mean no."""
+    return str(value or "").strip().lower() not in ("", "0", "false", "no", "off")
+
+
 def flag(name):
-    """An env var read as a switch: unset, 0, false, no, off all mean no."""
-    return os.environ.get(name, "").strip().lower() not in ("", "0", "false", "no", "off")
+    """An env var read as a switch (see `truthy`)."""
+    return truthy(os.environ.get(name))
 
 
 def clean(value):
@@ -557,10 +562,11 @@ def remember_leads():
 # -- the questions file ------------------------------------------------------
 #
 # `application-questions.org` is the answer store, and it belongs to the human: one heading
-# per question, the answer in an `:ANSWER:` property. Nothing about a question is stored on
-# a lead — the file is plain Q/A, one answer serving every form that asks it — so a lead can
-# wait on several of them at once. `lookup_answer` reads the file; `save_question` and
-# `unhold` write to it, which makes it both the memory and the inbox.
+# per question, the answer in an `:ANSWER:` property, or `:DECLINE: t` where the answer is
+# "I will not say". Nothing about a question is stored on a lead — the file is plain Q/A,
+# one answer serving every form that asks it — so a lead can wait on several of them at
+# once. `lookup_answer` reads the file; `save_question` and `unhold` write to it, which
+# makes it both the memory and the inbox.
 
 QUESTIONS_HEAD = """#+TITLE: Application Questions and Answers
 #+STARTUP: indent
@@ -568,8 +574,10 @@ QUESTIONS_HEAD = """#+TITLE: Application Questions and Answers
 # One entry per question, with the answer in an :ANSWER: property.
 # Questions are phrased generically (<Company>, <N> days, ...) so the same
 # answer serves every application. :SOURCE: lists the forms that asked it.
-# A heading with no :ANSWER: value is still open: `itempipe apply` appends it
-# when a form asks something this file cannot answer, and holds that lead.
+# :DECLINE: t instead of an answer means you will not answer that field: the
+# agent leaves it blank and never invents a value, and no lead is held for it.
+# A heading with neither an :ANSWER: nor a :DECLINE: is still open: `itempipe
+# apply` appends it when a form asks what this file cannot answer, and holds.
 """
 
 HEADING = re.compile(r"^(\*+)\s+(.*?)\s*$")
@@ -582,12 +590,22 @@ STOPWORDS = frozenset("""a an and any are as at be been by can could do does for
 
 @dataclass(frozen=True)
 class Question:
-    """One heading of the questions file: what was asked, and the user's answer to it."""
+    """One heading of the questions file: what was asked, and the user's answer to it.
+
+    `decline` is the user's refusal to answer at all (`:DECLINE: t`): it settles the
+    question without supplying a value, so nothing is invented and no lead waits on it.
+    """
     title: str
     answer: str = ""
+    decline: bool = False
     note: str = ""
     source: str = ""
     level: int = 2
+
+    @property
+    def settled(self):
+        """Answered, or deliberately declined: either way the user has decided."""
+        return bool(self.answer or self.decline)
 
     @property
     def key(self):
@@ -606,7 +624,7 @@ def question_key(text):
 
 
 def questions(path=None):
-    """Every question in the file, in file order: answered and open alike.
+    """Every question in the file, in file order: answered, declined and open alike.
 
     A heading is a question; a `*` section title is not, so it is left out. Org is read
     by hand rather than by a parser because only two things matter here: the heading, and
@@ -630,6 +648,8 @@ def questions(path=None):
         entry = found[-1]
         if name == "ANSWER":
             found[-1] = replace(entry, answer=value)
+        elif name == "DECLINE":
+            found[-1] = replace(entry, decline=truthy(value))
         elif name in ("NOTE", "FORMAT"):
             note = f"{entry.note}; {value}" if entry.note else value
             found[-1] = replace(entry, note=note)
@@ -646,9 +666,14 @@ def answer_score(title, tokens):
 
 
 def answered(query="", limit=5):
-    """The answered questions that best match `query`, best first. Unanswered never match."""
+    """The settled questions that best match `query`, best first.
+
+    Declined entries are included: "the user will not answer this" is a decision the
+    agent has to obey, and showing it is what stops that field being asked about again.
+    A heading the user has not decided on never matches.
+    """
     tokens = tokens_of(query)
-    rows = [entry for entry in questions() if entry.answer]
+    rows = [entry for entry in questions() if entry.settled]
     if not tokens:
         return rows[:limit]
     ranked = sorted(((answer_score(entry.title, tokens), entry) for entry in rows),
@@ -657,26 +682,38 @@ def answered(query="", limit=5):
 
 
 def best_answer(query):
-    """The one stored answer that covers every word of `query`, if there is one.
+    """The one stored entry that covers every word of `query`, if there is one.
 
-    Stricter than `answered` on purpose: this is what refuses a hold, so a partial match
-    (a salary question against "current salary") must not be taken as an answer.
+    A declined entry counts: the user has decided not to answer that field, so the agent
+    must neither ask again nor hold the lead for it. Strict on purpose — this is what
+    refuses a hold, so a partial match (a salary question against "current salary") must
+    not be taken as an answer.
     """
     tokens = tokens_of(query)
     if not tokens:
         return None
     full = [entry for entry in questions()
-            if entry.answer and all(token in entry.title.lower() for token in tokens)]
+            if entry.settled and all(token in entry.title.lower() for token in tokens)]
     return max(full, key=lambda entry: len(entry.title)) if full else None
 
 
 def answer_text(query="", limit=5):
-    """What `lookup_answer` hands the model: numbered questions with their answers."""
+    """What `lookup_answer` hands the model: numbered questions with their answers.
+
+    A declined entry is reported as DECLINED rather than as a value: the field is left
+    blank (or given the quoted fallback where the form insists), never invented.
+    """
     rows = answered(query, limit)
     if rows:
         blocks = []
         for number, entry in enumerate(rows, 1):
-            block = f"{number}. {entry.title}\n   Answer: {entry.answer}"
+            if entry.decline:
+                block = (f"{number}. {entry.title}\n   Answer: DECLINED — the user will not "
+                         "answer this. Never invent a value; leave the field blank")
+                block += (f", or enter {entry.answer!r} where the form insists."
+                          if entry.answer else ".")
+            else:
+                block = f"{number}. {entry.title}\n   Answer: {entry.answer}"
             if entry.note:
                 block += f"\n   Note: {entry.note}"
             blocks.append(block)
@@ -684,14 +721,14 @@ def answer_text(query="", limit=5):
     hint = ('Do not invent one: call save_question with the form\'s question verbatim, '
             'then finish_item("hold") so the lead waits for the user instead of being '
             "abandoned.")
-    if not any(entry.answer for entry in questions()):
+    if not any(entry.settled for entry in questions()):
         return f"No stored answers yet. {hint}"
     return f"No stored answer matches {clean(query)!r}. {hint}"
 
 
 def open_questions():
-    """The headings the file has no answer for: the user's to-do list."""
-    return [entry for entry in questions() if not entry.answer]
+    """The headings the user has neither answered nor declined: the to-do list."""
+    return [entry for entry in questions() if not entry.settled]
 
 
 def entry_text(question, source=""):
@@ -949,7 +986,9 @@ def tools_for(w=None, sess=None):
         any required free-text or personal-detail field. Pass the two most meaningful words
         of the form's question — "salary expectation", "notice period", "postal address" —
         because the saved questions are worded differently, so keywords match where whole
-        sentences do not. Use the answer as written, filling in <Company> or <N>."""
+        sentences do not. Use the answer as written, filling in <Company> or <N>. An entry
+        marked DECLINED is the user refusing that field: leave it blank (or type the value
+        it quotes), never invent one, and do not hold the lead for it."""
         return answer_text(query)
 
     def remember(question, item):
@@ -965,6 +1004,14 @@ def tools_for(w=None, sess=None):
             return False, ("NOT saved: one field's question, verbatim, not a summary of "
                            "several. Call this once per field.")
         if found := best_answer(question):
+            if found.decline:
+                fallback = (f", or enter {found.answer!r} where the form insists"
+                            if found.answer else "")
+                return False, (
+                    f"Declined in {QUESTIONS.name} — {found.title} — the user will not "
+                    "answer it: do not ask again and do not invent a value; leave that "
+                    f"field blank{fallback}. If the form will not submit without it, "
+                    'finish_item("archive", "required field declined")')
             return False, (f"Already answered in {QUESTIONS.name} — {found.title}: "
                            f"{found.answer}. Use it; do not hold for this one.")
         entry, new = ask(question, f"{item.name} ({item.title})")
@@ -1461,8 +1508,9 @@ def main(argv=None):
               + (f", {learned} lead(s) marked recorded" if learned else "")
               + (f", {back} lead(s) back from hold" if back else ""))
         stored = questions()
-        print(f"{QUESTIONS}: {sum(1 for q in stored if q.answer)} answered, "
-              f"{sum(1 for q in stored if not q.answer)} open; "
+        print(f"{QUESTIONS}: {sum(1 for q in stored if q.answer and not q.decline)} "
+              f"answered, {sum(1 for q in stored if q.decline)} declined, "
+              f"{sum(1 for q in stored if not q.settled)} open; "
               f"{Item.select().where(Item.state == HOLD).count()} lead(s) on hold")
         for item in Item.select().where(Item.state == HOLD):
             on = ", ".join(entry.title for entry in waiting(item.id)) or "no open question"

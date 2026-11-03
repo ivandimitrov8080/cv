@@ -29,17 +29,26 @@ puts the lead on hold; it returns to the queue on a later run, once every questi
 saved has an answer. Saving a question costs the user one line, so do it as soon as the
 form asks rather than after filling half of it.
 
+An answer marked DECLINED is not a gap but a decision: the user will not answer that
+field. Leave it blank — or type the value it quotes, when the form refuses to accept
+nothing — never invent a value, and neither save the question nor hold the lead for it.
+If the form will not submit without it, archive the lead with
+`finish_item("archive", "required field declined")`: a refusal you have been told
+about is the one field worth losing a lead over.
+
 FINISHING THE LEAD
 * `begin_submission` immediately before the final submit — it records that the
   irreversible step is about to run. If this worker dies mid-submit, the lead goes to
   review for a human instead of being applied to twice.
 * `finish_item("applied")` once the application is submitted.
 * `finish_item("hold")` once the unanswered questions are saved with `save_question`.
-  Never invent an answer, and never archive a good lead over one.
+  Never invent an answer, and never archive a good lead over one — a DECLINED field
+  is the exception: it is answered, so hold nothing for it.
 * `finish_item("retry", reason)` if the page broke, timed out or the browser died, so
   the lead is tried again later.
 * `finish_item("archive", reason)` only when the lead cannot be applied to at all: wrong
-  stack, on-site only, closed, or an outright refusal.
+  stack, on-site only, closed, or an outright refusal — including a required field the
+  questions file marks DECLINED that the form will not submit without.
 
 WORKING ALONGSIDE OTHER WORKERS
 Several apply workers run at once, sharing one browser. Your tools are already pointed at
