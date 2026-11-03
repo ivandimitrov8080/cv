@@ -191,3 +191,27 @@
 
 
        
+
+** What second languages do you speak?: *
+
+** Nationality: *
+
+** What is your tech stack?: *
+
+** What is your current job title?: *
+
+** Are you currently employed? If ye, where?:
+
+** Available for Realocation to Portugal (Not supported by HumanIT):
+
+** Required fields not covered by stored answers: Nationality, second languages spoken, current employment/employer, current job title, tech stack (multi-select), and availability for relocation to Portugal. Saved as questions; lead returns once answered.
+
+** 3 References (1 Direct Manager)
+
+** Required field "3 References (1 Direct Manager)" has no stored answer; saved as a question for the user.
+
+** Resume: * (the resume PDF at ~/src/cv/result/Ivan_Dimitrov_Resume_IT_Consultant.pdf is not readable by the upload tool, which is limited to /home/ivand/src/cv — which path or public URL should I upload?)
+
+** Arbeitszeugnis* (erforderlich) — please upload your employment reference letter
+
+** Required upload "Arbeitszeugnis" (employment reference) has no stored file/answer, and the CV PDF path was not accessible for upload. Saved the required question; lead held for the user.
