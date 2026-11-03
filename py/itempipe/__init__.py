@@ -16,7 +16,7 @@ printed. What to look for, and how widely, is `search.toml`; this module has no 
 about stacks, countries or companies.
 """
 
-import argparse, asyncio, contextlib, os, re, shutil, sys, time, tomllib, uuid
+import argparse, asyncio, contextlib, os, re, sys, tomllib, uuid
 from dataclasses import dataclass, field, replace
 from datetime import datetime, timedelta, timezone
 from functools import lru_cache
@@ -46,11 +46,10 @@ DB = Path(os.environ.get("ITEMPIPE_DB", ROOT / "py/itempipe.db"))
 PROMPTS, CV = Path(__file__).with_name("prompts"), ROOT / "cv.typ"
 QUESTIONS = Path(os.environ.get("ITEMPIPE_QUESTIONS", ROOT / "application-questions.org"))
 CONFIG = Path(os.environ.get("ITEMPIPE_CONFIG") or Path(__file__).with_name("search.toml"))
-CDP_PORT = int(os.environ.get("ITEMPIPE_CDP_PORT", "9222"))
-CHROME = shutil.which("chromium-sandboxed") or shutil.which("chromium")
 PROFILE = Path(os.environ.get("ITEMPIPE_PROFILE", "/tmp/itempipe-chromium"))
-CHROME_LOG = Path(os.environ.get("ITEMPIPE_CHROME_LOG", f"/tmp/itempipe-chromium-{CDP_PORT}.log"))
-MCP_LOG = Path(os.environ.get("ITEMPIPE_MCP_LOG", f"/tmp/itempipe-mcp-{CDP_PORT}.log"))
+# Only used when set explicitly: playwright-mcp's own default browser is what works here.
+CHROME = os.environ.get("ITEMPIPE_CHROME") or ""
+MCP_LOG = Path(os.environ.get("ITEMPIPE_MCP_LOG", "/tmp/itempipe-mcp.log"))
 MCP_OUTPUT = int(os.environ.get("ITEMPIPE_MCP_OUTPUT", "20000"))  # chars kept per tool call
 SEARCH_TRIES = int(os.environ.get("ITEMPIPE_SEARCH_TRIES", "3"))
 SESSIONS = int(os.environ.get("ITEMPIPE_SESSIONS", "0"))        # 0 = until you stop it
@@ -1450,32 +1449,19 @@ async def search(brief, workers=4, sessions=SESSIONS, progress=None):
     return progress
 
 
-def cdp_endpoint(port=CDP_PORT):
-    return f"http://127.0.0.1:{port}"
-
-
-async def _listening(endpoint, timeout=0.5):
-    """True if something is already answering CDP there."""
-    import httpx
-    try:
-        async with httpx.AsyncClient(timeout=timeout) as client:
-            return (await client.get(f"{endpoint}/json/version")).is_success
-    except Exception:
-        return False
-
-
 def _tail(lines=14):
     try:
-        text = CHROME_LOG.read_text(encoding="utf-8", errors="replace").strip()
+        text = MCP_LOG.read_text(encoding="utf-8", errors="replace").strip()
     except OSError:
         return ""
     return "\n".join(text.splitlines()[-lines:])
 
 
 def chrome_hint(log):
-    """Pick the likely cause out of chromium's own words, so the fix is obvious."""
+    """Pick the likely cause out of the browser's own words, so the fix is obvious."""
     text = (log or "").lower()
-    if "singletonlock" in text or "profile appears to be in use" in text:
+    if "singletonlock" in text or "profile appears to be in use" in text \
+            or "browser is already in use" in text:
         return (f"the profile {PROFILE} is in use by another Chromium. Close it, or set "
                 "ITEMPIPE_PROFILE elsewhere.")
     if "no usable sandbox" in text or "running as root" in text:
@@ -1484,12 +1470,13 @@ def chrome_hint(log):
         return ("Chromium wants a display. Run under a graphical session (or through "
                 "chromium-sandboxed, which binds the Wayland socket), or set "
                 "ITEMPIPE_HEADLESS=1.")
-    if "address already in use" in text or "devtoolsactiveport" in text:
-        return (f"CDP port {CDP_PORT} is taken. Kill the other browser, or set "
-                "ITEMPIPE_CDP_PORT.")
+    if "executable doesn't exist" in text or "executable doesn't exist" in text \
+            or "is not found" in text:
+        return ("Playwright cannot find a browser to launch. Run `npx @playwright/mcp "
+                "install-browser chromium`, or set ITEMPIPE_CHROME=/path/to/chromium.")
     if "multiple targets are not supported" in text:
-        return ("Chromium's headless mode cannot open more than one tab at startup. "
-                "Unset ITEMPIPE_HEADLESS to run headed.")
+        return ("Chromium's headless mode cannot open more than one tab at startup, and "
+                "every worker needs its own tab. Unset ITEMPIPE_HEADLESS to run headed.")
     if "error while loading shared libraries" in text or "bwrap:" in text:
         return "Chromium (or the sandbox wrapper) could not start: see the log."
     if "permission denied" in text:
@@ -1497,77 +1484,33 @@ def chrome_hint(log):
     return "No recognised cause; the log below is the whole story."
 
 
-async def stop_proc(proc, timeout=5.0):
-    """Terminate, then kill. A process that is already gone is not an error."""
-    if proc.returncode is not None:
-        return
-    with contextlib.suppress(ProcessLookupError, ChildProcessError):
-        proc.terminate()
-    try:
-        await asyncio.wait_for(proc.wait(), timeout)
-        return
-    except (asyncio.TimeoutError, ProcessLookupError):
-        pass
-    with contextlib.suppress(ProcessLookupError, ChildProcessError):
-        proc.kill()
-    with contextlib.suppress(ProcessLookupError, ChildProcessError):
-        await asyncio.wait_for(proc.wait(), timeout)
-
-
-async def chromium(port=CDP_PORT, timeout=20.0):
-    """Start one Chromium — headed unless ITEMPIPE_HEADLESS is set — that the shared
-    playwright-mcp attaches to.
-
-    Returns the process when we started it, or None when a Chromium was already
-    listening (a previous run, or one you started yourself): in that case it is not
-    ours to kill. One playwright-mcp session attaches to this browser and gives every
-    worker a tab; nothing else is shared but the process and its profile.
-
-    Chromium's stderr goes to CHROME_LOG rather than the terminal, because a browser
-    that refuses to start is silent on stdout and its last lines name the reason.
-    """
-    endpoint = cdp_endpoint(port)
-    if await _listening(endpoint):
-        return None
-    if CHROME is None:
-        raise Startup("no chromium on PATH; install chromium or point PATH at it.")
-    PROFILE.mkdir(parents=True, exist_ok=True)
-    CHROME_LOG.parent.mkdir(parents=True, exist_ok=True)
-    args = [CHROME, f"--remote-debugging-port={port}", "--user-data-dir", str(PROFILE),
-            "--no-first-run", "--no-default-browser-check", "about:blank"]
-    if flag("ITEMPIPE_HEADLESS"):        # headed by default: headless is opt-in
-        args.insert(1, "--headless")
-    with open(CHROME_LOG, "wb") as stderr:      # fresh log each run; the child keeps the fd
-        proc = await asyncio.create_subprocess_exec(
-            *args, stdout=asyncio.subprocess.DEVNULL, stderr=stderr)
-    deadline, pause = time.monotonic() + timeout, 0.25
-    while time.monotonic() < deadline:
-        if await _listening(endpoint):
-            return proc
-        if proc.returncode is not None:         # it gave up; the log says why
-            break
-        await asyncio.sleep(pause)
-    await stop_proc(proc)                       # kill() on a reaped process raises
+def startup_message(exc):
+    """What to print when no browser came up: the cause, the fix, and the log's tail."""
     detail = _tail()
-    how = (f"exited with {proc.returncode}" if proc.returncode is not None
-           else f"was still running after {timeout:.0f}s")
-    raise Startup("\n".join(filter(None, (
-        f"chromium {how} without opening {endpoint}.",
+    return "\n".join(filter(None, (
+        f"playwright-mcp could not start a browser: {type(exc).__name__}: {clean(exc)}",
         f"  {chrome_hint(detail)}",
-        f"  log: {CHROME_LOG}",
-        detail))))
+        f"  log: {MCP_LOG}",
+        detail)))
 
 
-def mcp_config(endpoint):
-    """The one playwright-mcp server that owns the shared browser and all its tabs.
+def mcp_config():
+    """The single playwright-mcp server, which owns the one browser and window.
 
     Exactly the fields `mcp.StdioServerParameters` takes, so it can be passed straight to
-    it. The environment is inherited whole because playwright-mcp needs more of it than
-    the SDK's safe default (HOME, PATH): a display, a runtime dir, the sandbox binds.
+    it. This process is the *only* thing that launches a browser: a browser we launched
+    ourselves and a browser it launched would be two windows, so there is only ever this
+    one. The name of the binary is `playwright-mcp`.
+
+    The environment is inherited whole because playwright-mcp needs more of it than the
+    SDK's safe default (HOME, PATH): a display, a runtime dir, the sandbox binds.
     """
-    return {"command": "playwright-mcp",
-            "args": ["--cdp-endpoint", endpoint, "--cdp-timeout", "30000"],
-            "env": dict(os.environ)}
+    args = []
+    if CHROME:                  # opt-in: otherwise its own browser is used
+        args += ["--executable-path", CHROME]
+    if flag("ITEMPIPE_HEADLESS"):
+        args.append("--headless")
+    return {"command": "playwright-mcp", "args": args, "env": dict(os.environ)}
 
 
 TAB_LINE = re.compile(r"^\s*-\s*(\d+):\s*(.*)$", re.M)
@@ -1656,11 +1599,11 @@ def mcp_tool(tool, client, invoke=None):
 class SharedBrowser:
     """One playwright-mcp connection and one tab per worker.
 
-    Spawning one MCP server per worker makes each server a separate Playwright browser
-    context: a second window for every extra worker. Instead there is one server for the
-    whole run, and each worker is assigned a tab by index. Every tool call selects that
-    tab and runs under one lock, so two workers can never drive the same page even though
-    they share the MCP process.
+    A playwright-mcp process *launches* a browser — that is what it is for. One server per
+    worker therefore meant one browser (and one window) per worker, on top of anything we
+    started ourselves. Instead there is one server for the whole run, and each worker is
+    assigned a tab in its one browser. Every tool call selects that tab and runs under one
+    lock, so two workers can never drive the same page even though they share the process.
     """
 
     def __init__(self, client, remote_tools):
@@ -1727,15 +1670,17 @@ class SharedBrowser:
 
 
 @contextlib.asynccontextmanager
-async def browser(endpoint):
-    """The one playwright-mcp process all apply workers share.
+async def browser():
+    """The one playwright-mcp process, which owns the one browser and window.
 
     The client is the official `mcp` SDK — `mcp.Client` spawns the server over stdio,
-    does the initialize handshake and lists its tools. The server attaches to the one
-    Chromium started by `chromium()`; `SharedBrowser` then gives every worker a tab in
-    that browser. The subprocess has to outlive all workers, so this is a context manager
-    rather than a function returning a list. Server stderr goes to MCP_LOG instead of the
-    terminal, which the progress board is busy drawing on.
+    does the initialize handshake and lists its tools. The server launches the browser
+    itself (persistent, at PROFILE) and `SharedBrowser` hands every worker a tab in it.
+    Nothing else starts a browser: one server, one window, one profile, one set of logins.
+
+    The subprocess has to outlive all workers, so this is a context manager rather than a
+    function returning a list. Server stderr — which is where the browser's own complaints
+    land — goes to MCP_LOG instead of the terminal, which the progress board is drawing on.
     """
     try:
         from mcp import Client, StdioServerParameters, stdio_client
@@ -1743,13 +1688,21 @@ async def browser(endpoint):
         raise Startup(f"the MCP client is missing ({exc}). `itempipe apply` needs the "
                       "official `mcp` SDK (`uv pip install mcp`); `itempipe search` "
                       "does not.") from exc
-    params = StdioServerParameters(**mcp_config(endpoint))
+    params = StdioServerParameters(**mcp_config())
+    PROFILE.mkdir(parents=True, exist_ok=True)
     MCP_LOG.parent.mkdir(parents=True, exist_ok=True)
     with open(MCP_LOG, "a", encoding="utf-8", errors="replace") as errlog:
         # Building the transport here is the only way to move the server's own stderr
-        # aside; `Client(params)` would send it to our stderr, over the board.
-        async with Client(stdio_client(params, errlog=errlog)) as client:
-            remote = await client.list_tools()
+        # aside; `Client(params)` would send it to our stderr, over the board. The
+        # try/except wraps only the handshake, so a worker's own failure is not
+        # dressed up as a startup error.
+        async with contextlib.AsyncExitStack() as stack:
+            try:
+                client = await stack.enter_async_context(
+                    Client(stdio_client(params, errlog=errlog)))
+                remote = await client.list_tools()
+            except Exception as exc:        # no browser at all: say why, and stop
+                raise Startup(startup_message(exc)) from exc
             yield SharedBrowser(client, remote.tools)
 
 
@@ -1766,10 +1719,10 @@ async def heartbeat(w):
 async def apply(workers=2):
     """Apply to the queue in parallel, one lead at a time per worker.
 
-    One Chromium and one playwright-mcp process serve every worker; `SharedBrowser`
-    gives each worker its own tab in that one window. Claims are compare-and-swap, kept
-    alive by a heartbeat, and every write is fenced by the claim token, so two workers
-    can never submit the same lead.
+    One playwright-mcp process owns the browser and the window; `SharedBrowser` gives
+    each worker its own tab in it. Claims are compare-and-swap, kept alive by a heartbeat,
+    and every write is fenced by the claim token, so two workers can never submit the same
+    lead.
 
     Nothing that goes wrong with one lead is allowed to end the run: a graph that hits the
     recursion limit, a crashed tab or a dead MCP session is reported on the board, the
@@ -1779,9 +1732,8 @@ async def apply(workers=2):
     around it — the group never reaches the terminal.
     """
     reports = []
-    proc = await chromium()
     try:
-        async with browser(cdp_endpoint()) as shared:
+        async with browser() as shared:
             async def one(i):
                 tag, w = f"w{i + 1}", Worker()
                 try:
@@ -1836,9 +1788,8 @@ async def apply(workers=2):
                     reports.append(f"[itempipe] worker crashed: {type(result).__name__}: "
                                    f"{clean(result)}")
     finally:
-        if proc is not None:
-            status.worker("··", "state", "closing browser")
-            await stop_proc(proc)            # tolerates a browser that already died
+        # The MCP server owns the browser: closing its stdio session closes the window.
+        status.worker("··", "state", "closing browser")
     held = list(Item.select().where(Item.state == HOLD))
     if held:                                 # the run is over, but not for these
         reports.append(f"{len(held)} lead(s) on hold: answer the open questions in "

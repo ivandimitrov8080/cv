@@ -136,48 +136,53 @@ A session that raises does not end the run: the worker logs it on the board and 
 
 ## The browser
 
-`apply` starts **one** Chromium — headed by default, so you can watch it — with
-`--remote-debugging-port` (9222 by default, `ITEMPIPE_CDP_PORT` to change it), then
-starts **one** `playwright-mcp` process attached to it with `--cdp-endpoint`. The server
-gives each worker a numbered tab in that one window, and every browser tool call selects
-the caller's tab under a lock before touching it. So there is one browser, one window,
-one profile, one set of logins, and one tab per worker: a worker's tools only ever see
-its own page, and `browser_tabs`/`browser_close` are hidden from the model.
+`apply` starts **one** `playwright-mcp` process, and *that* process owns the browser. It
+launches a single Chromium — headed by default, so you can watch it — with the persistent
+profile at `/tmp/itempipe-chromium`, so the run has one window, one profile and one set of
+logins. `itempipe` itself never launches a browser: a browser of our own plus the one the
+server launches is exactly the two-windows bug, so only one process is allowed to start
+one.
 
-* A Chromium already listening on that port is adopted and left running; one we started
-  is terminated when `apply` exits.
-* Chromium's stderr goes to `/tmp/itempipe-chromium-9222.log` (`ITEMPIPE_CHROME_LOG`, and
-  `ITEMPIPE_CDP_PORT` for the port). If it refuses to start, `apply` prints the last lines
-  of that log plus the likely fix, and exits 1, rather than a traceback.
+The server gives each worker a numbered tab in that one window, and every browser tool
+call selects the caller's tab under a lock before touching it. So there is one tab per
+worker, a worker's tools only ever see its own page, and `browser_tabs`/`browser_close`
+are hidden from the model.
+
+* The profile is `/tmp/itempipe-chromium` (`ITEMPIPE_PROFILE` to change it), passed as
+  `--user-data-dir`, so logins survive a run. Under `chromium-sandboxed` that path may be
+  inside the sandbox's tmpfs; bind-mount a profile path into the wrapper if you want them
+  to survive a reboot.
 * `ITEMPIPE_HEADLESS=1` adds `--headless`; only do that where there is no display, and
   note that Chromium's headless mode refuses to start with more than one target
   ("Multiple targets are not supported in headless mode"), so headed is the safe default.
-* The profile's location and the browser's death are the two things that go wrong here.
-  A missing display, a profile locked by an earlier crash, and a taken port each have
-  their own line in that message.
-* The profile is `/tmp/itempipe-chromium` (`ITEMPIPE_PROFILE` to change it). Under
-  `chromium-sandboxed` that is inside the sandbox's tmpfs, so logins do not survive a
-  reboot; bind-mount a profile path into the wrapper if you want them to.
+* `ITEMPIPE_CHROME=/path/to/chromium` adds `--executable-path`, which is how you point it
+  at `chromium-sandboxed` or a system build. Left unset, playwright-mcp uses its own
+  browser, which is the path that needs no configuration.
+* A second `apply` run on the same profile fails with "Browser is already in use"; the
+  message printed says so and names `ITEMPIPE_PROFILE`. A missing display, a locked
+  profile and a browser that will not launch each have their own line, taken from the log.
 * Spawning one `playwright-mcp` per worker would create one Playwright browser context per
   worker — visibly, a new window for each. One server with a tab pool avoids that: all
-  tabs share the browser and its logins. The model never sees the tab tools, and workers
-  cannot switch, open or close each other's tabs. A page that opens a popup moves its
-  worker's tab number; the shared browser re-reads the list after every call, so the next
-  tool call follows the worker to the page it actually opened.
+  tabs share the browser and its logins. A page that opens a popup moves its worker's tab
+  number; the shared browser re-reads the list after every call, so the next tool call
+  follows the worker to the page it actually opened.
 * The MCP connection itself is short: the official `mcp` SDK's
-  `Client(StdioServerParameters(command="playwright-mcp", args=["--cdp-endpoint", …]))`
+  `Client(StdioServerParameters(command="playwright-mcp", args=["--user-data-dir", …]))`
   spawns the one server over stdio, handshakes and lists its tools, and each tool is
   wrapped in a LangChain `StructuredTool` whose `args_schema` is the tool's own JSON
   Schema dict — passed through, not rebuilt, so the model sees exactly what the server
   declared. `SharedBrowser` binds each wrapper to one tab and serialises the select+call
-  pair. The connection is held open for as long as any worker runs. LangChain 1 can do
-  the same conversion via `langchain.mcp.MCPAdapter`, but that namespace is FastMCP
-  underneath (`fastmcp>=4`), so it is not used and neither `fastmcp` nor the old
-  `langchain-mcp-adapters` is a dependency. `search` never touches MCP.
-* playwright-mcp's own stderr goes to `/tmp/itempipe-mcp-9222.log` (`ITEMPIPE_MCP_LOG`)
-  rather than the terminal, which the progress board is drawing on. Each tool result is
-  capped at `ITEMPIPE_MCP_OUTPUT` (20000) characters, because a page snapshot can be
-  longer than the context it is about to land in.
+  pair. The connection is held open for as long as any worker runs, and closing it closes
+  the browser. LangChain 1 can do the same conversion via `langchain.mcp.MCPAdapter`, but
+  that namespace is FastMCP underneath (`fastmcp>=4`), so it is not used and neither
+  `fastmcp` nor the old `langchain-mcp-adapters` is a dependency. `search` never touches
+  MCP.
+* playwright-mcp's own stderr — including the browser's — goes to `/tmp/itempipe-mcp.log`
+  (`ITEMPIPE_MCP_LOG`) rather than the terminal, which the progress board is drawing on.
+  If the browser will not come up, `apply` prints the last lines of that log plus the
+  likely fix and exits 1, rather than a traceback.
+* Each tool result is capped at `ITEMPIPE_MCP_OUTPUT` (20000) characters, because a page
+  snapshot can be longer than the context it is about to land in.
 * Tools coming from playwright-mcp answer like the others: a failed call, an `isError`
   result or a dead subprocess comes back as `NOT done: …` rather than an exception, so a
   worker is never killed mid-node by the browser.

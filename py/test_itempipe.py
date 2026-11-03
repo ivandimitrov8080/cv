@@ -1,6 +1,6 @@
 """Queue mechanics only: no model, no browser, no network."""
 
-import asyncio, contextlib, io, sys, tempfile, unittest
+import asyncio, contextlib, io, os, sys, tempfile, unittest
 from datetime import timedelta
 from pathlib import Path
 from types import SimpleNamespace
@@ -361,24 +361,34 @@ class StatusTest(unittest.TestCase):
 
 
 class BrowserTest(unittest.TestCase):
-    """One browser and one MCP session; one tab per worker inside it.
+    """One playwright-mcp server, one browser, one window; one tab per worker.
 
     Unit level only: these read the data handed to the MCP client and the error paths.
-    Nothing starts chromium, spawns playwright-mcp or speaks MCP — `itempipe apply` is
+    Nothing starts a browser, spawns playwright-mcp or speaks MCP — `itempipe apply` is
     how those get exercised, by hand.
     """
 
-    def test_workers_attach_to_one_shared_browser(self):
-        # `mcp_config` is data only: the fields `mcp.StdioServerParameters` wants, so the
-        # one playwright-mcp server attaches to the shared CDP browser and owns no profile
-        # of its own. Nothing here starts a browser or speaks MCP.
-        cfg = ip.mcp_config(ip.cdp_endpoint())
+    def test_one_server_owns_the_browser_and_the_profile(self):
+        # `mcp_config` is data only: the fields `mcp.StdioServerParameters` wants. The one
+        # playwright-mcp process launches the browser itself, so there is exactly one
+        # window and no second browser of ours to attach to.
+        cfg = ip.mcp_config()
         self.assertEqual(cfg["command"], "playwright-mcp")
-        self.assertIn("--cdp-endpoint", cfg["args"])
-        self.assertIn(ip.cdp_endpoint(), cfg["args"])
-        self.assertNotIn("--user-data-dir", cfg["args"])   # the browser owns the profile
+        self.assertIn("--user-data-dir", cfg["args"])
+        self.assertIn(str(ip.PROFILE), cfg["args"])      # one profile, one set of logins
+        self.assertNotIn("--cdp-endpoint", cfg["args"])  # nobody else launches one
+        self.assertNotIn("--isolated", cfg["args"])      # logins must persist
         self.assertNotIn("--shared-browser-context", cfg["args"])  # tab pool, not HTTP
-        self.assertEqual(ip.cdp_endpoint(9333), "http://127.0.0.1:9333")
+        self.assertGreaterEqual(len(cfg["env"]), 1)      # the environment is inherited
+
+    def test_headless_and_the_executable_are_opt_in(self):
+        self.assertNotIn("--headless", ip.mcp_config()["args"])
+        self.assertNotIn("--executable-path", ip.mcp_config()["args"])
+        with mock.patch.dict(os.environ, {"ITEMPIPE_HEADLESS": "1"}):
+            self.assertIn("--headless", ip.mcp_config()["args"])
+        with mock.patch.object(ip, "CHROME", "/nix/store/x/bin/chromium"):
+            self.assertIn("--executable-path", ip.mcp_config()["args"])
+            self.assertIn("/nix/store/x/bin/chromium", ip.mcp_config()["args"])
 
     def test_the_tab_listing_parser_knows_the_current_tab(self):
         listing = "- 0: [](about:blank)\n- 1: (current) [Acme](https://acme.dev)"
@@ -518,29 +528,29 @@ class BrowserTest(unittest.TestCase):
     def test_a_missing_mcp_client_is_a_sentence_not_a_traceback(self):
         async def enter():
             with mock.patch.dict(sys.modules, {"mcp": None}):
-                async with ip.browser(ip.cdp_endpoint()):
+                async with ip.browser():
                     pass
         with self.assertRaises(ip.Startup) as caught:
             asyncio.run(enter())
         self.assertIn("mcp", str(caught.exception))
 
-    def test_stopping_a_dead_process_is_not_an_error(self):
-        # The old code called kill() on a browser that had already exited, which raised
-        # ProcessLookupError instead of saying why chromium refused to start.
-        async def gone():
-            proc = await asyncio.create_subprocess_exec(
-                sys.executable, "-c", "pass",
-                stdout=asyncio.subprocess.DEVNULL, stderr=asyncio.subprocess.DEVNULL)
-            await proc.wait()
-            await ip.stop_proc(proc)
-            return proc.returncode
-        self.assertEqual(asyncio.run(gone()), 0)
+    def test_a_failed_startup_names_the_log_and_the_fix(self):
+        # No browser is a sentence, not a traceback: what happened, the likely fix, and
+        # where the rest of the story is.
+        with tempfile.TemporaryDirectory() as tmp:
+            log = Path(tmp) / "mcp.log"
+            log.write_text("Failed to create SingletonLock\n", encoding="utf-8")
+            with mock.patch.object(ip, "MCP_LOG", log):
+                out = ip.startup_message(RuntimeError("browser died"))
+        self.assertIn("browser died", out)
+        self.assertIn("in use", out)          # the hint, read from the log
+        self.assertIn(str(log), out)           # and where to read the rest
 
     def test_the_log_is_translated_into_a_fix(self):
         self.assertIn("in use", ip.chrome_hint("Failed to create SingletonLock"))
         self.assertIn("--no-sandbox", ip.chrome_hint("Running as root without --no-sandbox"))
         self.assertIn("display", ip.chrome_hint("Missing X server or $DISPLAY"))
-        self.assertIn("9222", ip.chrome_hint("Address already in use"))
+        self.assertIn("install-browser", ip.chrome_hint("Executable doesn't exist at /x"))
         self.assertIn("No recognised cause", ip.chrome_hint(""))
 
 
@@ -577,14 +587,11 @@ class ApplyTest(unittest.TestCase):
                 return []
 
         @contextlib.asynccontextmanager
-        async def one_browser(endpoint):
+        async def one_browser():
             nonlocal shared
-            entered.append(endpoint)
+            entered.append("browser")
             shared = Browser()
             yield shared
-
-        async def no_chromium():
-            return None
 
         def fake_agent(role, tools):
             return {tool.name: tool for tool in tools}
@@ -598,8 +605,7 @@ class ApplyTest(unittest.TestCase):
             tools["finish_item"].invoke({"outcome": "applied"})
             return f"{tag}: applied"
 
-        with mock.patch.object(ip, "chromium", no_chromium), \
-             mock.patch.object(ip, "browser", one_browser), \
+        with mock.patch.object(ip, "browser", one_browser), \
              mock.patch.object(ip, "agent", fake_agent), \
              mock.patch.object(ip, "run", fake_run), \
              mock.patch.object(ip.status, "worker", lambda *args, **kwargs: None):
