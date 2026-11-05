@@ -1,5 +1,11 @@
 from ddgs import DDGS
 from toon import encode
+from crawl4ai import AsyncWebCrawler, BrowserConfig, CrawlerRunConfig, CacheMode
+
+state = {}
+
+def init():
+    state["crawler"] = AsyncWebCrawler(config=BrowserConfig(browser_mode="custom", cdp_url="http://localhost:9222"))
 
 def search(query: str):
     """Search the web for query.
@@ -9,8 +15,15 @@ def search(query: str):
     """
     return encode(DDGS().text(query, max_results = 5))
 
-def fetch(url: str):
+async def fetch(url: str):
     """Fetch a url and get the content.
+    Args:
+        url: The url to fetch.
     """
-    pass
-    
+    run = CrawlerRunConfig(
+        cache_mode=CacheMode.BYPASS,
+        wait_until="networkidle",
+        page_timeout=60_000,
+    )
+    r = await state["crawler"].arun(url, config=run)
+    print(r.success, r.markdown[:500])

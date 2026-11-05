@@ -90,6 +90,7 @@
                     typst
                     pdfminer
                     ruff
+                    playwright
                     chromium-sandboxed
                     itempipe
                   ];
