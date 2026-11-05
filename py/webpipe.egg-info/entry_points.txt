@@ -1,0 +1,2 @@
+[console_scripts]
+webpipe = lib:main
