@@ -100,10 +100,7 @@ class Browser:
                   or {"type": "object", "properties": {}})
 
         async def call(**arguments):
-            try:
-                result = await self.run(tab, name, arguments)
-            except Exception as exc:
-                return f"NOT done: {type(exc).__name__}: {exc}"
+            result = await self.run(tab, name, arguments)
             text = text_of(result)
             if failed(result):
                 return f"NOT done: {text or 'the tool failed without saying why'}"
@@ -134,15 +131,7 @@ def params():
 async def browser(config):
     from mcp import Client, stdio_client
     Path(config.act.profile).mkdir(parents=True, exist_ok=True)
-    Path(config.act.mcp_log).parent.mkdir(parents=True, exist_ok=True)
-    with open(config.act.mcp_log, "a", encoding="utf-8", errors="replace") as errlog:
-        async with contextlib.AsyncExitStack() as stack:
-            try:
-                client = await stack.enter_async_context(
-                    Client(stdio_client(params(), errlog=errlog)))
-                remote = await client.list_tools()
-            except Exception as exc:
-                raise RuntimeError(
-                    f"playwright-mcp could not start: {type(exc).__name__}: {exc} "
-                    f"(log: {config.act.mcp_log})") from exc
-            yield Browser(client, remote.tools, config.act.mcp_output)
+    async with contextlib.AsyncExitStack() as stack:
+        client = await stack.enter_async_context(Client(stdio_client(params())))
+        remote = await client.list_tools()
+        yield Browser(client, remote.tools, config.act.mcp_output)

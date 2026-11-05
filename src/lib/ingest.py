@@ -68,14 +68,9 @@ async def run(config):
             try:
                 answer = await stream(agent, message(tasks), tag, config.ingest.steps)
                 reports.append(f"{tag}: {clean(answer)[:200] or 'no report'}")
-            except asyncio.CancelledError:
-                raise
-            except Exception as exc:
-                print(f"{tag} session failed: {clean(exc)}", file=sys.stderr)
             finally:
                 memo.release(session.claimed)
             await asyncio.sleep(config.ingest.pause)
 
-    await asyncio.gather(*(worker(index) for index in range(config.ingest.workers)),
-                         return_exceptions=True)
+    await asyncio.gather(*(worker(index) for index in range(config.ingest.workers)))
     return reports

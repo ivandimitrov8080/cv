@@ -68,11 +68,7 @@ async def work(config, store, shared):
         tag = f"w{index + 1}"
         claim = Claim(store, config.act.lease)
         notes = Notes(config.act.notes) if config.act.notes else None
-        try:
-            extra = shared.tools(await shared.claim()) if shared is not None else []
-        except Exception as exc:
-            reports.append(f"{tag} has no browser: {clean(exc)}")
-            return reports
+        extra = shared.tools(await shared.claim()) if shared is not None else []
         agent = build(
             config.model,
             render(config.act.prompt, {"BRIEF": config.brief}),
@@ -86,10 +82,6 @@ async def work(config, store, shared):
                 answer = await stream(agent, START, tag, config.act.steps)
                 if answer:
                     reports.append(f"{tag}: {clean(answer)[:200]}")
-            except asyncio.CancelledError:
-                raise
-            except Exception as exc:
-                reports.append(f"{tag} gave up on one item: {clean(exc)}")
             finally:
                 beat.cancel()
                 await asyncio.gather(beat, return_exceptions=True)
@@ -100,6 +92,5 @@ async def work(config, store, shared):
                 break
         return reports
 
-    await asyncio.gather(*(worker(index) for index in range(config.act.workers)),
-                         return_exceptions=True)
+    await asyncio.gather(*(worker(index) for index in range(config.act.workers)))
     return reports

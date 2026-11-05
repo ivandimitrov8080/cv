@@ -63,7 +63,7 @@ def record_tool(store, memo, session):
         description="Record one item. The arguments are the table's own columns.")
 
 
-def research_tools(memo, session, tries=3):
+def research_tools(memo, session):
     def take(key, kind, action):
         if key in session.claimed:
             return None
@@ -80,25 +80,15 @@ def research_tools(memo, session, tries=3):
         key = query_key(query)
         if refused := take(key, "query", "searched"):
             return refused
-        reason = "no engine answered"
-        for attempt in range(tries):
-            try:
-                found = await asyncio.to_thread(
-                    lambda: list(DDGS(timeout=15).text(clean(query), max_results=8) or []))
-            except Exception as exc:
-                reason = f"{type(exc).__name__}: {clean(exc)}"
-            else:
-                if found:
-                    memo.settle(key, "found", f"{len(found)} hits")
-                    return "\n\n".join(
-                        "\n".join(filter(None, (hit.get("title"), hit.get("href"),
-                                                hit.get("body"))))
-                        for hit in found)[:6000]
-                reason = "no results"
-            if attempt + 1 < tries:
-                await asyncio.sleep(1.5 * (attempt + 1))
-        memo.settle(key, "empty", reason)
-        return f"NOT searched: {reason}. Do not repeat the query; try another task."
+        found = await asyncio.to_thread(
+            lambda: list(DDGS(timeout=15).text(clean(query), max_results=8) or []))
+        if not found:
+            memo.settle(key, "empty", "no results")
+            return "NOT searched: no results. Do not repeat the query; try another task."
+        memo.settle(key, "found", f"{len(found)} hits")
+        return "\n\n".join(
+            "\n".join(filter(None, (hit.get("title"), hit.get("href"), hit.get("body"))))
+            for hit in found)[:6000]
 
     @tool
     async def fetch(url: str) -> str:
@@ -120,10 +110,7 @@ def research_tools(memo, session, tries=3):
         if response.status_code >= 400:
             memo.settle(key, "dead", f"HTTP {response.status_code}")
             return f"NOT fetched: HTTP {response.status_code} for {url}."
-        try:
-            text = await asyncio.to_thread(trafilatura.extract, response.text)
-        except Exception:
-            text = None
+        text = await asyncio.to_thread(trafilatura.extract, response.text)
         body = "\n".join(line for line in (text or response.text).splitlines() if line.strip())
         memo.settle(key, "open", f"HTTP {response.status_code}")
         return body.strip()[:8000] or "Fetched, but the page has no readable text."
@@ -142,9 +129,8 @@ class Notes:
         for line in text.splitlines():
             if match := HEADING.match(line):
                 found.append([match.group(1), {}])
-            elif found and (match := PROPERTY.match(line)):
-                if match.group(2):
-                    found[-1][1][match.group(1).upper()] = match.group(2)
+            elif found and (match := PROPERTY.match(line)) and match.group(2):
+                found[-1][1][match.group(1).upper()] = match.group(2)
         return [(title, properties) for title, properties in found if properties]
 
     def ranked(self, query):

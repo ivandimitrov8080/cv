@@ -1,7 +1,6 @@
 import argparse
 import asyncio
 import dataclasses
-import sys
 
 from . import act, config, db, ingest
 
@@ -33,8 +32,5 @@ def main(argv=None):
         reports = asyncio.run(ingest.run(cfg) if args.command == "ingest" else act.run(cfg))
     except KeyboardInterrupt:
         return 130
-    except Exception as exc:
-        print(f"webpipe: {type(exc).__name__}: {exc}", file=sys.stderr)
-        return 1
     print("\n".join(reports or []) or "nothing to report")
     return 0

@@ -56,7 +56,6 @@ class Act:
     lease: int = 1800
     browser: bool = False
     profile: str = "/tmp/webpipe-chromium"
-    mcp_log: str = "/tmp/webpipe-mcp.log"
     mcp_output: int = 20000
 
 
@@ -131,7 +130,6 @@ def load(path):
             lease=int(act.get("lease", 1800)),
             browser=bool(act.get("browser", False)),
             profile=str(act.get("profile", "/tmp/webpipe-chromium")),
-            mcp_log=str(act.get("mcp_log", "/tmp/webpipe-mcp.log")),
             mcp_output=int(act.get("mcp_output", 20000)),
         ),
     )
