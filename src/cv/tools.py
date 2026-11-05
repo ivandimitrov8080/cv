@@ -26,4 +26,4 @@ async def fetch(url: str):
         page_timeout=60_000,
     )
     r = await state["crawler"].arun(url, config=run)
-    print(r.success, r.markdown[:500])
+    return r.markdown
