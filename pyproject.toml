@@ -7,7 +7,9 @@ authors = [
     { name = "Ivan Kirilov Dimitrov", email = "ivan@idimitrov.dev" }
 ]
 requires-python = ">=3.14"
-dependencies = []
+dependencies = [
+    "pydantic-ai>=2.66.0",
+]
 
 [project.scripts]
 cv = "cv:main"
