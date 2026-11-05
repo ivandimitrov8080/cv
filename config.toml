@@ -1,2 +1,5 @@
 [api]
 key_cmd = "pass dev/deepseek.com/key"
+
+[model]
+version = "deepseek-v4-flash"

@@ -7,10 +7,14 @@ from pydantic import ConfigDict, TypeAdapter
 class ApiConfig:
     key_cmd: str
 
+@dataclass(frozen=True, config=ConfigDict(extra="forbid"))
+class ModelConfig:
+    version: str
 
 @dataclass(frozen=True, config=ConfigDict(extra="forbid"))
 class Config:
     api: ApiConfig
+    model: ModelConfig
 
 def parse_config() -> Config:
     config_file = os.getenv("CV_CONFIG_FILE")
