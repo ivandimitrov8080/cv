@@ -10,6 +10,7 @@ class ApiConfig:
 @dataclass(frozen=True, config=ConfigDict(extra="forbid"))
 class ModelConfig:
     version: str
+    thinking: bool
 
 @dataclass(frozen=True, config=ConfigDict(extra="forbid"))
 class Config:
