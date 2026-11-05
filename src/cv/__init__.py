@@ -1,2 +1,6 @@
+from . import config
+
+
 def main() -> None:
-    print("Hello from cv!")
+    cfg = config.parse_config()
+    print(cfg.api.key_cmd)
