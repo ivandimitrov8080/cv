@@ -1,10 +1,10 @@
-import random
-
 from ddgs import DDGS
+from toon import encode
 
-def roll_dice() -> str:
-    """Roll a six-sided die and return the result."""
-    return str(random.randint(1, 6))
-
-def search():
-    return DDGS().text("speedtest", max_results = 5)
+def search(query: str):
+    """Search the web for query.
+    
+    Args:
+        query: The search terms to look up.
+    """
+    return encode(DDGS().text(query, max_results = 5))

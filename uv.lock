@@ -378,12 +378,14 @@ source = { editable = "." }
 dependencies = [
     { name = "ddgs" },
     { name = "pydantic-ai" },
+    { name = "python-toon" },
 ]
 
 [package.metadata]
 requires-dist = [
     { name = "ddgs", specifier = ">=9.16.1" },
     { name = "pydantic-ai", specifier = ">=2.66.0" },
+    { name = "python-toon", specifier = ">=0.2.0" },
 ]
 
 [[package]]
@@ -1488,6 +1490,15 @@ source = { registry = "https://pypi.org/simple" }
 sdist = { url = "https://files.pythonhosted.org/packages/9f/b7/15b905f6142a9a8a68f66900788da1a32e4d4254452783b37ad1eccb0506/python_multipart-0.0.33.tar.gz", hash = "sha256:b8112424a6abd162ec08d390565dd113ad699f2fe6fef3c987b8bbcbfe9e390d", size = 50499, upload-time = "2026-10-31T14:23:47.461Z" }
 wheels = [
     { url = "https://files.pythonhosted.org/packages/dd/1b/6b1b4164ec734cac911460ab599bfbe46afedd42c5c9627fe4235942c314/python_multipart-0.0.33-py3-none-any.whl", hash = "sha256:8f16c07b36add9da6b2ee87d3efcaf0a45a6de9c3d0a5dd94e9ccf7675a7bc45", size = 32253, upload-time = "2026-10-31T14:23:46.33Z" },
+]
+
+[[package]]
+name = "python-toon"
+version = "0.2.0"
+source = { registry = "https://pypi.org/simple" }
+sdist = { url = "https://files.pythonhosted.org/packages/40/78/25f79f308d1a685da4969b6b84585f3a3148523c05a3de0848338a33eefc/python_toon-0.2.0.tar.gz", hash = "sha256:1b9fcb3fa225cb7973a2637834de08a26236013ab04da0cf80c4af73e141ccf2", size = 55594, upload-time = "2026-09-29T07:40:49.991Z" }
+wheels = [
+    { url = "https://files.pythonhosted.org/packages/ea/9a/90ba108ce3ce3e7f50855066fe0269a2f29e399ac9d6a69df94ecbe8fa9e/python_toon-0.2.0-py3-none-any.whl", hash = "sha256:40056dafb8f28ad71440fce11cc12dda63045c752319a0d87bc7b95761a45955", size = 24894, upload-time = "2026-09-29T07:40:48.754Z" },
 ]
 
 [[package]]
