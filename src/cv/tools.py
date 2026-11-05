@@ -4,8 +4,9 @@ from crawl4ai import AsyncWebCrawler, BrowserConfig, CrawlerRunConfig, CacheMode
 
 state = {}
 
-def init():
+def init(cfg: Config):
     state["crawler"] = AsyncWebCrawler(config=BrowserConfig(browser_mode="custom", cdp_url="http://localhost:9222"))
+    state["cfg"] = cfg
 
 def search(query: str):
     """Search the web for query.
@@ -13,7 +14,8 @@ def search(query: str):
     Args:
         query: The search terms to look up.
     """
-    return encode(DDGS().text(query, max_results = 5))
+    print(f"Searching for query <<{query}>>")
+    return encode(DDGS().text(query, max_results = 5, backend=state["cfg"].search.backend))
 
 async def fetch(url: str):
     """Fetch a url and get the content.

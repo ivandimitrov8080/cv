@@ -4,3 +4,6 @@ key_cmd = "pass dev/deepseek.com/key"
 [model]
 version = "deepseek-v4-flash"
 thinking = false
+
+[search]
+backend = "duckduckgo"

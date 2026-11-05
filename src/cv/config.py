@@ -13,9 +13,14 @@ class ModelConfig:
     thinking: bool
 
 @dataclass(frozen=True, config=ConfigDict(extra="forbid"))
+class SearchConfig:
+    backend: str
+
+@dataclass(frozen=True, config=ConfigDict(extra="forbid"))
 class Config:
     api: ApiConfig
     model: ModelConfig
+    search: SearchConfig
 
 def parse_config() -> Config:
     config_file = os.getenv("CV_CONFIG_FILE")
