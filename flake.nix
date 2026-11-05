@@ -14,7 +14,6 @@
   };
   outputs =
     inputs@{
-      self,
       nixpkgs,
       systems,
       devenv,
@@ -90,6 +89,7 @@
                   packages = with pkgs; [
                     typst
                     pdfminer
+                    ruff
                     chromium-sandboxed
                     itempipe
                   ];
@@ -111,6 +111,7 @@
             prettier.enable = true;
             deadnix.enable = true;
             statix.enable = true;
+            ruff.enable = true;
           };
         }).config.build.wrapper
       );

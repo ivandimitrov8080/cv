@@ -1,7 +1,7 @@
 import re
 import sys
 
-CANNED = re.compile(r"need more steps to process|sorry, i (?:can'?t|cannot)", re.I)
+CANNED = re.compile(r"need more steps to process|sorry, i (?:can'?t|cannot)", re.IGNORECASE)
 
 
 def field(message, name, default=None):

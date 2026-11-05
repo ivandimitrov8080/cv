@@ -1,5 +1,5 @@
 import uuid
-from datetime import datetime, timedelta, timezone
+from datetime import UTC, datetime, timedelta
 
 from peewee import IntegrityError, SqliteDatabase, fn
 from playhouse.reflection import generate_models
@@ -8,7 +8,7 @@ RESERVED = frozenset({"id", "state", "submitting", "claim_token", "claimed_until
 
 
 def now():
-    return datetime.now(timezone.utc).replace(tzinfo=None)
+    return datetime.now(UTC).replace(tzinfo=None)
 
 
 class Store:
@@ -187,7 +187,7 @@ class Memo:
 
     def settle(self, key, verdict, note=None):
         m = self.store.memo
-        fields = dict(verdict=verdict, note=(note or None), at=now())
+        fields = {"verdict": verdict, "note": (note or None), "at": now()}
         if m.update(**fields).where(m.key == key).execute():
             return True
         try:

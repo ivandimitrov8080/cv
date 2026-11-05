@@ -7,7 +7,7 @@ from pathlib import Path
 
 from langchain_core.tools import StructuredTool
 
-TAB_LINE = re.compile(r"^\s*-\s*(\d+):\s*(.*)$", re.M)
+TAB_LINE = re.compile(r"^\s*-\s*(\d+):\s*(.*)$", re.MULTILINE)
 HIDDEN = frozenset({"browser_tabs", "browser_close"})
 
 

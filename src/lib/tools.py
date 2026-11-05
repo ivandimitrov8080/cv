@@ -8,7 +8,7 @@ from pydantic import create_model
 
 HEADING = re.compile(r"^\*+\s+(.+?)\s*$")
 PROPERTY = re.compile(r"^\s*:([A-Z][A-Z0-9_-]*):\s*(.*?)\s*$")
-TRACKING = re.compile(r"^(utm_\w+|ref|src|source|gclid|fbclid|mc_cid)$", re.I)
+TRACKING = re.compile(r"^(utm_\w+|ref|src|source|gclid|fbclid|mc_cid)$", re.IGNORECASE)
 
 
 def clean(value):

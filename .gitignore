@@ -15,5 +15,6 @@ __pycache__/
 *.db
 *.db-wal
 *.db-shm
+*.egg-info
 .venv/
 .env
