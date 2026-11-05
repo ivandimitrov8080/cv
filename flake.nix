@@ -72,7 +72,7 @@
               (
                 { config, ... }:
                 let
-                  itempipe = config.languages.python.import ./py { };
+                  itempipe = config.languages.python.import ./. { };
                 in
                 {
                   devenv.root = "/home/ivand/src/cv";

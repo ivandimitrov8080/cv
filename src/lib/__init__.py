@@ -9,10 +9,12 @@ from . import act, config, db, ingest
 def main(argv=None):
     parser = argparse.ArgumentParser(prog="webpipe")
     parser.add_argument("command", choices=["init", "status", "ingest", "act"])
-    parser.add_argument("-c", "--config", default="config/tool.toml")
+    parser.add_argument("-c", "--config", default=None,
+                        help="path to tool.toml (default: ./config/tool.toml, then "
+                             "the checkout's src/config/tool.toml)")
     parser.add_argument("-n", "--workers", type=int)
     args = parser.parse_args(argv)
-    cfg = config.load(args.config)
+    cfg = config.load(args.config or config.default_config())
     if args.workers:
         cfg = dataclasses.replace(
             cfg,

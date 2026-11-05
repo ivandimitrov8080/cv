@@ -7,3 +7,13 @@ bin/**
 cv.pdf
 *.html
 .playwright-mcp
+__pycache__/
+*.pyc
+.pytest_cache/
+.ruff_cache/
+.trash/
+*.db
+*.db-wal
+*.db-shm
+.venv/
+.env

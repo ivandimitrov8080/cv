@@ -22,5 +22,12 @@ dependencies = [
 [project.scripts]
 webpipe = "lib:main"
 
+# The sources live in src/, so setuptools needs to be told where the package
+# root is; `lib` is the only importable package.
 [tool.setuptools]
+package-dir = { "" = "src" }
 packages = ["lib"]
+
+[tool.pytest.ini_options]
+pythonpath = ["src"]
+testpaths = ["src"]

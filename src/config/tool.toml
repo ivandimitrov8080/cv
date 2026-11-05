@@ -37,6 +37,6 @@ workers = 1
 steps = 120
 lease = 1800
 browser = true
-notes = "../../application-questions.org"
+notes = "../../data/application-questions.org"
 guarded = ["applied"]
 outcomes = { applied = "ACTIVE", retry = "NEW", hold = "HOLD", archive = "ARCHIVED" }

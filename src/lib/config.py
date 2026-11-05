@@ -3,6 +3,21 @@ import tomllib
 from dataclasses import dataclass
 from pathlib import Path
 
+CONFIG_ENV = "WEBPIPE_CONFIG"
+LOCAL_CONFIG = Path("config", "tool.toml")
+# src/lib/config.py -> src/config/tool.toml, i.e. the config next to the sources.
+SOURCE_CONFIG = Path(__file__).resolve().parent.parent / "config" / "tool.toml"
+
+
+def default_config():
+    """Locate tool.toml when --config is not given."""
+    if override := os.environ.get(CONFIG_ENV):
+        return Path(override)
+    local = Path.cwd() / LOCAL_CONFIG
+    if local.is_file():
+        return local
+    return SOURCE_CONFIG if SOURCE_CONFIG.is_file() else local
+
 
 @dataclass(frozen=True)
 class Model:
