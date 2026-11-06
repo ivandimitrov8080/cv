@@ -1,15 +1,28 @@
 import asyncio
-
-from cv import agents, config
+import cv
+from cv import agents
 from cv.tools import Tools
+from cv.config import Config, parse_config
 
+global tools_list
+
+async def agent(cfg: Config):
+    agent = agents.init_agent(cfg, cv.tools_list)
+    return (await agent.run(cfg.task)).output
+
+async def agent_loop(cfg: Config):
+    while True:
+        await agent(cfg)
 
 async def go() -> None:
-    cfg = config.parse_config()
+    cfg = parse_config()
     tools = Tools(cfg)
-    tools_list = [tools.search, tools.fetch]
-    agent = agents.init_agent(cfg, tools_list)
-    print((await agent.run("search the web for ddgs and tell me what it says on the pypi page about the DDGS class")).output)
+    cv.tools_list = [tools.search, tools.fetch]
+    results = await asyncio.gather(*(agent_loop(cfg) for _ in range(cfg.threads)))
+    for i, out in enumerate(results, 1):
+        print(f"--- run {i} ---\n{out}")
+
+    
 
 def main() -> None:
     asyncio.run(go())

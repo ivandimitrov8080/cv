@@ -22,6 +22,8 @@ class SearchConfig:
 
 @dataclass(frozen=True, config=ConfigDict(extra="forbid"))
 class Config:
+    threads: int
+    task: str
     api: ApiConfig
     model: ModelConfig
     search: SearchConfig

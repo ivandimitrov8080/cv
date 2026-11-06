@@ -1,3 +1,6 @@
+threads = 10
+task = "Find remote software development jobs"
+
 [api]
 key_cmd = "pass dev/deepseek.com/key"
 

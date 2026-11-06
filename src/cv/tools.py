@@ -1,5 +1,6 @@
 from crawl4ai import AsyncWebCrawler, BrowserConfig, CacheMode, CrawlerRunConfig
 from ddgs import DDGS
+from ddgs.exceptions import DDGSException
 from toon import encode
 
 from cv.config import Config
@@ -22,8 +23,8 @@ class Tools:
             with DDGS(timeout=20) as ddgs:
                 cfg = self.cfg.search
                 return encode(ddgs.text(query, max_results=cfg.max_results, backend=cfg.backend, region=cfg.region))
-        except Exception as e:
-            print("Error fetching", e, type(e))
+        except DDGSException as e:
+            print("Error fetching: ", e)
             
 
     async def fetch(self, url: str):
