@@ -1,6 +1,5 @@
 from crawl4ai import AsyncWebCrawler, BrowserConfig, CacheMode, CrawlerRunConfig
-from ddgs import DDGS
-from ddgs.exceptions import DDGSException
+from requests import get
 from toon import encode
 
 from cv.config import Config
@@ -19,12 +18,9 @@ class Tools:
         query: The search terms to look up.
         """
         print(f"Searching for query <<{query}>>")
-        try:
-            with DDGS(timeout=20) as ddgs:
-                cfg = self.cfg.search
-                return encode(ddgs.text(query, max_results=cfg.max_results, backend=cfg.backend, region=cfg.region))
-        except DDGSException as e:
-            print("Error fetching: ", e)
+        results = get(f"http://localhost:8080/search?q={query}&format=json").json()["results"]
+        data = [{"title": a["title"], "url": a["url"]} for a in results]
+        return encode(data)
             
 
     async def fetch(self, url: str):
