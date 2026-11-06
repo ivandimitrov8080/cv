@@ -1,23 +1,24 @@
 import asyncio
-import cv
-from cv import agents
-from cv.tools import Tools
+from types import MethodType
+
+from cv.agents import new_agent
 from cv.config import Config, parse_config
+from cv.tools import Tools
 
-global tools_list
-
-async def agent(cfg: Config):
-    agent = agents.init_agent(cfg, cv.tools_list)
-    return (await agent.run(cfg.task)).output
+cfg: Config
+tools_list: list[MethodType] = []
 
 async def agent_loop(cfg: Config):
     while True:
-        await agent(cfg)
+        print((await new_agent(cfg, tools_list).run(cfg.task)).output)
 
-async def go() -> None:
+def setup():
+    global tools_list, cfg
     cfg = parse_config()
     tools = Tools(cfg)
-    cv.tools_list = [tools.search, tools.fetch]
+    tools_list = [tools.search, tools.fetch]
+
+async def go() -> None:
     results = await asyncio.gather(*(agent_loop(cfg) for _ in range(cfg.threads)))
     for i, out in enumerate(results, 1):
         print(f"--- run {i} ---\n{out}")
@@ -25,4 +26,5 @@ async def go() -> None:
     
 
 def main() -> None:
+    setup()
     asyncio.run(go())
