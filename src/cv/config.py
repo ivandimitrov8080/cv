@@ -1,7 +1,9 @@
-import tomllib
 import os
-from pydantic.dataclasses import dataclass
+import tomllib
+
 from pydantic import ConfigDict, TypeAdapter
+from pydantic.dataclasses import dataclass
+
 
 @dataclass(frozen=True, config=ConfigDict(extra="forbid"))
 class ApiConfig:

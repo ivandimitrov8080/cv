@@ -1,14 +1,13 @@
 import asyncio
-import time
-from . import config
-from . import agents
-from . import tools
+
+from cv import agents, config, tools
+
 
 async def go() -> None:
     cfg = config.parse_config()
     tools.init(cfg)
     tools_list = [tools.search, tools.fetch]
-    agent = agents.init_agent(cfg, tools_list)
+    agents.init_agent(cfg, tools_list)
     #print(await tools.fetch("https://example.com/spa-page"))
     #print(await tools.fetch("https://search.nixos.org/packages?channel=26.05&query=ddgr"))
     print(tools.search("ddgs pypi DDGS class"))

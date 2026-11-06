@@ -1,6 +1,8 @@
+from crawl4ai import AsyncWebCrawler, BrowserConfig, CacheMode, CrawlerRunConfig
 from ddgs import DDGS
 from toon import encode
-from crawl4ai import AsyncWebCrawler, BrowserConfig, CrawlerRunConfig, CacheMode
+
+from cv.config import Config
 
 state = {}
 
