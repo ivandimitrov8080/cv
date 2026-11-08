@@ -21,12 +21,17 @@ class SearchConfig:
     max_results: int
 
 @dataclass(frozen=True, config=ConfigDict(extra="forbid"))
+class DataConfig:
+    db: str
+
+@dataclass(frozen=True, config=ConfigDict(extra="forbid"))
 class Config:
     threads: int
     task: str
     api: ApiConfig
     model: ModelConfig
     search: SearchConfig
+    data: DataConfig
 
 def parse_config() -> Config:
     config_file = os.getenv("CV_CONFIG_FILE") or ""

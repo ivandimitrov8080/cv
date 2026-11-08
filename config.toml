@@ -12,3 +12,6 @@ thinking = false
 backend = "duckduckgo"
 region = "en_uk"
 max_results = 10
+
+[data]
+db = "~/src/cv/test.sqlite"
