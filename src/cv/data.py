@@ -1,10 +1,13 @@
 from os.path import expanduser
+from cv.util import silentremove
 
-from peewee import CharField, Model, SqliteDatabase
+from peewee import CharField, DatabaseProxy, Model, SqliteDatabase
 
-from cv import cfg
+from cv.config import Config
 
-db = SqliteDatabase(expanduser(cfg.data.db))
+DEFAULT_DB = "~/.local/state/web.sqlite"
+
+db = DatabaseProxy()
 
 class BaseModel(Model):
     class Meta:
@@ -13,10 +16,16 @@ class BaseModel(Model):
 
 class SearchState(BaseModel):
     query = CharField(unique=True)
+    result = CharField()
 
 class FetchState(BaseModel):
     url = CharField(unique=True)
+    result = CharField()
 
-def init():
-    db.connect()
-    db.create_tables([SearchState, FetchState])
+def init_db(cfg: Config):
+    db_path = expanduser(cfg.data.db) or DEFAULT_DB
+    silentremove(db_path)
+    database = SqliteDatabase(db_path)
+    db.initialize(database)
+    database.connect()
+    database.create_tables([SearchState, FetchState])
