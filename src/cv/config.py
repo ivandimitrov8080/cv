@@ -6,15 +6,6 @@ from pydantic.dataclasses import dataclass
 
 
 @dataclass(frozen=True, config=ConfigDict(extra="forbid"))
-class ApiConfig:
-    key_cmd: str
-
-@dataclass(frozen=True, config=ConfigDict(extra="forbid"))
-class ModelConfig:
-    version: str
-    thinking: bool
-
-@dataclass(frozen=True, config=ConfigDict(extra="forbid"))
 class SearchConfig:
     backend: str
     region: str
@@ -25,13 +16,21 @@ class DataConfig:
     db: str
 
 @dataclass(frozen=True, config=ConfigDict(extra="forbid"))
-class Config:
-    threads: int
+class AgentConfig:
+    key_cmd: str
+    version: str
+    thinking: bool
+    system_prompt: str
+    instructions: str
     task: str
-    api: ApiConfig
-    model: ModelConfig
+    threads: int
+    tools: list[str]
+    
+@dataclass(frozen=True, config=ConfigDict(extra="forbid"))
+class Config:
     search: SearchConfig
     data: DataConfig
+    agents: list[AgentConfig]
 
 def parse_config() -> Config:
     config_file = os.getenv("CV_CONFIG_FILE") or ""

@@ -1,5 +1,6 @@
-from os import remove
 from errno import ENOENT
+from os import remove
+
 
 def silentremove(filename):
     try:

@@ -1,9 +1,9 @@
 from os.path import expanduser
-from cv.util import silentremove
 
 from peewee import CharField, DatabaseProxy, Model, SqliteDatabase
 
 from cv.config import Config
+from cv.util import silentremove
 
 DEFAULT_DB = "~/.local/state/web.sqlite"
 

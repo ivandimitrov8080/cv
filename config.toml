@@ -1,13 +1,3 @@
-threads = 10
-task = "Find remote software development jobs"
-
-[api]
-key_cmd = "pass dev/deepseek.com/key"
-
-[model]
-version = "deepseek-v4-flash"
-thinking = false
-
 [search]
 backend = "duckduckgo"
 region = "en_uk"
@@ -15,3 +5,13 @@ max_results = 10
 
 [data]
 db = "~/src/cv/data/web.sqlite"
+
+[[agents]]
+key_cmd = "pass dev/deepseek.com/key"
+version = "deepseek-v4-flash"
+thinking = false
+task = "Find remote software development jobs"
+system_prompt = ""
+instructions = ""
+threads = 10
+tools = ["search", "fetch"]
