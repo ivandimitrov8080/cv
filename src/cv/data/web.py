@@ -1,13 +1,13 @@
-from peewee import CharField
+from peewee import TextField
 
 from cv.data import BaseModel
 
 
 class SearchState(BaseModel):
-    query = CharField(unique=True)
-    result = CharField()
+    query = TextField(unique=True)
+    result = TextField()
 
 class FetchState(BaseModel):
-    url = CharField(unique=True)
-    result = CharField()
+    url = TextField(unique=True)
+    result = TextField()
 
