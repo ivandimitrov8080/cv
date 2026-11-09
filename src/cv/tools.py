@@ -4,7 +4,7 @@ from requests import get
 from toon import encode
 
 from cv.config import Config
-from cv.data import FetchState, SearchState
+from cv.data.web import FetchState, SearchState
 
 
 class Tools:
