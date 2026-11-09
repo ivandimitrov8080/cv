@@ -4,7 +4,7 @@ from requests import get
 from toon import encode
 
 from cv.config import Config
-from cv.data.lead import Lead, Comment
+from cv.data.lead import Comment, Lead
 from cv.data.web import FetchState, SearchState
 
 
@@ -45,8 +45,11 @@ class Tools:
                 page_timeout=60_000,
             )
             r = await self.crawler.arun(url, config=run)
-            FetchState.update(result=r.markdown).where(FetchState.url == url).execute()
-            return r.markdown
+            if r.markdown is not None:
+                FetchState.update(result=r.markdown).where(FetchState.url == url).execute()
+                return r.markdown
+            else:
+                return "Fetch returned no content."
         except IntegrityError as e:
             if "UNIQUE constraint failed" in str(e):
                 return "That url has already been scraped. Try another one."

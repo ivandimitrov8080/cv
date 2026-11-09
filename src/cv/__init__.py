@@ -1,4 +1,4 @@
-from asyncio import TaskGroup
+from asyncio import TaskGroup, run
 from types import MethodType
 
 from cv.agents import new_agent
@@ -30,4 +30,4 @@ async def go() -> None:
 
 def main() -> None:
     setup()
-    # asyncio.run(go())
+    run(go())

@@ -93,6 +93,7 @@
                     playwright
                     chromium-sandboxed
                     itempipe
+                    visidata
                   ];
                 }
               )

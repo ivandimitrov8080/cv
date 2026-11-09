@@ -1,6 +1,7 @@
 from datetime import datetime
 from enum import Enum
-from peewee import DateTimeField, ForeignKeyField, TextField, CharField
+
+from peewee import CharField, DateTimeField, ForeignKeyField, TextField
 
 from cv.data import BaseModel
 
