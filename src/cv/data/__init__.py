@@ -10,7 +10,6 @@ class BaseModel(Model):
     class Meta:
         database = db
 
-
 from cv.config import Config
 from cv.data.lead import Comment, Lead
 from cv.data.web import FetchState, SearchState

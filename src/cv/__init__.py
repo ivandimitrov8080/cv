@@ -30,6 +30,4 @@ async def go() -> None:
 
 def main() -> None:
     setup()
-    print(tools_list[0]("Search for something"))
-    print(tools_list[0]("Search for something"))
     # asyncio.run(go())
