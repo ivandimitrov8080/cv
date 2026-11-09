@@ -4,6 +4,7 @@ from requests import get
 from toon import encode
 
 from cv.config import Config
+from cv.data.lead import Lead, Comment
 from cv.data.web import FetchState, SearchState
 
 
@@ -49,5 +50,23 @@ class Tools:
         except IntegrityError as e:
             if "UNIQUE constraint failed" in str(e):
                 return "That url has already been scraped. Try another one."
+            else:
+                raise
+
+    async def save_lead(self, url: str, title: str, description: str, comments: list[str]):
+        """Persist a Lead to db for later processing.
+        Args:
+        url: The job board/site careers/contacts page for the Lead
+        title: The position name
+        description: A short summary of the company and the position
+        comments: Any additional comments to the lead in question
+        """
+        try:
+            lead = Lead.create(url=url, title=title, description=description)
+            for comment in comments:
+                Comment.create(lead=lead, text=comment)
+        except IntegrityError as e:
+            if "UNIQUE constraint failed" in str(e):
+                return "This Lead has already been saved. Try another one."
             else:
                 raise

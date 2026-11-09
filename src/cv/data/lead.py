@@ -9,7 +9,6 @@ class Lead(BaseModel):
     url = TextField(unique=True)
     title = TextField()
     description = TextField()
-    comments = TextField()
     created = DateTimeField(default=datetime.now)
 
 
