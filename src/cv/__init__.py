@@ -1,4 +1,4 @@
-import asyncio
+from asyncio import TaskGroup
 from types import MethodType
 
 from cv.agents import new_agent
@@ -12,21 +12,20 @@ tools_list: list[MethodType] = []
 async def agent_loop(cfg: AgentConfig):
     tools = list(filter(lambda x: x.__name__ in cfg.tools, tools_list))
     while True:
-        print((await new_agent(cfg, tools).run(cfg.task)).output)
+        await new_agent(cfg, tools).run(cfg.task)
 
 def setup():
     global tools_list, cfg
     cfg = parse_config()
     tools = Tools(cfg)
-    tools_list = [tools.search, tools.fetch]
+    tools_list = [tools.search, tools.fetch, tools.save_lead]
     init_db(cfg)
 
 async def go() -> None:
-    for agent in cfg.agents:
-        results = await asyncio.gather(*(agent_loop(agent) for _ in range(agent.threads)))
-        for i, out in enumerate(results, 1):
-            print(f"--- run {i} ---\n{out}")
-
+    async with TaskGroup() as tg:
+        for agent in cfg.agents:
+            for _ in range(agent.threads):
+                tg.create_task(agent_loop(agent))
     
 
 def main() -> None:

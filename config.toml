@@ -14,4 +14,4 @@ task = "Find remote software development jobs"
 system_prompt = ""
 instructions = ""
 threads = 10
-tools = ["search", "fetch"]
+tools = ["search", "fetch", "save_lead"]
