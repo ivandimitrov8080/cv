@@ -37,5 +37,4 @@ async def go() -> None:
 
 def main() -> None:
     setup()
-    print(tools_list[3]())
-    #run(go())
+    run(go())

@@ -87,9 +87,6 @@ class Tools:
         """Sets the lead state after attempting an application.
         Args:
         url: The Lead url.
-        new_state: The state to be updated as such:
-        applied = After successfuly applying to the lead.
-        blocked = When there were problems applying to the lead like there was no answer for a question.
-        cancelled = Cancelled if the lead does not meet apply criteria such as asking questions that the user does not wish to answer.
+        new_state: The state the lead is in after attempting an application.
         """
         Lead.update(state=LeadState(new_state)).where(Lead.url == url).execute()

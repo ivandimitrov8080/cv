@@ -6,22 +6,32 @@ max_results = 10
 [data]
 db = "~/src/cv/data/web.sqlite"
 
-[[agents]]
-key_cmd = "pass dev/deepseek.com/key"
-version = "deepseek-v4-flash"
-thinking = false
-task = "Find remote software development jobs and save them to db."
-system_prompt = ""
-instructions = ""
-threads = 10
-tools = ["search", "fetch", "save_lead"]
+#[[agents]]
+#key_cmd = "pass dev/deepseek.com/key"
+#version = "deepseek-v4-flash"
+#thinking = false
+#task = "Find remote software development jobs and save them to db."
+#system_prompt = ""
+#instructions = ""
+#threads = 10
+#tools = ["search", "fetch", "save_lead"]
 
 [[agents]]
 key_cmd = "pass dev/deepseek.com/key"
 version = "deepseek-v4-flash"
 thinking = true
 task = "Get a next_lead from the database and use a browser to apply to it."
-system_prompt = ""
+system_prompt = """The resume to attach is at /home/ivand/src/cv/result/Ivan_Dimitrov_Resume_IT_Consultant_ATS.pdf.
+  Take AT MOST ONE lead and conclude it before taking another. The workflow is like so:
+  1. Take the next lead's URL
+  2. Use a browser to apply
+  3. Go over the application form and fill in any REQUIRED information
+  4. Submit the form.
+  At the end of this process the lead must be updated usng update_lead with the appropriate status update.
+  applied = After successfuly applying to the lead.
+  blocked = When there were problems applying to the lead like there was no answer for a question.
+  cancelled = Cancelled if the lead does not meet apply criteria such as asking questions that the user does not wish to answer.
+"""
 instructions = ""
 capabilities = ["playwright"]
 threads = 3
