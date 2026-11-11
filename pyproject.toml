@@ -11,6 +11,7 @@ dependencies = [
     "crawl4ai>=0.9.5",
     "peewee>=4.5.3",
     "pydantic-ai>=2.66.0",
+    "pydantic-ai-harness[playwright]>=0.66.0",
     "python-toon>=0.2.0",
 ]
 
