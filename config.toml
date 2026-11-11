@@ -23,5 +23,6 @@ thinking = true
 task = "Get a next_lead from the database and use a browser to apply to it."
 system_prompt = ""
 instructions = ""
+capabilities = ["playwright"]
 threads = 3
 tools = ["next_lead", "update_lead"]
