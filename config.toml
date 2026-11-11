@@ -15,3 +15,13 @@ system_prompt = ""
 instructions = ""
 threads = 10
 tools = ["search", "fetch", "save_lead"]
+
+[[agents]]
+key_cmd = "pass dev/deepseek.com/key"
+version = "deepseek-v4-flash"
+thinking = true
+task = "Get a next_lead from the database and use a browser to apply to it."
+system_prompt = ""
+instructions = ""
+threads = 3
+tools = ["next_lead", "update_lead"]
