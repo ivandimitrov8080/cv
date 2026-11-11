@@ -4,7 +4,8 @@ from requests import get
 from toon import encode
 
 from cv.config import Config
-from cv.data.lead import Comment, Lead
+from cv.data import db
+from cv.data.lead import Comment, Lead, LeadState
 from cv.data.web import FetchState, SearchState
 
 
@@ -73,3 +74,22 @@ class Tools:
                 return "This Lead has already been saved. Try another one."
             else:
                 raise
+
+    def next_lead(self):
+        """Fetches the next NEW lead from the DB to be processed.
+        """
+        with db.atomic():
+            lead = Lead.get(Lead.state == LeadState.NEW)
+            Lead.update(state=LeadState.PROCESSING).where(Lead.url == lead.url).execute()
+        return lead.url
+
+    def update_lead(self, url: str, new_state: str):
+        """Sets the lead state after attempting an application.
+        Args:
+        url: The Lead url.
+        new_state: The state to be updated as such:
+        applied = After successfuly applying to the lead.
+        blocked = When there were problems applying to the lead like there was no answer for a question.
+        cancelled = Cancelled if the lead does not meet apply criteria such as asking questions that the user does not wish to answer.
+        """
+        Lead.update(state=LeadState(new_state)).where(Lead.url == url).execute()

@@ -18,7 +18,7 @@ def setup():
     global tools_list, cfg
     cfg = parse_config()
     tools = Tools(cfg)
-    tools_list = [tools.search, tools.fetch, tools.save_lead]
+    tools_list = [tools.search, tools.fetch, tools.save_lead, tools.next_lead]
     init_db(cfg)
 
 async def go() -> None:
@@ -30,4 +30,5 @@ async def go() -> None:
 
 def main() -> None:
     setup()
-    run(go())
+    print(tools_list[3]())
+    #run(go())

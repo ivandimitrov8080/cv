@@ -8,7 +8,9 @@ from cv.data import BaseModel
 
 class LeadState(str, Enum):
     NEW = "new"
+    PROCESSING = "processing"
     APPLIED = "applied"
+    BLOCKED = "blocked"
     CANCELLED = "cancelled"
 
 class Lead(BaseModel):

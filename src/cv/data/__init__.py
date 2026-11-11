@@ -2,7 +2,7 @@ from os.path import expanduser
 
 from peewee import DatabaseProxy, Model, SqliteDatabase
 
-DEFAULT_DB = "~/.local/state/web.sqlite"
+DEFAULT_DB = ":memory:"
 
 db = DatabaseProxy()
 
