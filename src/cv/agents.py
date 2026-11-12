@@ -1,6 +1,6 @@
 import subprocess
 from types import MethodType
-from typing import TypeVar
+from typing import TypeVar, get_origin
 
 from playhouse.pydantic_utils import to_pydantic
 from pydantic_ai import Agent
@@ -18,7 +18,7 @@ def new_agent[R](cfg: AgentConfig,
               instructions: list | None = None,
               system_prompt: str = "",
               output_type: type[R] = str
-              ) -> Agent[object, list[R]]:
+              ) -> Agent[object, R]:
     if capabilities is None:
         capabilities = []
     if tools is None:
@@ -32,5 +32,5 @@ def new_agent[R](cfg: AgentConfig,
                  model_settings=OpenAIChatModelSettings(thinking=cfg.thinking),
                  instructions=instructions,
                  system_prompt=system_prompt,
-                 output_type=list[to_pydantic(output_type)]
+                 output_type=to_pydantic(output_type)
                  )

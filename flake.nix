@@ -39,6 +39,7 @@
             nativeBuildInputs = with pkgs; [
               typst
               corefonts
+              pdfminer
             ];
             buildPhase = ''
               runHook preBuild
@@ -51,6 +52,8 @@
               mkdir -p $out
               cp cv.pdf $out/Ivan_Dimitrov_Resume_IT_Consultant.pdf
               cp cv-ats.pdf $out/Ivan_Dimitrov_Resume_IT_Consultant_ATS.pdf
+              pdf2txt cv.pdf > $out/Ivan_Dimitrov_Resume_IT_Consultant.txt
+              pdf2txt cv-ats.pdf > $out/Ivan_Dimitrov_Resume_IT_Consultant_ATS.txt
               runHook postBuild
             '';
           };
