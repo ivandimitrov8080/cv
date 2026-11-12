@@ -1,6 +1,5 @@
 import os
 import tomllib
-from typing import Optional
 
 from pydantic import ConfigDict, TypeAdapter
 from pydantic.dataclasses import dataclass
@@ -23,7 +22,7 @@ class AgentConfig:
     thinking: bool
     system_prompt: str
     instructions: str
-    capabilities: Optional[list[str]]
+    capabilities: list[str] | None
     task: str
     threads: int
     tools: list[str]

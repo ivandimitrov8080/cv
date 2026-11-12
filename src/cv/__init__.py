@@ -1,31 +1,33 @@
 from asyncio import TaskGroup, run
-from types import MethodType
 
-import playwright
+from pydantic_ai.capabilities import MCP
 from pydantic_ai_harness.playwright import PlaywrightBrowser
+
 from cv.agents import new_agent
 from cv.config import AgentConfig, Config, parse_config
 from cv.data import init_db
-from cv.tools import Tools
 
 cfg: Config
-tools_list: list[MethodType] = []
+
+def varName(p):
+    for k, v in globals().items():
+        if id(p) == id(v):
+            return k
+
+web4ai = MCP("http://localhost:8000/mcp")
 
 playwright = PlaywrightBrowser(cdp_url="http://localhost:9222")
 
+capabilities = [playwright, web4ai]
+
 async def agent_loop(cfg: AgentConfig):
-    tools = list(filter(lambda x: x.__name__ in cfg.tools, tools_list))
-    capabilities = []
-    if "playwright" in (cfg.capabilities or []):
-        capabilities = [playwright]
+    caps = list(filter(lambda x: varName(x), capabilities))
     while True:
-        await new_agent(cfg, tools, capabilities=capabilities).run(cfg.task)
+        await new_agent(cfg, capabilities=caps).run(cfg.task)
 
 def setup():
-    global tools_list, cfg
+    global cfg
     cfg = parse_config()
-    tools = Tools(cfg)
-    tools_list = [tools.search, tools.fetch, tools.save_lead, tools.next_lead]
     init_db(cfg)
 
 async def go() -> None:
