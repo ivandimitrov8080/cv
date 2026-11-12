@@ -1,16 +1,11 @@
 [data]
 db = "~/src/cv/data/web.sqlite"
 
-[[agents]]
+[agent]
 key_cmd = "pass dev/deepseek.com/key"
 version = "deepseek-v4-flash"
-thinking = false
-task = "search camel facts."
-system_prompt = ""
-instructions = ""
-threads = 10
-tools = []
-capabilities = ["web4ai"]
+thinking = true
+threads = 1
 
 #[[agents]]
 #key_cmd = "pass dev/deepseek.com/key"

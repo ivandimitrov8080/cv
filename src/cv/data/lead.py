@@ -1,13 +1,10 @@
 from datetime import datetime
 from enum import Enum
-from typing import TYPE_CHECKING
 
 from peewee import CharField, DateTimeField, ForeignKeyField, TextField
 
 from cv.data import BaseModel
 
-if TYPE_CHECKING:
-    from peewee import ModelSelect
 
 class LeadState(str, Enum):
     NEW = "new"
@@ -22,9 +19,6 @@ class Lead(BaseModel):
     description = TextField()
     state = CharField(default=LeadState.NEW, choices=[(c.value, c.name) for c in LeadState])
     created = DateTimeField(default=datetime.now)
-
-    if TYPE_CHECKING:
-        comments: ModelSelect[Comment]
 
 
 class Comment(BaseModel):
