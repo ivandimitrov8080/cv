@@ -29,7 +29,6 @@ class AgentConfig:
     
 @dataclass(frozen=True, config=ConfigDict(extra="forbid"))
 class Config:
-    search: SearchConfig
     data: DataConfig
     agents: list[AgentConfig]
 

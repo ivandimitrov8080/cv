@@ -5,12 +5,12 @@ db = "~/src/cv/data/web.sqlite"
 key_cmd = "pass dev/deepseek.com/key"
 version = "deepseek-v4-flash"
 thinking = false
-task = "Find remote software development jobs."
+task = "search camel facts."
 system_prompt = ""
 instructions = ""
 threads = 10
 tools = []
-capabilities = []
+capabilities = ["web4ai"]
 
 #[[agents]]
 #key_cmd = "pass dev/deepseek.com/key"

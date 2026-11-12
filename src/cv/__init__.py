@@ -14,7 +14,7 @@ def varName(p):
         if id(p) == id(v):
             return k
 
-web4ai = MCP("http://localhost:8000/mcp")
+web4ai = MCP("http://localhost:8000/mcp", tool_prefix=True, id="web")
 
 playwright = PlaywrightBrowser(cdp_url="http://localhost:9222")
 
@@ -22,8 +22,7 @@ capabilities = [playwright, web4ai]
 
 async def agent_loop(cfg: AgentConfig):
     caps = list(filter(lambda x: varName(x), capabilities))
-    while True:
-        await new_agent(cfg, capabilities=caps).run(cfg.task)
+    print((await new_agent(cfg, capabilities=caps).run(cfg.task)).output)
 
 def setup():
     global cfg
