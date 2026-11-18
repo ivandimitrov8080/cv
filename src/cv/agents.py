@@ -1,6 +1,6 @@
 import subprocess
 from types import MethodType
-from typing import TypeVar, get_origin
+from typing import TypeVar
 
 from playhouse.pydantic_utils import to_pydantic
 from pydantic_ai import Agent

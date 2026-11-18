@@ -11,7 +11,7 @@ class BaseModel(Model):
         database = db
 
 from cv.config import Config
-from cv.data.lead import Comment, Lead
+from cv.data.lead import Comment, Lead, Tag
 
 
 def init_db(cfg: Config):
@@ -19,4 +19,4 @@ def init_db(cfg: Config):
     database = SqliteDatabase(db_path)
     db.initialize(database)
     database.connect()
-    database.create_tables([Lead, Comment])
+    database.create_tables([Lead, Comment, Tag])

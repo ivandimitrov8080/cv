@@ -1,13 +1,12 @@
 from asyncio import TaskGroup, run
 
 from peewee import IntegrityError
-from playhouse.pydantic_utils import to_pydantic
 from pydantic_ai.capabilities import MCP
 from pydantic_ai_harness.playwright import PlaywrightBrowser
 
 from cv.agents import new_agent
 from cv.config import AgentConfig, Config, parse_config
-from cv.data import init_db, db
+from cv.data import db, init_db
 from cv.data.lead import Lead, LeadState
 
 cfg: Config
