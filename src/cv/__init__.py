@@ -1,8 +1,8 @@
 from asyncio import TaskGroup, run
+from sys import argv
 
 from peewee import IntegrityError
 from pydantic_ai.capabilities import MCP
-from pydantic_ai_harness.playwright import PlaywrightBrowser
 
 from cv.agents import new_agent
 from cv.config import AgentConfig, Config, parse_config
@@ -18,9 +18,7 @@ def varName(p):
 
 web4ai = MCP("http://localhost:8000/mcp", tool_prefix=True, id="web")
 
-playwright = PlaywrightBrowser(cdp_url="http://localhost:9222")
-
-capabilities = [playwright, web4ai]
+capabilities = [web4ai]
 
 def next_lead() -> Lead:
     with db.atomic():
@@ -39,7 +37,7 @@ def read_questions():
 async def apply_jobs(cfg: AgentConfig):
     lead_url = next_lead().url
     agent = new_agent(cfg,
-                      capabilities=[playwright],
+                      capabilities=[web4ai],
                       output_type=Lead,
                       system_prompt=f"The lead URL is {lead_url}. Apply only to one job post and return the status depending on the result. The CV to attach is at /home/ivand/src/cv/result/Ivan_Dimitrov_Resume_IT_Consultant_ATS.pdf. Fill out only required fields and ignore fields that are not required. Do not fabricate information. Here's the user profile: {read_profile()}. Here's the Q/A info: {read_questions()}")
     task = "Apply to jobs online."
@@ -69,12 +67,19 @@ def setup():
     cfg = parse_config()
     init_db(cfg)
 
-async def go() -> None:
+async def go_apply() -> None:
     async with TaskGroup() as tg:
         for _ in range(cfg.agent.threads):
             tg.create_task(apply_jobs(cfg.agent))
     
+async def go_search() -> None:
+    async with TaskGroup() as tg:
+        for _ in range(cfg.agent.threads):
+            tg.create_task(search_jobs(cfg.agent))
 
 def main() -> None:
     setup()
-    run(go())
+    if argv[1] == "apply":
+        run(go_apply())
+    else:
+        run(go_search())
