@@ -27,11 +27,11 @@ def next_lead() -> Lead:
     return lead
 
 def read_profile():
-    with open("../../cv.typ") as f:
+    with open("cv.typ") as f:
         return f.readline()
 
 def read_questions():
-    with open("../../data/application-questions.org") as f:
+    with open("data/application-questions.org") as f:
         return f.readline()
 
 async def apply_jobs(cfg: AgentConfig):
