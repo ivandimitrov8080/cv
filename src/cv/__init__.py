@@ -1,7 +1,7 @@
 import subprocess
 from asyncio import TaskGroup, run
 from sys import argv
-
+from playhouse.pydantic_utils import to_pydantic
 from peewee import IntegrityError
 from pydantic_ai import Agent, RunContext, ToolDefinition
 from pydantic_ai.capabilities import MCP, PrepareTools
@@ -55,7 +55,7 @@ async def apply_jobs():
     lead_url = next_lead().url
     agent = Agent(model, model_settings=model_settings,
                   capabilities=[web4ai, PrepareTools(browser_act)],
-                  output_type=Lead,
+                  output_type=to_pydantic(Lead),
                   system_prompt=f"The lead URL is {lead_url}. Apply only to one job post and return the status depending on the result. The CV to attach is at /home/ivand/src/cv/result/Ivan_Dimitrov_Resume_IT_Consultant_ATS.pdf. Fill out only required fields and ignore fields that are not required. Do not fabricate information. Here's the user profile: {read_profile()}. Here's the Q/A info: {read_questions()}")
     task = "Apply to jobs online."
     lead = (await agent.run(task)).output
@@ -65,7 +65,7 @@ async def search_jobs():
     existing_leads = [(l.url + ' ') for l in Lead.select(Lead.url)]
     agent = Agent(model, model_settings=model_settings,
                   capabilities=[web4ai, PrepareTools(browser_read)],
-                  output_type=list[Lead],
+                  output_type=list[to_pydantic(Lead)],
                   system_prompt=f"Avoid the existing lead urls: {existing_leads}. As soon as you find a few return. The point is to not search too much.")
     task = "Search for remote software development jobs online."
     leads = (await agent.run(task)).output
