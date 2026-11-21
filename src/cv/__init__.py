@@ -79,6 +79,14 @@ async def search_jobs():
             print(e)
 
 
+async def search():
+    while True:
+        await search_jobs()
+
+async def apply():
+    while True:
+        await apply_jobs()
+
 def setup():
     global cfg, api_key, model, model_settings
     cfg = parse_config()
@@ -92,12 +100,12 @@ def setup():
 async def go_apply() -> None:
     async with TaskGroup() as tg:
         for _ in range(cfg.agent.threads):
-            tg.create_task(apply_jobs())
+            tg.create_task(apply())
     
 async def go_search() -> None:
     async with TaskGroup() as tg:
         for _ in range(cfg.agent.threads):
-            tg.create_task(search_jobs())
+            tg.create_task(search())
 
 
 def main() -> None:

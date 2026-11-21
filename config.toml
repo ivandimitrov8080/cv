@@ -5,7 +5,7 @@ db = "~/src/cv/data/web.sqlite"
 key_cmd = "pass dev/deepseek.com/key"
 version = "deepseek-v4-flash"
 thinking = true
-threads = 1
+threads = 10
 
 #[[agents]]
 #key_cmd = "pass dev/deepseek.com/key"
