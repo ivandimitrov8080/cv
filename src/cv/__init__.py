@@ -1,10 +1,13 @@
 import subprocess
 from asyncio import TaskGroup, run
 from sys import argv
-from playhouse.pydantic_utils import to_pydantic
+from typing import Any
+
 from peewee import IntegrityError
+from playhouse.pydantic_utils import to_pydantic
 from pydantic_ai import Agent, RunContext, ToolDefinition
 from pydantic_ai.capabilities import MCP, PrepareTools
+from pydantic_ai.mcp import CallToolFunc, MCPToolset, ToolResult
 from pydantic_ai.models.openai import OpenAIChatModel, OpenAIChatModelSettings
 from pydantic_ai.providers.deepseek import DeepSeekProvider
 
@@ -23,7 +26,15 @@ def varName(p):
         if id(p) == id(v):
             return k
 
-web4ai = MCP("http://localhost:8000/mcp", tool_prefix=True, id="web")
+async def bridge_meta(
+    ctx: RunContext[Any],
+    call_tool: CallToolFunc,
+    name: str,
+    args: dict[str, Any],
+) -> ToolResult:
+    return await call_tool(name, args, metadata=dict(ctx.metadata or {}))
+
+web4ai = MCP(local=MCPToolset("http://localhost:5353/mcp", process_tool_call=bridge_meta, id="web"), tool_prefix=True, id="web")
 
 capabilities = [web4ai]
 
@@ -51,14 +62,14 @@ async def browser_act(_: RunContext, tool_defs: list[ToolDefinition]) -> list[To
 async def browser_read(_: RunContext, tool_defs: list[ToolDefinition]) -> list[ToolDefinition]:
     return [td for td in tool_defs if td.name in READ]
 
-async def apply_jobs():
+async def apply_jobs(id: int):
     lead_url = next_lead().url
     agent = Agent(model, model_settings=model_settings,
                   capabilities=[web4ai, PrepareTools(browser_act)],
                   output_type=to_pydantic(Lead),
-                  system_prompt=f"The lead URL is {lead_url}. Apply only to one job post and return the status depending on the result. The CV to attach is at /home/ivand/src/cv/result/Ivan_Dimitrov_Resume_IT_Consultant_ATS.pdf. Fill out only required fields and ignore fields that are not required. Do not fabricate information. Here's the user profile: {read_profile()}. Here's the Q/A info: {read_questions()}")
+                  system_prompt=f"You have access to a single browser page. Use it wisely. The lead URL is {lead_url}. Apply to that job post and return the status depending on the result. The CV to attach is at /home/ivand/src/cv/result/Ivan_Dimitrov_Resume_IT_Consultant_ATS.pdf. Fill out only required fields and ignore fields that are not required. Do not fabricate information. Here's the user profile: {read_profile()}. Here's the Q/A info: {read_questions()}")
     task = "Apply to jobs online."
-    lead = (await agent.run(task)).output
+    lead = (await agent.run(task, metadata={"page": id})).output
     Lead.update(state=lead.state).where(Lead.url == lead_url).execute()
 
 async def search_jobs():
@@ -83,9 +94,9 @@ async def search():
     while True:
         await search_jobs()
 
-async def apply():
+async def apply(id: int):
     while True:
-        await apply_jobs()
+        await apply_jobs(id)
 
 def setup():
     global cfg, api_key, model, model_settings
@@ -99,8 +110,8 @@ def setup():
 
 async def go_apply() -> None:
     async with TaskGroup() as tg:
-        for _ in range(cfg.agent.threads):
-            tg.create_task(apply())
+        for i in range(cfg.agent.threads):
+            tg.create_task(apply(i))
     
 async def go_search() -> None:
     async with TaskGroup() as tg:
