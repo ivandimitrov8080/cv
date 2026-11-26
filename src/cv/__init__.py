@@ -1,10 +1,10 @@
+
 import subprocess
 from asyncio import TaskGroup, run
 from sys import argv
 from typing import Any
 
 from peewee import IntegrityError
-from playhouse.pydantic_utils import to_pydantic
 from pydantic_ai import Agent, RunContext, ToolDefinition
 from pydantic_ai.capabilities import MCP, PrepareTools
 from pydantic_ai.mcp import CallToolFunc, MCPToolset, ToolResult
@@ -13,7 +13,7 @@ from pydantic_ai.providers.deepseek import DeepSeekProvider
 
 from cv.config import Config, parse_config
 from cv.data import db, init_db
-from cv.data.lead import Lead, LeadState
+from cv.data.lead import Lead, LeadSchema, LeadState, save_leads, update_lead
 
 cfg: Config
 
@@ -66,29 +66,25 @@ async def apply_jobs(id: int):
     lead_url = next_lead().url
     agent = Agent(model, model_settings=model_settings,
                   capabilities=[web4ai, PrepareTools(browser_act)],
-                  output_type=to_pydantic(Lead),
+                  output_type=LeadSchema,
                   system_prompt=f"You have access to a single browser page. Use it wisely. The lead URL is {lead_url}. Apply to that job post and return the status depending on the result. The CV to attach is at /home/ivand/src/cv/result/Ivan_Dimitrov_Resume_IT_Consultant_ATS.pdf. Fill out only required fields and ignore fields that are not required. Do not fabricate information. Here's the user profile: {read_profile()}. Here's the Q/A info: {read_questions()}")
     task = "Apply to jobs online."
-    lead = (await agent.run(task, metadata={"page": id})).output
-    Lead.update(state=lead.state).where(Lead.url == lead_url).execute()
+    lead: LeadSchema = (await agent.run(task, metadata={"page": id})).output
+    lead.url = lead_url
+    update_lead(lead)
 
 async def search_jobs():
     existing_leads = [(l.url + ' ') for l in Lead.select(Lead.url)]
     agent = Agent(model, model_settings=model_settings,
                   capabilities=[web4ai, PrepareTools(browser_read)],
-                  output_type=list[to_pydantic(Lead)],
+                  output_type=list[LeadSchema],
                   system_prompt=f"Avoid the existing lead urls: {existing_leads}. As soon as you find a few return. The point is to not search too much.")
     task = "Search for remote software development jobs online."
-    leads = (await agent.run(task)).output
-    for lead in leads:
-        try:
-            Lead.create(
-                url=lead.url,
-                title=lead.title,
-                description=lead.description)
-        except IntegrityError as e:
-            print(e)
-
+    leads: list[LeadSchema] = (await agent.run(task)).output
+    try:
+        save_leads(leads)
+    except IntegrityError as e:
+        print(e)
 
 async def search():
     while True:
