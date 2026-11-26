@@ -38,7 +38,7 @@ web4ai = MCP(local=MCPToolset("http://localhost:5353/mcp", process_tool_call=bri
 
 capabilities = [web4ai]
 
-def next_lead() -> Lead:
+def next_lead() -> Lead | None:
     with db.atomic():
         lead = Lead.get(Lead.state == LeadState.NEW)
         Lead.update(state=LeadState.PROCESSING).where(Lead.url == lead.url).execute()
@@ -63,14 +63,16 @@ async def browser_read(_: RunContext, tool_defs: list[ToolDefinition]) -> list[T
     return [td for td in tool_defs if td.name in READ]
 
 async def apply_jobs(id: int):
-    lead_url = next_lead().url
+    l = next_lead()
+    if not l:
+        return
     agent = Agent(model, model_settings=model_settings,
                   capabilities=[web4ai, PrepareTools(browser_act)],
                   output_type=LeadSchema,
-                  system_prompt=f"You have access to a single browser page. Use it wisely. The lead URL is {lead_url}. Apply to that job post and return the status depending on the result. The CV to attach is at /home/ivand/src/cv/result/Ivan_Dimitrov_Resume_IT_Consultant_ATS.pdf. Fill out only required fields and ignore fields that are not required. Do not fabricate information. Here's the user profile: {read_profile()}. Here's the Q/A info: {read_questions()}")
+                  system_prompt=f"You have access to a single browser page. Use it wisely. The lead URL is {l.url}. Apply to that job post and return the status depending on the result. The CV to attach is at /home/ivand/src/cv/result/Ivan_Dimitrov_Resume_IT_Consultant_ATS.pdf. Fill out only required fields and ignore fields that are not required. Do not fabricate information. Here's the user profile: {read_profile()}. Here's the Q/A info: {read_questions()}")
     task = "Apply to jobs online."
     lead: LeadSchema = (await agent.run(task, metadata={"page": id})).output
-    lead.url = lead_url
+    lead.url = l.url
     update_lead(lead)
 
 async def search_jobs():
