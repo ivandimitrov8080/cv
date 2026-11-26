@@ -40,12 +40,12 @@ class Lead(BaseModel):
 
 class Comment(BaseModel):
     lead = ForeignKeyField(Lead, backref="comments", on_delete="CASCADE")
-    text = TextField()
+    value = TextField()
     created = DateTimeField(default=datetime.now)
 
 class Tag(BaseModel):
     lead = ForeignKeyField(Lead, backref="tags", on_delete="CASCADE")
-    tag = CharField(choices=[(c.value, c.name) for c in LeadTag])
+    value = CharField(choices=[(c.value, c.name) for c in LeadTag])
     created = DateTimeField(default=datetime.now)
 
 class LeadSchema(pydantic.BaseModel):
@@ -94,15 +94,16 @@ def save_leads(leads: list[LeadSchema]) -> list[Lead]:
 
 def update_lead(lead: LeadSchema):
     with db.atomic():
-        row = Lead.update(
-            url=lead.url,
+        Lead.update(
             title=lead.title,
             description=lead.description,
             state=LeadState(lead.state),
-        )
+        ).where(Lead.url == lead.url).execute()
+        Tag.delete().where(Tag.lead == lead.url).execute()
+        Comment.delete().where(Comment.lead == lead.url).execute()
         for t in lead.tags:
-            Tag.create(lead=row, tag=LeadTag(t).value)
+            Tag.create(lead=lead.url, value=LeadTag(t).value)
         for c in lead.comments:
-            Comment.create(lead=row, text=c)
-        return row
+            Comment.create(lead=lead.url, value=c)
+        return Lead.get(Lead.url == lead.url)
 
