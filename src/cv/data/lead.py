@@ -81,11 +81,11 @@ def save_leads(leads: list[LeadSchema]) -> list[Lead]:
     with db.atomic():
         Lead.bulk_create(rows, batch_size=100)
         Tag.bulk_create(
-            [Tag(lead=r.url, tag=LeadTag(t).value) for r, s in zip(rows, fresh) for t in s.tags],
+            [Tag(lead=r.url, value=LeadTag(t).value) for r, s in zip(rows, fresh) for t in s.tags],
             batch_size=100,
         ) if any(s.tags for s in fresh) else None
         Comment.bulk_create(
-            [Comment(lead=r.url, text=c) for r, s in zip(rows, fresh) for c in s.comments],
+            [Comment(lead=r.url, value=c) for r, s in zip(rows, fresh) for c in s.comments],
             batch_size=100,
         ) if any(s.comments for s in fresh) else None
 
