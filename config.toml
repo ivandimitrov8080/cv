@@ -1,5 +1,5 @@
 [data]
-db = "~/src/cv/data/web.sqlite"
+db = "~/src/cv/data/leads.db"
 
 [agent]
 key_cmd = "pass dev/deepseek.com/key"

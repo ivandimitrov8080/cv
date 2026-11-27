@@ -69,7 +69,7 @@ async def apply_jobs(id: int):
     agent = Agent(model, model_settings=model_settings,
                   capabilities=[web4ai, PrepareTools(browser_act)],
                   output_type=LeadSchema,
-                  system_prompt=f"You have access to a single browser page. Use it wisely. The lead URL is {l.url}. Apply to that job post and return the status depending on the result. The CV to attach is at /home/ivand/src/cv/result/Ivan_Dimitrov_Resume_IT_Consultant_ATS.pdf. Fill out only required fields and ignore fields that are not required. Do not fabricate information. Here's the user profile: {read_profile()}. Here's the Q/A info: {read_questions()}")
+                  system_prompt=f"You have access to a single browser page. Use it wisely. Never log in. Apply anonymously if possible if not stop application. Never sign up. Never click on links that open another tab, instead navigate to the href with the go tool. The lead URL is {l.url}. Apply to that job post and return the status depending on the result. The CV to attach is at /home/ivand/src/cv/result/Ivan_Dimitrov_Resume_IT_Consultant_ATS.pdf. Fill out only required fields and ignore fields that are not required. Do not fabricate information. Here's the user profile: {read_profile()}. Here's the Q/A info: {read_questions()}")
     task = "Apply to jobs online."
     lead: LeadSchema = (await agent.run(task, metadata={"page": id})).output
     lead.url = l.url
@@ -80,7 +80,7 @@ async def search_jobs():
     agent = Agent(model, model_settings=model_settings,
                   capabilities=[web4ai, PrepareTools(browser_read)],
                   output_type=list[LeadSchema],
-                  system_prompt=f"Avoid the existing lead urls: {existing_leads}. As soon as you find a few return. The point is to not search too much.")
+                  system_prompt=f"Avoid the existing lead urls: {existing_leads}. As soon as you find a few return. The point is to not search too much. Avoid job boards and focus on small private companies preferably without an HR department. This might require smart searching not directly findable by querying for jobs. Maybe query for small companies instead and scrape their website to find potential openings.")
     task = "Search for remote software development jobs online."
     leads: list[LeadSchema] = (await agent.run(task)).output
     try:
